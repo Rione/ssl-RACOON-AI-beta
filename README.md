@@ -65,6 +65,12 @@ $ poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
 
 # Install deps
 $ poetry install
+
+# Activate virtual environment
+$ poetry shell
+
+# Setup pre-commit hook
+$ pre-commit install
 ```
 
 ### 実行
@@ -74,3 +80,12 @@ RACOON-AIを実行するには、以下のコマンドを実行してくださ�
 ```bash
 ./run.sh
 ```
+
+## 使用フック
+- check-yaml (YAML の構文チェック)
+- end-of-file-fixer (ファイルの最後に改行が一行になるように修正)
+- mixed-line-ending (改行コードを LF に統一)
+- no-commit-to-branch (master/main に commit するのを抑止)
+- black (Python のコードを整形)
+
+(参照: [Supported hooks - pre-commit](https://pre-commit.com/hooks.html))
