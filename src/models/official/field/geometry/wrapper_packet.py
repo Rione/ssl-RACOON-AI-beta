@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,7 +10,7 @@ class WrapperPacket(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, detection, geometry):
 
         self.__detection = None
 

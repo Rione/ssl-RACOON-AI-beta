@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 from models.official.field.pose_3_d import Pose3D
@@ -9,7 +9,7 @@ from models.official.field.pose_3_d import Pose3D
 
 class DetectionBall(Pose3D):
     # ˅
-    
+
     # ˄
 
     def __init__(self, confidence, area, pixel_x, pixel_y, x, y, z):
@@ -23,7 +23,7 @@ class DetectionBall(Pose3D):
         self.__pixel_y = pixel_y
 
         # ˅
-        pass
+        Pose3D.__init__(self, x, y, 0, z)
         # ˄
 
     def __str__(self):
@@ -56,7 +56,7 @@ class DetectionBall(Pose3D):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

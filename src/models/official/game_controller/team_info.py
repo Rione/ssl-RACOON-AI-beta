@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,35 +10,35 @@ class TeamInfo(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, name, score, red_cards, yellow_card_times, yellow_cards, timeouts, timeout_time, goalkeeper, foul_counter, ball_placement_failures, can_place_ball, max_allowed_bots, bot_substitution_intent, ball_placement_failures_reached):
 
-        self.__name = None
+        self.__name = name
 
-        self.__score = 0
+        self.__score = score
 
-        self.__red_cards = 0
+        self.__red_cards = red_cards
 
-        self.__yellow_card_times = 0
+        self.__yellow_card_times = yellow_card_times
 
-        self.__yellow_cards = 0
+        self.__yellow_cards = yellow_cards
 
-        self.__timeouts = 0
+        self.__timeouts = timeouts
 
-        self.__timeout_time = 0
+        self.__timeout_time = timeout_time
 
-        self.__goalkeeper = 0
+        self.__goalkeeper = goalkeeper
 
-        self.__foul_counter = 0
+        self.__foul_counter = foul_counter
 
-        self.__ball_placement_failures = 0
+        self.__ball_placement_failures = ball_placement_failures
 
-        self.__can_place_ball = 0
+        self.__can_place_ball = can_place_ball
 
-        self.__max_allowed_bots = 0
+        self.__max_allowed_bots = max_allowed_bots
 
-        self.__bot_substitution_intent = 0
+        self.__bot_substitution_intent = bot_substitution_intent
 
-        self.__ball_placement_failures_reached = 0
+        self.__ball_placement_failures_reached = ball_placement_failures_reached
 
         # ˅
         pass

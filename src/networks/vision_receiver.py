@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 import socket
@@ -28,6 +28,8 @@ class VisionReceiver(object):
 
         self.__frames = []
 
+        self.__geometries = None
+
         self.__blue_robots = []
 
         self.__yellow_robots = []
@@ -53,6 +55,11 @@ class VisionReceiver(object):
     def append_frame(self, frame):
         # ˅
         self.__frames.append(frame)
+        # ˄
+
+    def append_geometry(self, geometry):
+        # ˅
+        pass
         # ˄
 
     def receive(self):
@@ -87,6 +94,11 @@ class VisionReceiver(object):
         frame = DetectionFrame(frame_number, t_sent, t_capture, camera_id, balls, robots_yellow,
                                robots_blue)
         return frame
+        # ˄
+
+    def get_geometry(self):
+        # ˅
+        pass
         # ˄
 
     def get_balls(self):
