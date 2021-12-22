@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,28 +10,28 @@ class FieldCircularArc(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, name, center, radius, a1, a2, thickness, type):
 
         # Name of this field marking.
-        self.__name = None
+        self.__name = name
 
         # Center point of the circular arc.
-        self.__center = Vector2f(0,0)
+        self.__center = center
 
         # Radius of the arc.
-        self.__radius = 0
+        self.__radius = radius
 
         # Start angle in counter-clockwise order.
-        self.__a1 = 0
+        self.__a1 = a1
 
         # End angle in counter-clockwise order.
-        self.__a2 = 0
+        self.__a2 = a2
 
         # Thickness of the arc.
-        self.__thickness = 0
+        self.__thickness = thickness
 
         # The type of this shape
-        self.__type = 0
+        self.__type = type
 
         # ˅
         pass

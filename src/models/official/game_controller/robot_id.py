@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,11 +10,11 @@ class RobotId(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, id, team):
 
-        self.__id = 0
+        self.__id = id
 
-        self.__team = 0
+        self.__team = team
 
         # ˅
         pass
