@@ -36,7 +36,36 @@ cd ~/ws
 git clone git@github.com:Rione-SSL/RACOON-AI
 ```
 
-SSHキーなどの設定は、Rione-SSLのNotionを確認してください。
+SSHキーなどの設定は、Rione-SSLのNotionを確認してください。  
+
+### 環境構築
+
+Pythonのバージョンは3.10です。
+
+既に別のPythonを使用している場合は、[pyenv](https://github.com/pyenv/pyenv)などを使用して別途インストールしてください。  
+
+なお、Windows では公式の Py ランチャーが使用できます。
+二つ目以降のPythonをインストールする際に項目を選択し、同時にインストールしてください。  
+
+依存関係管理とパッケージングには、[poetry](https://python-poetry.org)を使用します。(下記は ubuntu 環境でのコマンド例です)  
+
+```sh
+# Install poetry
+$ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+
+# Follow the description, add installed package to your PATH
+$ export $PATH="$PATH:<PATH_TO_POETRY_BIN>"
+
+# Check if poetry is installed
+$ poetry --version
+> Poetry version 1.1.12
+
+# Enable tab completion (optional)
+$ poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
+
+# Install deps
+$ poetry install
+```
 
 ### 実行
 
@@ -45,5 +74,3 @@ RACOON-AIを実行するには、以下のコマンドを実行してくださ�
 ```bash
 ./run.sh
 ```
-
-
