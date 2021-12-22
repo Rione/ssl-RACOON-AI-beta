@@ -7,7 +7,7 @@
 
 class ResponceReceiver(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -24,7 +24,7 @@ class ResponceReceiver(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

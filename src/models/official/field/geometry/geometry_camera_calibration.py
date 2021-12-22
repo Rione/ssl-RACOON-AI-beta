@@ -7,10 +7,24 @@
 
 class GeometryCameraCalibration(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, camera_id, focal_length, principal_point_x, principal_point_y, distortion, q0, q1, q2, q3, tx, ty, tz):
+    def __init__(
+        self,
+        camera_id,
+        focal_length,
+        principal_point_x,
+        principal_point_y,
+        distortion,
+        q0,
+        q1,
+        q2,
+        q3,
+        tx,
+        ty,
+        tz,
+    ):
 
         self.__camera_id = camera_id
 
@@ -118,7 +132,7 @@ class GeometryCameraCalibration(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

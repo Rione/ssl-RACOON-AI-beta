@@ -7,10 +7,21 @@
 
 class GeometryFieldSize(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, field_length, field_width, goal_width, goal_depth, boundary_width, field_lines, field_arcs, penalty_area_depth, penalty_area_width):
+    def __init__(
+        self,
+        field_length,
+        field_width,
+        goal_width,
+        goal_depth,
+        boundary_width,
+        field_lines,
+        field_arcs,
+        penalty_area_depth,
+        penalty_area_width,
+    ):
 
         self.__field_length = field_length
 
@@ -94,7 +105,7 @@ class GeometryFieldSize(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

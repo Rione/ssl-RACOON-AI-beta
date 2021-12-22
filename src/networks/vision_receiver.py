@@ -36,18 +36,21 @@ class VisionReceiver(object):
 
         self.__port = 10020
 
-        self.__local_address = '0.0.0.0'
+        self.__local_address = "0.0.0.0"
 
-        self.__multicast_group = '224.5.23.2'
+        self.__multicast_group = "224.5.23.2"
 
         # ˅
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.__sock.setsockopt(socket.IPPROTO_IP,
-                               socket.IP_ADD_MEMBERSHIP,
-                               socket.inet_aton(self.__multicast_group) + socket.inet_aton(self.__local_address))
-        self.__sock.bind(('', self.__port))
+        self.__sock.setsockopt(
+            socket.IPPROTO_IP,
+            socket.IP_ADD_MEMBERSHIP,
+            socket.inet_aton(self.__multicast_group)
+            + socket.inet_aton(self.__local_address),
+        )
+        self.__sock.bind(("", self.__port))
 
         self.receive()
         # ˄
@@ -91,8 +94,15 @@ class VisionReceiver(object):
         robots_yellow = self.__data.detection.robots_yellow
         robots_blue = self.__data.detection.robots_blue
 
-        frame = DetectionFrame(frame_number, t_sent, t_capture, camera_id, balls, robots_yellow,
-                               robots_blue)
+        frame = DetectionFrame(
+            frame_number,
+            t_sent,
+            t_capture,
+            camera_id,
+            balls,
+            robots_yellow,
+            robots_blue,
+        )
         return frame
         # ˄
 
@@ -114,7 +124,9 @@ class VisionReceiver(object):
                 y = ball.y
                 z = ball.z
 
-                detection_ball = DetectionBall(confidence, area, pixel_x, pixel_y, x, y, z)
+                detection_ball = DetectionBall(
+                    confidence, area, pixel_x, pixel_y, x, y, z
+                )
                 balls.append(detection_ball)
 
         return balls
@@ -154,7 +166,9 @@ class VisionReceiver(object):
                 pixel_x = robot_b.pixel_x
                 pixel_y = robot_b.pixel_y
                 height = robot_b.height
-                detection_robot = DetectionRobot(confidence, robot_id, x, y, theta, pixel_x, pixel_y, height)
+                detection_robot = DetectionRobot(
+                    confidence, robot_id, x, y, theta, pixel_x, pixel_y, height
+                )
 
                 if robot_id not in seen_id_blue:
                     seen_id_blue.append(robot_b.robot_id)
@@ -169,7 +183,9 @@ class VisionReceiver(object):
                 pixel_x = robot_y.pixel_x
                 pixel_y = robot_y.pixel_y
                 height = robot_y.height
-                detection_robot = DetectionRobot(confidence, robot_id, x, y, theta, pixel_x, pixel_y, height)
+                detection_robot = DetectionRobot(
+                    confidence, robot_id, x, y, theta, pixel_x, pixel_y, height
+                )
 
                 if robot_id not in seen_id_yellow:
                     seen_id_yellow.append(robot_y.robot_id)

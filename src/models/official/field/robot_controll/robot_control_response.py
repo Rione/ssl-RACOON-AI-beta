@@ -7,7 +7,7 @@
 
 class RobotControlResponse(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, feedback):
@@ -30,7 +30,7 @@ class RobotControlResponse(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

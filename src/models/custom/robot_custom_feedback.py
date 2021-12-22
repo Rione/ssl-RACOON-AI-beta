@@ -7,7 +7,7 @@
 
 class RobotCustomFeedback(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, battery_vol, boosted_vol, encoder_vals):
@@ -46,7 +46,7 @@ class RobotCustomFeedback(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

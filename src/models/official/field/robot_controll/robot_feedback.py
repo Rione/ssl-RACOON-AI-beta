@@ -7,7 +7,7 @@
 
 class RobotFeedback(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, id, dribbler_ball_contact, custom):
@@ -46,7 +46,7 @@ class RobotFeedback(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

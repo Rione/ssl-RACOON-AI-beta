@@ -7,10 +7,24 @@
 
 class RobotCommand(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, id, kickspeedx, kickspeedz, veltangent, velnormal, velangular, spinner, wheelsspeed, wheel1, wheel2, wheel3, wheel4):
+    def __init__(
+        self,
+        id,
+        kickspeedx,
+        kickspeedz,
+        veltangent,
+        velnormal,
+        velangular,
+        spinner,
+        wheelsspeed,
+        wheel1,
+        wheel2,
+        wheel3,
+        wheel4,
+    ):
 
         self.__id = id
 
@@ -190,7 +204,7 @@ class RobotCommand(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

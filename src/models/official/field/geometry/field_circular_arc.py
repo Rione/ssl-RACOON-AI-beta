@@ -7,7 +7,7 @@
 
 class FieldCircularArc(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, name, center, radius, a1, a2, thickness, type):
@@ -85,7 +85,7 @@ class FieldCircularArc(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

@@ -7,7 +7,7 @@
 
 class GeometryModels(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -21,7 +21,7 @@ class GeometryModels(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

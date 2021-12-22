@@ -7,7 +7,7 @@
 
 class WrapperPacket(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, detection, geometry):
@@ -26,7 +26,7 @@ class WrapperPacket(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

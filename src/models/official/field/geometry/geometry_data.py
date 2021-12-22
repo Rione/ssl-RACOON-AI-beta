@@ -7,7 +7,7 @@
 
 class GeometryData(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, field, calib, models):
@@ -46,7 +46,7 @@ class GeometryData(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

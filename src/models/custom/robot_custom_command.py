@@ -7,7 +7,7 @@
 
 class RobotCustomCommand(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, is_emergency_pressed):
@@ -24,7 +24,7 @@ class RobotCustomCommand(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

@@ -7,7 +7,7 @@
 
 class FieldLineSegment(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -15,10 +15,10 @@ class FieldLineSegment(object):
         self.__name = None
 
         # Start point of the line segment.
-        self.__p1 = Vector2f(0,0)
+        self.__p1 = Vector2f(0, 0)
 
         # End point of the line segment.
-        self.__p2 = Vector2f(0,0)
+        self.__p2 = Vector2f(0, 0)
 
         # Thickness of the line segment.
         self.__thickness = 0
@@ -79,7 +79,7 @@ class FieldLineSegment(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

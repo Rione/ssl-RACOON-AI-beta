@@ -7,7 +7,7 @@
 
 class SimCommand(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -59,7 +59,7 @@ class SimCommand(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

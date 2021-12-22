@@ -7,10 +7,26 @@
 
 class TeamInfo(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, name, score, red_cards, yellow_card_times, yellow_cards, timeouts, timeout_time, goalkeeper, foul_counter, ball_placement_failures, can_place_ball, max_allowed_bots, bot_substitution_intent, ball_placement_failures_reached):
+    def __init__(
+        self,
+        name,
+        score,
+        red_cards,
+        yellow_card_times,
+        yellow_cards,
+        timeouts,
+        timeout_time,
+        goalkeeper,
+        foul_counter,
+        ball_placement_failures,
+        can_place_ball,
+        max_allowed_bots,
+        bot_substitution_intent,
+        ball_placement_failures_reached,
+    ):
 
         self.__name = name
 
@@ -50,7 +66,7 @@ class TeamInfo(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

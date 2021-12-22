@@ -7,7 +7,7 @@
 
 class Vector2f(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, x, y):
@@ -45,7 +45,7 @@ class Vector2f(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

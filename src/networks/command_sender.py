@@ -7,7 +7,7 @@
 
 class CommandSender(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -19,7 +19,7 @@ class CommandSender(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

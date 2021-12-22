@@ -10,7 +10,7 @@ from models.official.field.robot_controll.robot_feedback import RobotFeedback
 
 class DetectionRobot(RobotFeedback, Pose2D):
     # ˅
-    
+
     # ˄
 
     def __init__(self, confidence, robot_id, x, y, theta, pixel_x, pixel_y, height):
@@ -65,7 +65,7 @@ class DetectionRobot(RobotFeedback, Pose2D):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 
