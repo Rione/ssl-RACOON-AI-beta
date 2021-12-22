@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,13 +10,13 @@ class RobotCustomFeedback(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, battery_vol, boosted_vol, encoder_vals):
 
-        self.__battery_vol = 0
+        self.__battery_vol = battery_vol
 
-        self.__boosted_vol = 0
+        self.__boosted_vol = boosted_vol
 
-        self.__encoder_vals = 0
+        self.__encoder_vals = encoder_vals
 
         # ˅
         pass

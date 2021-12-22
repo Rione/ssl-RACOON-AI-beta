@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -18,6 +18,30 @@ class Vector2f(object):
 
         # ˅
         pass
+        # ˄
+
+    @property
+    def x(self):
+        # ˅
+        return self.__x
+        # ˄
+
+    @x.setter
+    def x(self, value):
+        # ˅
+        self.__x = value
+        # ˄
+
+    @property
+    def y(self):
+        # ˅
+        return self.__y
+        # ˄
+
+    @y.setter
+    def y(self, value):
+        # ˅
+        self.__y = value
         # ˄
 
     # ˅

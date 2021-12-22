@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -10,25 +10,25 @@ class GeometryFieldSize(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, field_length, field_width, goal_width, goal_depth, boundary_width, field_lines, field_arcs, penalty_area_depth, penalty_area_width):
 
-        self.__field_length = 0
+        self.__field_length = field_length
 
-        self.__field_width = 0
+        self.__field_width = field_width
 
-        self.__goal_width = 0
+        self.__goal_width = goal_width
 
-        self.__goal_depth = 0
+        self.__goal_depth = goal_depth
 
-        self.__boundary_width = 0
+        self.__boundary_width = boundary_width
 
-        self.__field_lines = None
+        self.__field_lines = field_lines
 
-        self.__field_arcs = None
+        self.__field_arcs = field_arcs
 
-        self.__penalty_area_depth = 0
+        self.__penalty_area_depth = penalty_area_depth
 
-        self.__penalty_area_width = 0
+        self.__penalty_area_width = penalty_area_width
 
         # ˅
         pass
