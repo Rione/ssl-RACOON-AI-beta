@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -12,11 +12,11 @@ class GeometryData(object):
 
     def __init__(self, field, calib, models):
 
-        self.__field = None
+        self.__field = field
 
-        self.__calib = None
+        self.__calib = calib
 
-        self.__models = None
+        self.__models = models
 
         # ˅
         pass
@@ -24,7 +24,7 @@ class GeometryData(object):
 
     def __str__(self):
         # ˅
-        pass
+        return "<GeometryData>"
         # ˄
 
     @property

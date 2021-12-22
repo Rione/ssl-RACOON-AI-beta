@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -47,7 +47,7 @@ class GeometryFieldSize(object):
 
     def __str__(self):
         # ˅
-        pass
+        return "<GeometryFieldSize>"
         # ˄
 
     @property

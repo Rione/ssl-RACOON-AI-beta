@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
 import socket
@@ -9,6 +9,11 @@ import proto_py.messages_robocup_ssl_wrapper_pb2
 from models.official.field.detection.detection_ball import DetectionBall
 from models.official.field.detection.detection_frame import DetectionFrame
 from models.official.field.detection.detection_robot import DetectionRobot
+from models.official.field.geometry.geometry_data import GeometryData
+from models.official.field.geometry.geometry_field_size import GeometryFieldSize
+from models.official.field.geometry.geometry_camera_calibration import (
+    GeometryCameraCalibration,
+)
 
 # ˄
 
@@ -18,7 +23,9 @@ class VisionReceiver(object):
 
     # ˄
 
-    def __init__(self):
+    def __init__(self, invert=False):
+
+        self.__inverted = invert
 
         self.__num_of_cameras = 4
 
@@ -28,7 +35,7 @@ class VisionReceiver(object):
 
         self.__frames = []
 
-        self.__geometries = None
+        self.__geometries = []
 
         self.__blue_robots = []
 
@@ -52,7 +59,10 @@ class VisionReceiver(object):
         )
         self.__sock.bind(("", self.__port))
 
-        self.receive()
+        # コンストラクタでは、Visionを全カメラから受け取るまで待機
+        while len(self.__geometries) <= (self.__num_of_cameras - 1):
+            self.receive()
+
         # ˄
 
     def append_frame(self, frame):
@@ -62,11 +72,14 @@ class VisionReceiver(object):
 
     def append_geometry(self, geometry):
         # ˅
-        pass
+        self.__geometries.append(geometry)
         # ˄
 
     def receive(self):
         # ˅
+        # フレームの初期化
+        # TODO: geometriesは初期化するか？正直最初だけ受け取れば、参照のみで新規に受け取る必要はないかも
+        self.__frames = []
         # ロボット状態の初期化
         self.__yellow_robots = []
         self.__blue_robots = []
@@ -78,8 +91,17 @@ class VisionReceiver(object):
             self.__packet, recv = self.__sock.recvfrom(buffer_size)
             self.__data = proto_py.messages_robocup_ssl_wrapper_pb2.SSL_WrapperPacket()
             self.__data.ParseFromString(self.__packet)
-            frame = self.get_frame()
-            self.append_frame(frame)
+
+            # detectionのフレームを取り出す部分
+            if self.__data.HasField("detection"):
+                frame = self.get_frame()
+                self.append_frame(frame)
+
+            # geometryをデータを取り出す部分
+            if self.__data.HasField("geometry"):
+                geometry = self.get_geometry()
+                self.append_geometry(geometry)
+
             cam_counter = cam_counter + 1
 
         # ˄
@@ -108,7 +130,10 @@ class VisionReceiver(object):
 
     def get_geometry(self):
         # ˅
-        pass
+        field = self.__data.geometry.field
+        calib = self.__data.geometry.calib
+        geometry = GeometryData(field, calib, 0)
+        return geometry
         # ˄
 
     def get_balls(self):
@@ -194,6 +219,37 @@ class VisionReceiver(object):
         # ロボットを整列(0-10まで)させる
         self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
         self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
+        # ˄
+
+    def get_fieldsize(self):
+        # ˅
+        field_length = self.__geometries[0].field.field_length
+        field_width = self.__geometries[0].field.field_width
+        goal_width = self.__geometries[0].field.goal_width
+        goal_depth = self.__geometries[0].field.goal_depth
+        boundary_width = self.__geometries[0].field.boundary_width
+        field_lines = self.__geometries[0].field.field_lines
+        field_arcs = self.__geometries[0].field.field_arcs
+
+        # grSimからは出力されなかった(AttributeError).
+        # penalty_area_depth = self.__geometries[0].field.penalty_area_depth
+        # penalty_area_width = self.__geometries[0].field.penalty_area_width
+        penalty_area_depth = 0
+        penalty_area_width = 0
+
+        fieldsize = GeometryFieldSize(
+            field_length,
+            field_width,
+            goal_width,
+            goal_depth,
+            boundary_width,
+            field_lines,
+            field_arcs,
+            penalty_area_depth,
+            penalty_area_width,
+        )
+
+        return fieldsize
         # ˄
 
     # ˅
