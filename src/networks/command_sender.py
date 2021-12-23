@@ -29,6 +29,8 @@ class CommandSender(object):
 
         # ˅
         self.__local_address = "0.0.0.0"
+
+        # 送信ソケット作成
         self.__sock = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP
         )
@@ -43,10 +45,14 @@ class CommandSender(object):
 
     def send(self):
         # ˅
+        # タイムスタンプ等、grSimCommandsに必要な要素を用意
         timestamp = time.time()
         isteamyellow = self.__is_yellow
 
         send_data = grSim_Commands()
+
+        # set_robotcommandされた分だけループさせる
+        # TODO: 複数同じロボットがappendされてたらどうする？
         for robot_command in self.__data:
             send_data_one = grSim_Robot_Command()
             send_data_one.id = robot_command.id
@@ -65,9 +71,9 @@ class CommandSender(object):
 
         send_packet = grSim_Packet()
         send_packet.commands.CopyFrom(send_data)
-        print(send_packet)
         send_packet = send_packet.SerializeToString()
 
+        # 送信する
         self.__sock.sendto(send_packet, (self.__multicast_group, self.__port))
 
         # ˄
@@ -84,6 +90,7 @@ class CommandSender(object):
         wheelsspeed,
     ):
         # ˅
+        # RobotCommandインスタンスを作成
         robot_command = RobotCommand(
             id,
             kickspeedx,
@@ -99,6 +106,7 @@ class CommandSender(object):
             0,
         )
 
+        # self.__dataに追加していく
         self.__data.append(robot_command)
         # ˄
 
