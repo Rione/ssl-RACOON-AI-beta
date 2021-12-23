@@ -7,10 +7,19 @@
 
 class DetectionFrame(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, frame_number, t_capture, t_sent, camera_id, balls, robots_yellow, robots_blue):
+    def __init__(
+        self,
+        frame_number,
+        t_capture,
+        t_sent,
+        camera_id,
+        balls,
+        robots_yellow,
+        robots_blue,
+    ):
 
         self.__frame_number = frame_number
 
@@ -33,7 +42,15 @@ class DetectionFrame(object):
     def __str__(self):
         # ˅
         # TODO: balls, robots_yellow, robots_blue
-        return "DetectionFrame(%d, %.2f, %.2f, %d, %s, %s, %s)" % (self.__frame_number, self.__t_capture, self.__t_sent, self.__camera_id, "Undefined", "Undefined", "Undefined")
+        return "DetectionFrame(%d, %.2f, %.2f, %d, %s, %s, %s)" % (
+            self.__frame_number,
+            self.__t_capture,
+            self.__t_sent,
+            self.__camera_id,
+            "Undefined",
+            "Undefined",
+            "Undefined",
+        )
         # ˄
 
     @property
@@ -79,7 +96,7 @@ class DetectionFrame(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

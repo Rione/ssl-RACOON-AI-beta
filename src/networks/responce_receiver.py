@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 # ˅
 
@@ -7,7 +7,7 @@
 
 class ResponceReceiver(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self):
@@ -24,7 +24,7 @@ class ResponceReceiver(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

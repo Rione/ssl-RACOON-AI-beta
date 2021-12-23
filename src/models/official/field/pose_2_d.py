@@ -9,7 +9,7 @@ from models.official.field.geometry.vector_2_f import Vector2f
 
 class Pose2D(Vector2f):
     # ˅
-    
+
     # ˄
 
     def __init__(self, x, y, theta=0):
@@ -39,7 +39,7 @@ class Pose2D(Vector2f):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

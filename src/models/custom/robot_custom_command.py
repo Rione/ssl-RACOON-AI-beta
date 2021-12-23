@@ -7,12 +7,12 @@
 
 class RobotCustomCommand(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self):
+    def __init__(self, is_emergency_pressed):
 
-        self.__is_emergency_pressed = False
+        self.__is_emergency_pressed = is_emergency_pressed
 
         # ˅
         pass
@@ -24,7 +24,7 @@ class RobotCustomCommand(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

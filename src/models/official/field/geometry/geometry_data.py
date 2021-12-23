@@ -7,16 +7,16 @@
 
 class GeometryData(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self):
+    def __init__(self, field, calib, models):
 
-        self.__field = None
+        self.__field = field
 
-        self.__calib = None
+        self.__calib = calib
 
-        self.__models = None
+        self.__models = models
 
         # ˅
         pass
@@ -24,11 +24,29 @@ class GeometryData(object):
 
     def __str__(self):
         # ˅
-        pass
+        return "<GeometryData>"
+        # ˄
+
+    @property
+    def calib(self):
+        # ˅
+        return self.__calib
+        # ˄
+
+    @property
+    def field(self):
+        # ˅
+        return self.__field
+        # ˄
+
+    @property
+    def models(self):
+        # ˅
+        return self.__models
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

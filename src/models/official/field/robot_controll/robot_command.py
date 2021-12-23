@@ -7,34 +7,48 @@
 
 class RobotCommand(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self, id, kickspeedx):
+    def __init__(
+        self,
+        id,
+        kickspeedx,
+        kickspeedz,
+        veltangent,
+        velnormal,
+        velangular,
+        spinner,
+        wheelsspeed,
+        wheel1,
+        wheel2,
+        wheel3,
+        wheel4,
+    ):
 
         self.__id = id
 
         self.__kickspeedx = kickspeedx
 
-        self.__kickspeedz = 0
+        self.__kickspeedz = kickspeedz
 
-        self.__veltangent = 0
+        self.__veltangent = veltangent
 
-        self.__velnormal = 0
+        self.__velnormal = velnormal
 
-        self.__velangular = 0
+        self.__velangular = velangular
 
-        self.__spinner = False
+        self.__spinner = spinner
 
-        self.__wheelsspeed = False
+        self.__wheelsspeed = wheelsspeed
 
-        self.__wheel1 = 0
+        self.__wheel1 = wheel1
 
-        self.__wheel2 = 0
+        self.__wheel2 = wheel2
 
-        self.__wheel3 = 0
+        self.__wheel3 = wheel3
 
-        self.__wheel4 = 0
+        self.__wheel4 = wheel4
 
         # ˅
         pass
@@ -190,7 +204,7 @@ class RobotCommand(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

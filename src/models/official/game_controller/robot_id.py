@@ -7,14 +7,14 @@
 
 class RobotId(object):
     # ˅
-    
+
     # ˄
 
-    def __init__(self):
+    def __init__(self, id, team):
 
-        self.__id = 0
+        self.__id = id
 
-        self.__team = 0
+        self.__team = team
 
         # ˅
         pass
@@ -26,7 +26,7 @@ class RobotId(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 
