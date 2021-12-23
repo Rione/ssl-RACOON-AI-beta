@@ -12,8 +12,22 @@ class RefReceiver(object):
 
     def __init__(self):
 
-        self.__port = None
+        self.__port = port
 
+        self.__multicast_group = multicast_group
+
+        self.__data = data
+
+        # ˅
+        pass
+        # ˄
+
+    def receive(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_refcommand(self):
         # ˅
         pass
         # ˄

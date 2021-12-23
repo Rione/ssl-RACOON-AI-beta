@@ -8,9 +8,8 @@ from sys import path
 
 path.append(str(Path.joinpath(Path(__file__).parent.parent, "src")))
 
-from networks.vision_receiver import VisionReceiver
+import comms.communicate
 
 if __name__ == "__main__":
-    # 色チェンジならinvertをTrueに
-    test = VisionReceiver(invert=False)
-    print(test.get_fieldsize())
+    # comms/communicate内を実行
+    comms.communicate.do_communicate()
