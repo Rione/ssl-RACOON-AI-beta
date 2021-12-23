@@ -78,36 +78,10 @@ class CommandSender(object):
 
         # ˄
 
-    def set_robotcommand(
-        self,
-        id,
-        kickspeedx,
-        kickspeedz,
-        veltangent,
-        velnormal,
-        velangular,
-        spinner,
-        wheelsspeed,
-    ):
+    def set_robotcommand(self, robotcommand):
         # ˅
-        # RobotCommandインスタンスを作成
-        robot_command = RobotCommand(
-            id,
-            kickspeedx,
-            kickspeedz,
-            veltangent,
-            velnormal,
-            velangular,
-            spinner,
-            wheelsspeed,
-            0,
-            0,
-            0,
-            0,
-        )
-
         # self.__dataに追加していく
-        self.__data.append(robot_command)
+        self.__data.append(robotcommand)
         # ˄
 
     # ˅
