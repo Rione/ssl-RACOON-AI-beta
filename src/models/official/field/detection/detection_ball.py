@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
 from models.official.field.pose_3_d import Pose3D
