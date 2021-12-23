@@ -6,10 +6,10 @@ Ri-one SSL Accurate Operation AI
 
 ### ランタイム要件
 
-RACOON-AIはWindowsで動作すると思われますが、grSim等のインストール難易度が高いため、非推奨です。
+RACOON-AIはWindowsでも動作しますが、grSim等のインストール難易度が高いため、非推奨です。
 
 * 64bit Ubuntu 21.04, macOS (M1でも動作)
-* Latest Python 3
+* Python 3.10 or later
 * [SSL-Vision](https://github.com/RoboCup-SSL/ssl-vision)（実機環境）
 * [grSim](https://github.com/RoboCup-SSL/grSim)（シミュレーション環境）
 
@@ -20,11 +20,11 @@ RACOON-AIはWindowsで動作すると思われますが、grSim等のインス�
 * [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller)
 * [TIGERs-Autoref](https://github.com/TIGERs-Mannheim/AutoReferee)
 
-|   OS/Platform    |     SSL-Vision     |       grSim        | ssl-game-controller |   TIGERs-Autoref   |
-| :--------------: | :----------------: | :----------------: | :-----------------: | :----------------: |
-|     Windows      |        :x:         |     :question:     | :white_check_mark:  | :white_check_mark: |
-|   Ubuntu/Linux   | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
-| macOS(M1, Intel) |        :x:         | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+|   OS/Platform    |     SSL-Vision     |               grSim               | ssl-game-controller |   TIGERs-Autoref   |
+| :--------------: | :----------------: |:---------------------------------:| :-----------------: | :----------------: |
+|     Windows      |        :x:         | :white_check_mark: Runs on Docker | :white_check_mark:  | :white_check_mark: |
+|   Ubuntu/Linux   | :white_check_mark: |        :white_check_mark:         | :white_check_mark:  | :white_check_mark: |
+| macOS(M1, Intel) |        :x:         |        :white_check_mark:         | :white_check_mark:  | :white_check_mark: |
 
 ### 自分の環境にデプロイ
 
@@ -78,7 +78,7 @@ $ pre-commit install
 RACOON-AIを実行するには、以下のコマンドを実行してください。
 
 ```bash
-./run.sh
+./cmd/run.py
 ```
 
 ## 使用フック
