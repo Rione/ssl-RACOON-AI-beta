@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class WrapperPacket(object):
+class WrapperPacket:
     def __init__(self, detection, geometry):
 
         self.__detection = None

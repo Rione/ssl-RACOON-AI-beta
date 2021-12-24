@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class RobotCustomFeedback(object):
+class RobotCustomFeedback:
     def __init__(self, battery_vol, boosted_vol, encoder_vals):
 
         self.__battery_vol = battery_vol

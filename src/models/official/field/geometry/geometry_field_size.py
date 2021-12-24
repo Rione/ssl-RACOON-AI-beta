@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class GeometryFieldSize(object):
+class GeometryFieldSize:
     def __init__(
         self,
         field_length,

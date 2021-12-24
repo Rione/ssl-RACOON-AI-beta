@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class GeometryModels(object):
+class GeometryModels:
     def __init__(self):
         pass
 

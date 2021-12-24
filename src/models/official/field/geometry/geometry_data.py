@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class GeometryData(object):
+class GeometryData:
     def __init__(self, field, calib, models):
 
         self.__field = field

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 from models.official.field.pose_2_d import Pose2D
 from models.official.field.robot_controll.robot_feedback import RobotFeedback

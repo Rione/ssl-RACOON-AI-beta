@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class TeamInfo(object):
+class TeamInfo:
     def __init__(
         self,
         name,

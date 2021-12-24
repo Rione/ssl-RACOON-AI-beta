@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class FieldCircularArc(object):
+class FieldCircularArc:
     def __init__(self, name, center, radius, a1, a2, thickness, type):
 
         # Name of this field marking.

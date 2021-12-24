@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class RobotId(object):
+class RobotId:
     def __init__(self, id, team):
 
         self.__id = id

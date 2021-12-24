@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class DetectionFrame(object):
+class DetectionFrame:
     def __init__(
         self,
         frame_number,

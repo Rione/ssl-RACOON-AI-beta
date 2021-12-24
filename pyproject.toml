@@ -6,7 +6,7 @@ authors = ["Ri-one-SSL <rionesslq@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10.0"
+python = "3.10.*"
 protobuf = "^3.19.1"
 
 [tool.poetry.dev-dependencies]

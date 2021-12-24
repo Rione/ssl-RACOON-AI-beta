@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class SimCommand(object):
+class SimCommand:
     def __init__(self):
 
         self.__timestamp = 0

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class RobotControlResponse(object):
+class RobotControlResponse:
     def __init__(self, feedback):
 
         self.feedback = feedback

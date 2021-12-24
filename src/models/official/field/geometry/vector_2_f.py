@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class Vector2f(object):
+class Vector2f:
     def __init__(self, x, y):
 
         self.__x = x

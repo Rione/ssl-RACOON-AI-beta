@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 from models.official.field.geometry.vector_2_f import Vector2f
 

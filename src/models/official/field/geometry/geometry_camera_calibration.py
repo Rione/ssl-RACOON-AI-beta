@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class GeometryCameraCalibration(object):
+class GeometryCameraCalibration:
     def __init__(
         self,
         camera_id,

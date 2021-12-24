@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class RobotFeedback(object):
+class RobotFeedback:
     def __init__(self, id, dribbler_ball_contact, custom):
 
         self.id = id

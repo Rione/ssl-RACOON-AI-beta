@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class RobotCustomCommand(object):
-    def __init__(self, is_emergency_pressed):
+class RobotCustomCommand:
+    def __init__(self):
 
-        self.__is_emergency_pressed = is_emergency_pressed
+        self.__is_emergency_pressed: bool = False
 
-    def __str__(self):
-        pass
+    def __str__(self) -> str:
+        return f"EmergencyPressed: {self.__is_emergency_pressed}"

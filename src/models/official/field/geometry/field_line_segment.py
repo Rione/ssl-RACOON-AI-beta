@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 
-class FieldLineSegment(object):
+class FieldLineSegment:
     def __init__(self):
 
         self.__name = None
