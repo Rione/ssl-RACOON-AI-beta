@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
 
 
 class FieldCircularArc(object):
-    # ˅
-
-    # ˄
-
     def __init__(self, name, center, radius, a1, a2, thickness, type):
 
         # Name of this field marking.
@@ -33,62 +25,33 @@ class FieldCircularArc(object):
         # The type of this shape
         self.__type = type
 
-        # ˅
-        pass
-        # ˄
-
     def __str__(self):
-        # ˅
         pass
-        # ˄
 
     @property
     def name(self):
-        # ˅
         return self.__name
-        # ˄
 
     @property
     def center(self):
-        # ˅
         return self.__center
-        # ˄
 
     @property
     def radius(self):
-        # ˅
         return self.__radius
-        # ˄
 
     @property
     def a1(self):
-        # ˅
         return self.__a1
-        # ˄
 
     @property
     def a2(self):
-        # ˅
         return self.__a2
-        # ˄
 
     @property
     def thickness(self):
-        # ˅
         return self.__thickness
-        # ˄
 
     @property
     def type(self):
-        # ˅
         return self.__type
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄

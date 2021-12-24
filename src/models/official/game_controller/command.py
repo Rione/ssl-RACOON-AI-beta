@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
+
 from enum import Enum
-
-
-# ˄
 
 
 class Command(Enum):
@@ -46,8 +42,3 @@ class Command(Enum):
     BALL_PLACEMENT_YELLOW = 16
 
     BALL_PLACEMENT_BLUE = 17
-
-
-# ˅
-
-# ˄

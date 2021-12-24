@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
+
 from enum import Enum
-
-
-# ˄
 
 
 class Stage(Enum):
@@ -36,8 +32,3 @@ class Stage(Enum):
     PENALTY_SHOOTOUT = 12
 
     POST_GAME = 13
-
-
-# ˅
-
-# ˄

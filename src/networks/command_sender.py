@@ -1,6 +1,4 @@
 #!/usr/bin/env python3.10
-# -*- coding: utf-8 -*-
-# ˅
 from models.official.field.robot_controll.robot_command import RobotCommand
 from proto_py.grSim_Commands_pb2 import grSim_Robot_Command
 from proto_py.grSim_Commands_pb2 import grSim_Commands
@@ -9,14 +7,8 @@ from proto_py.grSim_Packet_pb2 import grSim_Packet
 import time
 import socket
 
-# ˄
-
 
 class CommandSender(object):
-    # ˅
-
-    # ˄
-
     def __init__(self, is_yellow=False):
 
         self.__port = 20011
@@ -40,11 +32,7 @@ class CommandSender(object):
             socket.inet_aton(self.__local_address),
         )
 
-        pass
-        # ˄
-
     def send(self):
-        # ˅
         # タイムスタンプ等、grSimCommandsに必要な要素を用意
         timestamp = time.time()
         isteamyellow = self.__is_yellow
@@ -76,19 +64,6 @@ class CommandSender(object):
         # 送信する
         self.__sock.sendto(send_packet, (self.__multicast_group, self.__port))
 
-        # ˄
-
     def set_robotcommand(self, robotcommand):
-        # ˅
         # self.__dataに追加していく
         self.__data.append(robotcommand)
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄

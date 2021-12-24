@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
 
 
 class FieldLineSegment(object):
-    # ˅
-
-    # ˄
-
     def __init__(self):
 
         self.__name = None
@@ -39,50 +31,25 @@ class FieldLineSegment(object):
         # RightFieldRightPenaltyStretch = 13;
         self.__type = 0
 
-        # ˅
-        pass
-        # ˄
-
     def __str__(self):
-        # ˅
         pass
-        # ˄
 
     @property
     def name(self):
-        # ˅
         return self.__name
-        # ˄
 
     @property
     def p1(self):
-        # ˅
         return self.__p1
-        # ˄
 
     @property
     def p2(self):
-        # ˅
         return self.__p2
-        # ˄
 
     @property
     def thickness(self):
-        # ˅
         return self.__thickness
-        # ˄
 
     @property
     def type(self):
-        # ˅
         return self.__type
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄

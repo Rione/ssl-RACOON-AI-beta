@@ -1,6 +1,4 @@
 #!/usr/bin/env python3.10
-# -*- coding: utf-8 -*-
-# ˅
 import socket
 import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
@@ -15,14 +13,8 @@ from models.official.field.geometry.geometry_camera_calibration import (
     GeometryCameraCalibration,
 )
 
-# ˄
-
 
 class VisionReceiver(object):
-    # ˅
-
-    # ˄
-
     def __init__(self, invert=False):
 
         self.__inverted = invert
@@ -47,7 +39,6 @@ class VisionReceiver(object):
 
         self.__multicast_group = "224.5.23.2"
 
-        # ˅
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -63,20 +54,13 @@ class VisionReceiver(object):
         while len(self.__geometries) <= (self.__num_of_cameras - 1):
             self.receive()
 
-        # ˄
-
     def append_frame(self, frame):
-        # ˅
         self.__frames.append(frame)
-        # ˄
 
     def append_geometry(self, geometry):
-        # ˅
         self.__geometries.append(geometry)
-        # ˄
 
     def receive(self):
-        # ˅
         # フレームの初期化
         # TODO: geometriesは初期化するか？正直最初だけ受け取れば、参照のみで新規に受け取る必要はないかも
         self.__frames = []
@@ -104,10 +88,7 @@ class VisionReceiver(object):
 
             cam_counter = cam_counter + 1
 
-        # ˄
-
     def get_frame(self):
-        # ˅
         frame_number = self.__data.detection.frame_number
         t_sent = self.__data.detection.t_sent
         t_capture = self.__data.detection.t_capture
@@ -126,18 +107,14 @@ class VisionReceiver(object):
             robots_blue,
         )
         return frame
-        # ˄
 
     def get_geometry(self):
-        # ˅
         field = self.__data.geometry.field
         calib = self.__data.geometry.calib
         geometry = GeometryData(field, calib, 0)
         return geometry
-        # ˄
 
     def get_balls(self):
-        # ˅
         balls = []
         for frame in self.__frames:
             for ball in frame.balls:
@@ -155,28 +132,22 @@ class VisionReceiver(object):
                 balls.append(detection_ball)
 
         return balls
-        # ˄
 
     def get_blue_robots(self):
-        # ˅
         # 2回目以降の参照は、前の値をそのまま出力
         if len(self.__blue_robots) == 0:
             self.get_robots()
 
         return self.__blue_robots
-        # ˄
 
     def get_yellow_robots(self):
-        # ˅
         # 2回目以降の参照は、前の値をそのまま出力
         if len(self.__yellow_robots) == 0:
             self.get_robots()
 
         return self.__yellow_robots
-        # ˄
 
     def get_robots(self):
-        # ˅
         blue_robots = []
         seen_id_blue = []
         yellow_robots = []
@@ -219,10 +190,8 @@ class VisionReceiver(object):
         # ロボットを整列(0-10まで)させる
         self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
         self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
-        # ˄
 
     def get_fieldsize(self):
-        # ˅
         field_length = self.__geometries[0].field.field_length
         field_width = self.__geometries[0].field.field_width
         goal_width = self.__geometries[0].field.goal_width
@@ -250,18 +219,11 @@ class VisionReceiver(object):
         )
 
         return fieldsize
-        # ˄
-
-    # ˅
-
-    # ˄
 
 
-# ˅
 # 以下、テストコード。コメントアウトして実行すると
 # 青チームロボットのロボットIDがそれぞれ出力される。
 # test = VisionReceiver()
 # blue = test.get_blue_robots()
 # for robot in blue:
 #     print(robot.robot_id)
-# ˄

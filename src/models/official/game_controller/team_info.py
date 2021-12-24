@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
 
 
 class TeamInfo(object):
-    # ˅
-
-    # ˄
-
     def __init__(
         self,
         name,
@@ -56,20 +48,5 @@ class TeamInfo(object):
 
         self.__ball_placement_failures_reached = ball_placement_failures_reached
 
-        # ˅
-        pass
-        # ˄
-
     def __str__(self):
-        # ˅
         pass
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄

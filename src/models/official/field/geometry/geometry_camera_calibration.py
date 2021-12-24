@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
 
 
 class GeometryCameraCalibration(object):
-    # ˅
-
-    # ˄
-
     def __init__(
         self,
         camera_id,
@@ -55,87 +47,52 @@ class GeometryCameraCalibration(object):
         # ˄
 
     def __str__(self):
-        # ˅
         pass
-        # ˄
 
     @property
     def principal_point_x(self):
-        # ˅
         return self.__principal_point_x
-        # ˄
 
     @property
     def principal_point_y(self):
-        # ˅
         return self.__principal_point_y
-        # ˄
 
     @property
     def distortion(self):
-        # ˅
         return self.__distortion
-        # ˄
 
     @property
     def q0(self):
-        # ˅
         return self.__q0
-        # ˄
 
     @property
     def camera_id(self):
-        # ˅
         return self.__camera_id
-        # ˄
 
     @property
     def tz(self):
-        # ˅
         return self.__tz
-        # ˄
 
     @property
     def q2(self):
-        # ˅
         return self.__q2
-        # ˄
 
     @property
     def focal_length(self):
-        # ˅
         return self.__focal_length
-        # ˄
 
     @property
     def q3(self):
-        # ˅
         return self.__q3
-        # ˄
 
     @property
     def ty(self):
-        # ˅
         return self.__ty
-        # ˄
 
     @property
     def tx(self):
-        # ˅
         return self.__tx
-        # ˄
 
     @property
     def q1(self):
-        # ˅
         return self.__q1
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄
