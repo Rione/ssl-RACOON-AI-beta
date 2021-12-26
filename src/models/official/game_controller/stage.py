@@ -1,9 +1,18 @@
 #!/usr/bin/env python3.10
 
+"""stage.py
+
+    This module contains the Stage enum.
+"""
+
 from enum import Enum
 
 
 class Stage(Enum):
+    """Stage
+
+    This enum contains the different stages of the game.
+    """
 
     NORMAL_FIRST_HALF_PRE = 0
 

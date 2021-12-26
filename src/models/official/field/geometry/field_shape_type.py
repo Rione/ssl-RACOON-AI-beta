@@ -1,34 +1,43 @@
 #!/usr/bin/env python3.10
 
+"""field_shape_type.py
+
+    This module contains the FieldShapeType enum.
+"""
+
 from enum import Enum
 
 
 class FieldShapeType(Enum):
+    """FieldShapeType
 
-    Undefined = 0
+    This enum represents the type of a field shape.
+    """
 
-    CenterCircle = 1
+    UNDEFINED = 0
 
-    TopTouchLine = 2
+    CENENTER_CIRCLE = 1
 
-    BottomTouchLine = 3
+    TOP_TOUCHLINE = 2
 
-    LeftGoalLine = 4
+    BOTTOM_TOUCHLINE = 3
 
-    RightGoalLine = 5
+    LEFT_GOALLINE = 4
 
-    HalfwayLine = 6
+    RIGHT_GOALLINE = 5
 
-    CenterLine = 7
+    HALFWAY_LINE = 6
 
-    LeftPenaltyStretch = 8
+    CENTER_LINE = 7
 
-    RightPenaltyStretch = 9
+    LEFT_PENALTY_STRETCH = 8
 
-    LeftFieldLeftPenaltyStretch = 10
+    RIGHT_PENALTY_STRETCH = 9
 
-    LeftFieldRightPenaltyStretch = 11
+    LEFT_FIELD_LEFT_PENALTY_STRETCH = 10
 
-    RightFieldLeftPenaltyStretch = 12
+    LEFT_FIELD_RIGHT_PENALTY_STRETCH = 11
 
-    RightFieldRightPenaltyStretch = 13
+    RIGHT_FIELD_LEFT_PENALTY_STRETCH = 12
+
+    RIGHT_FIELD_RIGHT_PENALTY_STRETCH = 13

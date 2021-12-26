@@ -1,3 +1,10 @@
+#!/usr/bin/env python3.10
+
+"""attacker.py
+
+    This module is for the Attacker class.
+"""
+
 from models.official.field.robot_controll.robot_command import RobotCommand
 
 

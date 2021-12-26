@@ -1,7 +1,19 @@
 #!/usr/bin/env python3.10
 
+"""field_line_segment.py
+
+    This module contains the FieldLineSegment class.
+"""
+
+from models.official.field.geometry.vector_2_f import Vector2f
+
 
 class FieldLineSegment:
+    """FieldLineSegment
+
+    A line segment on the field.
+    """
+
     def __init__(self):
 
         self.__name = None

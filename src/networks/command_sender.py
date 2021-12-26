@@ -1,15 +1,27 @@
 #!/usr/bin/env python3.10
+
+"""command_sender.py
+
+    This module is for the CommandSender class.
+"""
+
+import time
+import socket
+
 from models.official.field.robot_controll.robot_command import RobotCommand
 from proto_py.grSim_Commands_pb2 import grSim_Robot_Command
 from proto_py.grSim_Commands_pb2 import grSim_Commands
 from proto_py.grSim_Packet_pb2 import grSim_Packet
 
-import time
-import socket
-
 
 class CommandSender(object):
-    def __init__(self, is_yellow=False):
+    """CommandSender
+
+    Args:
+        is_yellow (bool): True if the robot is yellow.
+    """
+
+    def __init__(self, is_yellow: bool = False):
 
         self.__port = 20011
 

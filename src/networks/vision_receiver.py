@@ -1,4 +1,10 @@
 #!/usr/bin/env python3.10
+
+"""vision_receiver.py
+
+    This module is for the VisionReceiver class.
+"""
+
 import socket
 import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
@@ -14,10 +20,16 @@ from models.official.field.geometry.geometry_camera_calibration import (
 )
 
 
-class VisionReceiver(object):
-    def __init__(self, invert=False):
+class VisionReceiver:
+    """VisionReceiver
 
-        self.__inverted = invert
+    Args:
+        invert (bool): データを反転させるかどうか (default: False)
+    """
+
+    def __init__(self, invert: bool = False):
+
+        self.__inverted: bool = invert
 
         self.__num_of_cameras = 4
 

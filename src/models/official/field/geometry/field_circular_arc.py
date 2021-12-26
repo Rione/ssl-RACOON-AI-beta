@@ -1,57 +1,114 @@
 #!/usr/bin/env python3.10
 
+"""field_circular_arc.py
+
+    This module contains the FieldCircularArc class.
+"""
+
+from models.official.field.geometry.field_shape_type import FieldShapeType
+from models.official.field.geometry.vector_2_f import Vector2f
+
 
 class FieldCircularArc:
-    def __init__(self, name, center, radius, a1, a2, thickness, type):
+    """FieldCircularArc
 
-        # Name of this field marking.
-        self.__name = name
+    Args:
+        name (str): Name of this field marking.
+        center (Vector2f): Center point of the circular arc.
+        radius (float): Radius of the arc.
+        a1 (float): Start angle in counter-clockwise order.
+        a2 (float): End angle in counter-clockwise order.
+        thickness (float): Thickness of the arc.
+        type (FieldShapeType, optional): The type of this shape
+    """
 
-        # Center point of the circular arc.
-        self.__center = center
+    def __init__(
+        self,
+        name: str,
+        center: Vector2f,
+        radius: float,
+        a1: float,
+        a2: float,
+        thickness: float,
+        type: FieldShapeType = FieldShapeType.UNDEFINED,
+    ):
 
-        # Radius of the arc.
-        self.__radius = radius
+        self.__name: str = name
 
-        # Start angle in counter-clockwise order.
-        self.__a1 = a1
+        self.__center: Vector2f = center
 
-        # End angle in counter-clockwise order.
-        self.__a2 = a2
+        self.__radius: float = radius
 
-        # Thickness of the arc.
-        self.__thickness = thickness
+        self.__a1: float = a1
 
-        # The type of this shape
-        self.__type = type
+        self.__a2: float = a2
 
-    def __str__(self):
+        self.__thickness: float = thickness
+
+        self.__type: FieldShapeType = type
+
+    def __str__(self) -> str:
         pass
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """name
+
+        Returns:
+            str: Name of this field marking.
+        """
         return self.__name
 
     @property
-    def center(self):
+    def center(self) -> Vector2f:
+        """center
+
+        Returns:
+            Vector2f: Center point of the circular arc.
+        """
         return self.__center
 
     @property
-    def radius(self):
+    def radius(self) -> float:
+        """radius
+
+        Returns:
+            float: Radius of the arc.
+        """
         return self.__radius
 
     @property
-    def a1(self):
+    def a1(self) -> float:
+        """a1
+
+        Returns:
+            float: Start angle in counter-clockwise order.
+        """
         return self.__a1
 
     @property
-    def a2(self):
+    def a2(self) -> float:
+        """a2
+
+        Returns:
+            float: End angle in counter-clockwise order.
+        """
         return self.__a2
 
     @property
-    def thickness(self):
+    def thickness(self) -> float:
+        """thickness
+
+        Returns:
+            float: Thickness of the arc.
+        """
         return self.__thickness
 
     @property
-    def type(self):
+    def type(self) -> FieldShapeType:
+        """type
+
+        Returns:
+            FieldShapeType: The type of this shape
+        """
         return self.__type

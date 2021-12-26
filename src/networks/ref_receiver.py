@@ -1,7 +1,17 @@
 #!/usr/bin/env python3.10
 
+"""ref_receiver.py
+
+    This module is for the RefReceiver class.
+"""
+
 
 class RefReceiver(object):
+    """RefReceiver
+
+    Args:
+    """
+
     def __init__(self):
 
         self.__port = port

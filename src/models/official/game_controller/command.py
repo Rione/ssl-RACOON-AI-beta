@@ -1,9 +1,18 @@
 #!/usr/bin/env python3.10
 
+"""command.py
+
+    This module contains the Command enum.
+"""
+
 from enum import Enum
 
 
 class Command(Enum):
+    """Command
+
+    This enum represents the possible commands that can be sent by the game controller.
+    """
 
     HALT = 0
 
