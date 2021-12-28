@@ -10,13 +10,15 @@ import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
 import proto_py.messages_robocup_ssl_wrapper_pb2
 
-from models.official.field.detection.detection_ball import DetectionBall
-from models.official.field.detection.detection_frame import DetectionFrame
-from models.official.field.detection.detection_robot import DetectionRobot
-from models.official.field.geometry.geometry_data import GeometryData
-from models.official.field.geometry.geometry_field_size import GeometryFieldSize
-from models.official.field.geometry.geometry_camera_calibration import (
+from models.official.vision.detection import (
+    DetectionBall,
+    DetectionRobot,
+    DetectionFrame,
+)
+from models.official.vision.geometry import (
+    GeometryFieldSize,
     GeometryCameraCalibration,
+    GeometryData,
 )
 
 

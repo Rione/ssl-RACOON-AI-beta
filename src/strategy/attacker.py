@@ -5,7 +5,7 @@
     This module is for the Attacker class.
 """
 
-from models.official.field.robot_controll.robot_command import RobotCommand
+from models.official.grsim.commands import RobotCommand
 
 
 class Attacker(object):

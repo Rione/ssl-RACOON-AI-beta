@@ -8,7 +8,7 @@
 import time
 import socket
 
-from models.official.field.robot_controll.robot_command import RobotCommand
+from models.official.grsim.commands import SimRobotCommand
 from proto_py.grSim_Commands_pb2 import grSim_Robot_Command
 from proto_py.grSim_Commands_pb2 import grSim_Commands
 from proto_py.grSim_Packet_pb2 import grSim_Packet

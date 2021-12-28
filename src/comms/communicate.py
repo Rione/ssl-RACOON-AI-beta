@@ -1,6 +1,10 @@
-from src.networks.vision_receiver import VisionReceiver
-from src.networks.command_sender import CommandSender
-from src.strategy.attacker import Attacker
+#!/usr/bin/env python3.10
+
+"""communicate.py"""
+
+from networks.vision_receiver import VisionReceiver
+from networks.command_sender import CommandSender
+from strategy.attacker import Attacker
 
 # from src.observer.observer import Observer
 

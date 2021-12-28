@@ -2,7 +2,8 @@
 
 """robot_custom_feedback.py
 
-    This module contains the RobotCustomFeedback class.
+    This module contains:
+        - RobotCustomFeedback
 """
 
 
@@ -28,7 +29,13 @@ class RobotCustomFeedback:
         self.__encoder_vals: list[float] = encoder_vals
 
     def __str__(self) -> str:
-        pass
+        return (
+            "RobotCustomFeedback("
+            f"battery_vol={self.battery_vol:.2f}, "
+            f"boosted_vol={self.boosted_vol:.2f}, "
+            f"encoder_vals={self.__encoder_vals_to_str()}"
+            ")"
+        )
 
     @property
     def battery_vol(self) -> float:
@@ -56,3 +63,18 @@ class RobotCustomFeedback:
             float: The encoder values of the wheels.
         """
         return self.__encoder_vals
+
+    def __encoder_vals_to_str(self) -> str:
+        """_encoder_vals_to_str
+
+        Returns:
+            str: The rounded encoder values of the wheels as a string.
+        """
+        return "[" + ", ".join(f"{x:.2f}" for x in self.encoder_vals) + "]"
+
+
+if __name__ == "__main__":
+    custom_feedback = RobotCustomFeedback(
+        battery_vol=3, boosted_vol=4, encoder_vals=[1, 2, 3, 4]
+    )
+    print(custom_feedback)

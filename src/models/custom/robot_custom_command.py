@@ -2,7 +2,8 @@
 
 """ robot_custom_command.py
 
-    This module contains the RobotCustomCommand class.
+    This module contains:
+        - RobotCustomCommand
 """
 
 
@@ -20,4 +21,13 @@ class RobotCustomCommand:
         self.is_emergency_pressed: bool = False
 
     def __str__(self) -> str:
-        pass
+        return (
+            "RobotCustomCommand("
+            f"is_emergency_pressed={self.is_emergency_pressed}"
+            ")"
+        )
+
+
+if __name__ == "__main__":
+    custom_cmd = RobotCustomCommand()
+    print(custom_cmd)
