@@ -16,9 +16,6 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
-        args:
-          - "--profile=black"
-          - "--target-version=3.10"
 
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
@@ -29,17 +26,11 @@ repos:
     rev: v2.12.2
     hooks:
       - id: pylint
-        args:
-          - "--disable=C0330,C0326"
-          - "--max-line-length=88"
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.930
     hooks:
       - id: mypy
-        args:
-          - "--python-version=3.10"
-          - "--ignore-missing-imports"
 
   - repo: https://github.com/psf/black
     rev: 21.12b0
