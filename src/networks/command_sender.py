@@ -5,16 +5,15 @@
     This module is for the CommandSender class.
 """
 
-import time
 import socket
+import time
 
-from models.official.grsim.commands import SimRobotCommand
-from proto_py.grSim_Commands_pb2 import grSim_Robot_Command
-from proto_py.grSim_Commands_pb2 import grSim_Commands
+from models.official.grsim.commands import RobotCommand
+from proto_py.grSim_Commands_pb2 import grSim_Commands, grSim_Robot_Command
 from proto_py.grSim_Packet_pb2 import grSim_Packet
 
 
-class CommandSender(object):
+class CommandSender:
     """CommandSender
 
     Args:

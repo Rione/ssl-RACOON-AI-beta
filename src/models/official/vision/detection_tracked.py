@@ -17,7 +17,8 @@
 """
 
 from enum import Enum
-from models.official.game_controller.common import Team, RobotId
+
+from models.official.game_controller.common import RobotId, Team
 
 
 class Vector:

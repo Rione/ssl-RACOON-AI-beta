@@ -10,8 +10,8 @@
 """
 
 
-from models.official.grsim.replacement import Replacement
 from models.official.grsim.commands import SimCommands
+from models.official.grsim.replacement import Replacement
 
 
 class SimPacket:

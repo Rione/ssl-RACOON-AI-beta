@@ -2,8 +2,8 @@
 
 """communicate.py"""
 
-from networks.vision_receiver import VisionReceiver
 from networks.command_sender import CommandSender
+from networks.vision_receiver import VisionReceiver
 from strategy.attacker import Attacker
 
 # from src.observer.observer import Observer

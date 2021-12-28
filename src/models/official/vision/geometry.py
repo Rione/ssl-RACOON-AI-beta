@@ -16,6 +16,7 @@
 """
 
 from enum import Enum
+
 from models.official.vision.coordinate import Vector2f
 
 

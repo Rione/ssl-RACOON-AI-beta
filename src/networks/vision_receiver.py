@@ -6,19 +6,19 @@
 """
 
 import socket
+
 import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
 import proto_py.messages_robocup_ssl_wrapper_pb2
-
 from models.official.vision.detection import (
     DetectionBall,
-    DetectionRobot,
     DetectionFrame,
+    DetectionRobot,
 )
 from models.official.vision.geometry import (
-    GeometryFieldSize,
     GeometryCameraCalibration,
     GeometryData,
+    GeometryFieldSize,
 )
 
 
