@@ -7,6 +7,7 @@
 
 import socket
 import time
+from typing import List
 
 from models.official.grsim.commands import RobotCommand
 from proto_py.grSim_Commands_pb2 import grSim_Commands, grSim_Robot_Command
@@ -26,7 +27,7 @@ class CommandSender:
 
         self.__multicast_group = "127.0.0.1"
 
-        self.__data = []
+        self.__data: List[RobotCommand] = []
 
         self.__is_yellow = is_yellow
 
@@ -44,6 +45,10 @@ class CommandSender:
         )
 
     def send(self):
+        """
+        送信実行
+        :return: None
+        """
         # タイムスタンプ等、grSimCommandsに必要な要素を用意
         timestamp = time.time()
         isteamyellow = self.__is_yellow
@@ -51,7 +56,7 @@ class CommandSender:
         send_data = grSim_Commands()
 
         # set_robotcommandされた分だけループさせる
-        # TODO: 複数同じロボットがappendされてたらどうする？
+        # TO_DO: 複数同じロボットがappendされてたらどうする？
         for robot_command in self.__data:
             send_data_one = grSim_Robot_Command()
             send_data_one.id = robot_command.id
@@ -76,5 +81,10 @@ class CommandSender:
         self.__sock.sendto(send_packet, (self.__multicast_group, self.__port))
 
     def set_robotcommand(self, robotcommand):
+        """
+        ロボットコマンドを追加
+        :param robotcommand: RobotCommandの型が入ります
+        :return: None
+        """
         # self.__dataに追加していく
         self.__data.append(robotcommand)

@@ -6,6 +6,7 @@
 """
 
 import socket
+from typing import List
 
 import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
@@ -33,25 +34,25 @@ class VisionReceiver:
 
         self.__inverted: bool = invert
 
-        self.__num_of_cameras = 4
+        self.__num_of_cameras: int = 4
 
-        self.__packet = ""
+        self.__packet: str = ""
 
         self.__data = None
 
-        self.__frames = []
+        self.__frames: List[DetectionFrame] = []
 
-        self.__geometries = []
+        self.__geometries: List[GeometryData] = []
 
-        self.__blue_robots = []
+        self.__blue_robots: List[DetectionRobot] = []
 
-        self.__yellow_robots = []
+        self.__yellow_robots: List[DetectionRobot] = []
 
-        self.__port = 10020
+        self.__port: int = 10020
 
-        self.__local_address = "0.0.0.0"
+        self.__local_address: str = "0.0.0.0"
 
-        self.__multicast_group = "224.5.23.2"
+        self.__multicast_group: str = "224.5.23.2"
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,24 +70,38 @@ class VisionReceiver:
             self.receive()
 
     def append_frame(self, frame):
+        """
+        フレームを追加
+        :param frame: DetectionFrameが入ります
+        :return: None
+        """
         self.__frames.append(frame)
 
     def append_geometry(self, geometry):
+        """
+        ジオメトリ情報を追加
+        :param geometry: GeometryDataが入ります
+        :return: None
+        """
         self.__geometries.append(geometry)
 
     def receive(self):
+        """
+        受信を行います
+        :return: None
+        """
         # フレームの初期化
-        # TODO: geometriesは初期化するか？正直最初だけ受け取れば、参照のみで新規に受け取る必要はないかも
+        # TO_DO: geometriesは初期化するか？正直最初だけ受け取れば、参照のみで新規に受け取る必要はないかも
         self.__frames = []
         # ロボット状態の初期化
         self.__yellow_robots = []
         self.__blue_robots = []
-        buffer_size = 2048
+        buffer_size: int = 2048
         # データ受け取り開始
-        cam_counter = 1
+        cam_counter: int = 1
         # カメラの台数分ループさせる
         while cam_counter <= self.__num_of_cameras:
-            self.__packet, recv = self.__sock.recvfrom(buffer_size)
+            self.__packet, _ = self.__sock.recvfrom(buffer_size)
             self.__data = proto_py.messages_robocup_ssl_wrapper_pb2.SSL_WrapperPacket()
             self.__data.ParseFromString(self.__packet)
 
@@ -103,13 +118,17 @@ class VisionReceiver:
             cam_counter = cam_counter + 1
 
     def get_frame(self):
-        frame_number = self.__data.detection.frame_number
-        t_sent = self.__data.detection.t_sent
-        t_capture = self.__data.detection.t_capture
-        camera_id = self.__data.detection.camera_id
-        balls = self.__data.detection.balls
-        robots_yellow = self.__data.detection.robots_yellow
-        robots_blue = self.__data.detection.robots_blue
+        """
+        フレーム情報をDetectionFrameの型に置き換えます
+        :return: None
+        """
+        frame_number: int = self.__data.detection.frame_number
+        t_sent: float = self.__data.detection.t_sent
+        t_capture: float = self.__data.detection.t_capture
+        camera_id: int = self.__data.detection.camera_id
+        balls: List[DetectionBall] = self.__data.detection.balls
+        robots_yellow: List[DetectionRobot] = self.__data.detection.robots_yellow
+        robots_blue: List[DetectionRobot] = self.__data.detection.robots_blue
 
         frame = DetectionFrame(
             frame_number,
@@ -123,31 +142,43 @@ class VisionReceiver:
         return frame
 
     def get_geometry(self):
-        field = self.__data.geometry.field
-        calib = self.__data.geometry.calib
-        geometry = GeometryData(field, calib, 0)
+        """
+        ジオメトリ情報をGeometryDataに置き換えます
+        :return: None
+        """
+        field: GeometryFieldSize = self.__data.geometry.field
+        calib: GeometryCameraCalibration = self.__data.geometry.calib
+        geometry: GeometryData = GeometryData(field, calib, 0)
         return geometry
 
     def get_balls(self):
-        balls = []
+        """
+        ボール情報をDetectionBallに置き換えます
+        :return: None
+        """
+        balls: List[DetectionBall] = []
         for frame in self.__frames:
             for ball in frame.balls:
-                confidence = ball.confidence
-                area = ball.area
-                pixel_x = ball.pixel_x
-                pixel_y = ball.pixel_y
-                x = ball.x
-                y = ball.y
-                z = ball.z
+                confidence: float = ball.confidence
+                area: int = ball.area
+                pixel_x: float = ball.pixel_x
+                pixel_y: float = ball.pixel_y
+                ball_x: float = ball.x
+                ball_y: float = ball.y
+                ball_z: float = ball.z
 
-                detection_ball = DetectionBall(
-                    confidence, area, pixel_x, pixel_y, x, y, z
+                detection_ball: DetectionBall = DetectionBall(
+                    confidence, area, pixel_x, pixel_y, ball_x, ball_y, ball_z
                 )
                 balls.append(detection_ball)
 
         return balls
 
     def get_blue_robots(self):
+        """
+        青ロボットを抽出します
+        :return: List[DetectionRobot]
+        """
         # 2回目以降の参照は、前の値をそのまま出力
         if len(self.__blue_robots) == 0:
             self.get_robots()
@@ -155,6 +186,10 @@ class VisionReceiver:
         return self.__blue_robots
 
     def get_yellow_robots(self):
+        """
+        黄ロボットを抽出します
+        :return: List[DetectionRobot]
+        """
         # 2回目以降の参照は、前の値をそのまま出力
         if len(self.__yellow_robots) == 0:
             self.get_robots()
@@ -162,22 +197,33 @@ class VisionReceiver:
         return self.__yellow_robots
 
     def get_robots(self):
-        blue_robots = []
-        seen_id_blue = []
-        yellow_robots = []
-        seen_id_yellow = []
+        """
+        全ての色のロボットを抽出します
+        :return: List[DetectionRobot]
+        """
+        blue_robots: List[DetectionRobot] = []
+        seen_id_blue: List[int] = []
+        yellow_robots: List[DetectionRobot] = []
+        seen_id_yellow: List[int] = []
         for frame in self.__frames:
             for robot_b in frame.robots_blue:
-                confidence = robot_b.confidence
-                robot_id = robot_b.robot_id
-                x = robot_b.x
-                y = robot_b.y
-                theta = robot_b.orientation
-                pixel_x = robot_b.pixel_x
-                pixel_y = robot_b.pixel_y
-                height = robot_b.height
-                detection_robot = DetectionRobot(
-                    confidence, robot_id, x, y, theta, pixel_x, pixel_y, height
+                confidence: float = robot_b.confidence
+                robot_id: int = robot_b.robot_id
+                robot_x: float = robot_b.x
+                robot_y: float = robot_b.y
+                theta: float = robot_b.orientation
+                pixel_x: float = robot_b.pixel_x
+                pixel_y: float = robot_b.pixel_y
+                height: float = robot_b.height
+                detection_robot: DetectionRobot = DetectionRobot(
+                    confidence,
+                    robot_id,
+                    robot_x,
+                    robot_y,
+                    theta,
+                    pixel_x,
+                    pixel_y,
+                    height,
                 )
 
                 if robot_id not in seen_id_blue:
@@ -185,16 +231,23 @@ class VisionReceiver:
                     blue_robots.append(detection_robot)
 
             for robot_y in frame.robots_yellow:
-                confidence = robot_y.confidence
-                robot_id = robot_y.robot_id
-                x = robot_y.x
-                y = robot_y.y
-                theta = robot_y.orientation
-                pixel_x = robot_y.pixel_x
-                pixel_y = robot_y.pixel_y
-                height = robot_y.height
-                detection_robot = DetectionRobot(
-                    confidence, robot_id, x, y, theta, pixel_x, pixel_y, height
+                confidence: float = robot_y.confidence
+                robot_id: int = robot_y.robot_id
+                robot_x: float = robot_y.x
+                robot_y: float = robot_y.y
+                theta: float = robot_y.orientation
+                pixel_x: float = robot_y.pixel_x
+                pixel_y: float = robot_y.pixel_y
+                height: float = robot_y.height
+                detection_robot: DetectionRobot = DetectionRobot(
+                    confidence,
+                    robot_id,
+                    robot_x,
+                    robot_y,
+                    theta,
+                    pixel_x,
+                    pixel_y,
+                    height,
                 )
 
                 if robot_id not in seen_id_yellow:
@@ -206,11 +259,15 @@ class VisionReceiver:
         self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
 
     def get_fieldsize(self):
-        field_length = self.__geometries[0].field.field_length
-        field_width = self.__geometries[0].field.field_width
-        goal_width = self.__geometries[0].field.goal_width
-        goal_depth = self.__geometries[0].field.goal_depth
-        boundary_width = self.__geometries[0].field.boundary_width
+        """
+        GeometryDataからFieldSizeを抽出します
+        :return: List[GeometryFieldSize]
+        """
+        field_length: int = self.__geometries[0].field.field_length
+        field_width: int = self.__geometries[0].field.field_width
+        goal_width: int = self.__geometries[0].field.goal_width
+        goal_depth: int = self.__geometries[0].field.goal_depth
+        boundary_width: int = self.__geometries[0].field.boundary_width
         field_lines = self.__geometries[0].field.field_lines
         field_arcs = self.__geometries[0].field.field_arcs
 
@@ -220,7 +277,7 @@ class VisionReceiver:
         penalty_area_depth = 0
         penalty_area_width = 0
 
-        fieldsize = GeometryFieldSize(
+        fieldsize: GeometryFieldSize = GeometryFieldSize(
             field_length,
             field_width,
             goal_width,
