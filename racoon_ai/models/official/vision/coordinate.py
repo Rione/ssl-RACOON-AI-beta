@@ -8,7 +8,7 @@
         - Pose3D
 """
 
-from models.official.vision.detection_tracked import Vector2f, Vector3f
+from racoon_ai.models.official.vision.detection_tracked import Vector2f, Vector3f
 
 
 class Orientation:
@@ -54,13 +54,7 @@ class Pose2D(Vector2f, Orientation):
         Orientation.__init__(self, theta)
 
     def __str__(self) -> str:
-        return (
-            "Pose2D("
-            f"x={self.x:.2f}, "
-            f"y={self.y:.2f}, "
-            f"theta={self.theta:.2f}"
-            ")"
-        )
+        return "Pose2D(" f"x={self.x:.2f}, " f"y={self.y:.2f}, " f"theta={self.theta:.2f}" ")"
 
     def __repr__(self) -> str:
         return f"Pose2D({self.x}, {self.y}, {self.theta})"
@@ -96,14 +90,7 @@ class Pose3D(Vector3f, Orientation):
         Orientation.__init__(self, theta)
 
     def __str__(self) -> str:
-        return (
-            "Pose3D("
-            f"x={self.x:.2f}, "
-            f"y={self.y:.2f}, "
-            f"theta={self.theta:.2f}, "
-            f"z={self.z:.2f}"
-            ")"
-        )
+        return "Pose3D(" f"x={self.x:.2f}, " f"y={self.y:.2f}, " f"theta={self.theta:.2f}, " f"z={self.z:.2f}" ")"
 
     def __repr__(self) -> str:
         return f"Pose3D({self.x}, {self.y}, {self.theta}, {self.z})"

@@ -7,7 +7,7 @@
 
 import math
 
-from models.official.grsim.commands import RobotCommand
+from racoon_ai.models.official.grsim.commands import RobotCommand
 
 
 def radian(object1, object2):
@@ -61,9 +61,7 @@ class Attacker:
         return send_command
 
     def straight_move_ball(self):
-        radian_ball_robot = radian_normalize(
-            radian(self.__balls[0], self.__our_robots[0]) - self.__our_robots[0].theta
-        )
+        radian_ball_robot = radian_normalize(radian(self.__balls[0], self.__our_robots[0]) - self.__our_robots[0].theta)
 
         send_command = RobotCommand(
             self.__attacker_id,

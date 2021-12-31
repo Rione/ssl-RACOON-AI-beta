@@ -10,7 +10,7 @@
 """
 
 
-from models.official.vision.detection_tracked import TrackedFrame
+from racoon_ai.models.official.vision.detection_tracked import TrackedFrame
 
 
 class TrackerWrapperPacket:
@@ -53,13 +53,7 @@ class TrackerWrapperPacket:
         )
 
     def __repr__(self) -> str:
-        return (
-            "TrackerWrapperPacket("
-            f"{self.uuid}, "
-            f"{self.source_name}, "
-            f"{self.tracked_frame}"
-            ")"
-        )
+        return "TrackerWrapperPacket(" f"{self.uuid}, " f"{self.source_name}, " f"{self.tracked_frame}" ")"
 
     @property
     def uuid(self) -> str:

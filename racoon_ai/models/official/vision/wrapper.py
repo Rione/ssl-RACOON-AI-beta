@@ -9,8 +9,8 @@
         https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_wrapper.proto
 """
 
-from models.official.vision.detection import DetectionFrame
-from models.official.vision.geometry import GeometryData
+from racoon_ai.models.official.vision.detection import DetectionFrame
+from racoon_ai.models.official.vision.geometry import GeometryData
 
 
 class WrapperPacket:
@@ -28,12 +28,7 @@ class WrapperPacket:
         self.__geometry: GeometryData = geomrtry
 
     def __str__(self) -> str:
-        return (
-            "WrapperPacket("
-            f"detection={self.detection!s}, "
-            f"geometry={self.geometry!s}"
-            ")"
-        )
+        return "WrapperPacket(" f"detection={self.detection!s}, " f"geometry={self.geometry!s}" ")"
 
     def __repr__(self) -> str:
         return f"WrapperPacket({self.detection}, {self.geometry})"

@@ -88,12 +88,8 @@ _SSL_WRAPPERPACKET = _descriptor.Descriptor(
     serialized_end=209,
 )
 
-_SSL_WRAPPERPACKET.fields_by_name[
-    "detection"
-].message_type = messages__robocup__ssl__detection__pb2._SSL_DETECTIONFRAME
-_SSL_WRAPPERPACKET.fields_by_name[
-    "geometry"
-].message_type = messages__robocup__ssl__geometry__pb2._SSL_GEOMETRYDATA
+_SSL_WRAPPERPACKET.fields_by_name["detection"].message_type = messages__robocup__ssl__detection__pb2._SSL_DETECTIONFRAME
+_SSL_WRAPPERPACKET.fields_by_name["geometry"].message_type = messages__robocup__ssl__geometry__pb2._SSL_GEOMETRYDATA
 DESCRIPTOR.message_types_by_name["SSL_WrapperPacket"] = _SSL_WRAPPERPACKET
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 

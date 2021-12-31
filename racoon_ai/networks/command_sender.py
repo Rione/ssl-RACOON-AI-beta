@@ -9,9 +9,9 @@ import socket
 import time
 from typing import List
 
-from models.official.grsim.commands import RobotCommand
-from proto_py.grSim_Commands_pb2 import grSim_Commands, grSim_Robot_Command
-from proto_py.grSim_Packet_pb2 import grSim_Packet
+from racoon_ai.models.official.grsim.commands import RobotCommand
+from racoon_ai.proto_py.grSim_Commands_pb2 import grSim_Commands, grSim_Robot_Command
+from racoon_ai.proto_py.grSim_Packet_pb2 import grSim_Packet
 
 
 class CommandSender:
@@ -35,9 +35,7 @@ class CommandSender:
         self.__local_address = "0.0.0.0"
 
         # 送信ソケット作成
-        self.__sock = socket.socket(
-            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP
-        )
+        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(
             socket.IPPROTO_IP,
             socket.IP_MULTICAST_IF,

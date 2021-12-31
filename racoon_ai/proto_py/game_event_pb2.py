@@ -403,16 +403,10 @@ _SSL_REFEREE_GAME_EVENT = _descriptor.Descriptor(
     serialized_end=819,
 )
 
-_SSL_REFEREE_GAME_EVENT_ORIGINATOR.fields_by_name[
-    "team"
-].enum_type = _SSL_REFEREE_GAME_EVENT_TEAM
+_SSL_REFEREE_GAME_EVENT_ORIGINATOR.fields_by_name["team"].enum_type = _SSL_REFEREE_GAME_EVENT_TEAM
 _SSL_REFEREE_GAME_EVENT_ORIGINATOR.containing_type = _SSL_REFEREE_GAME_EVENT
-_SSL_REFEREE_GAME_EVENT.fields_by_name[
-    "gameEventType"
-].enum_type = _SSL_REFEREE_GAME_EVENT_GAMEEVENTTYPE
-_SSL_REFEREE_GAME_EVENT.fields_by_name[
-    "originator"
-].message_type = _SSL_REFEREE_GAME_EVENT_ORIGINATOR
+_SSL_REFEREE_GAME_EVENT.fields_by_name["gameEventType"].enum_type = _SSL_REFEREE_GAME_EVENT_GAMEEVENTTYPE
+_SSL_REFEREE_GAME_EVENT.fields_by_name["originator"].message_type = _SSL_REFEREE_GAME_EVENT_ORIGINATOR
 _SSL_REFEREE_GAME_EVENT_GAMEEVENTTYPE.containing_type = _SSL_REFEREE_GAME_EVENT
 _SSL_REFEREE_GAME_EVENT_TEAM.containing_type = _SSL_REFEREE_GAME_EVENT
 DESCRIPTOR.message_types_by_name["SSL_Referee_Game_Event"] = _SSL_REFEREE_GAME_EVENT

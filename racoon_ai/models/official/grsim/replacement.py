@@ -152,24 +152,10 @@ class BallReplacement:
         self.__vy: float = vy
 
     def __str__(self) -> str:
-        return (
-            "BallReplacement("
-            f"x={self.x:.2f} ,"
-            f"y={self.y:.2f} ,"
-            f"vx={self.vx:.2f} ,"
-            f"vy={self.vy:.2f}"
-            ")"
-        )
+        return "BallReplacement(" f"x={self.x:.2f} ," f"y={self.y:.2f} ," f"vx={self.vx:.2f} ," f"vy={self.vy:.2f}" ")"
 
     def __repr__(self) -> str:
-        return (
-            "BallReplacement("
-            f"{self.x}, "
-            f"{self.y}, "
-            f"{self.vx}, "
-            f"{self.vy}"
-            ")"
-        )
+        return "BallReplacement(" f"{self.x}, " f"{self.y}, " f"{self.vx}, " f"{self.vy}" ")"
 
     @property
     def x(self) -> float:

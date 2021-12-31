@@ -840,9 +840,7 @@ _SSL_GEOMETRYDATA = _descriptor.Descriptor(
 _SSL_FIELDLINESEGMENT.fields_by_name["p1"].message_type = _VECTOR2F
 _SSL_FIELDLINESEGMENT.fields_by_name["p2"].message_type = _VECTOR2F
 _SSL_FIELDCICULARARC.fields_by_name["center"].message_type = _VECTOR2F
-_SSL_GEOMETRYFIELDSIZE.fields_by_name[
-    "field_lines"
-].message_type = _SSL_FIELDLINESEGMENT
+_SSL_GEOMETRYFIELDSIZE.fields_by_name["field_lines"].message_type = _SSL_FIELDLINESEGMENT
 _SSL_GEOMETRYFIELDSIZE.fields_by_name["field_arcs"].message_type = _SSL_FIELDCICULARARC
 _SSL_GEOMETRYDATA.fields_by_name["field"].message_type = _SSL_GEOMETRYFIELDSIZE
 _SSL_GEOMETRYDATA.fields_by_name["calib"].message_type = _SSL_GEOMETRYCAMERACALIBRATION
@@ -850,9 +848,7 @@ DESCRIPTOR.message_types_by_name["Vector2f"] = _VECTOR2F
 DESCRIPTOR.message_types_by_name["SSL_FieldLineSegment"] = _SSL_FIELDLINESEGMENT
 DESCRIPTOR.message_types_by_name["SSL_FieldCicularArc"] = _SSL_FIELDCICULARARC
 DESCRIPTOR.message_types_by_name["SSL_GeometryFieldSize"] = _SSL_GEOMETRYFIELDSIZE
-DESCRIPTOR.message_types_by_name[
-    "SSL_GeometryCameraCalibration"
-] = _SSL_GEOMETRYCAMERACALIBRATION
+DESCRIPTOR.message_types_by_name["SSL_GeometryCameraCalibration"] = _SSL_GEOMETRYCAMERACALIBRATION
 DESCRIPTOR.message_types_by_name["SSL_GeometryData"] = _SSL_GEOMETRYDATA
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 

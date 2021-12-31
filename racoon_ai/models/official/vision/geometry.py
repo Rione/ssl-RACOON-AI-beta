@@ -17,7 +17,7 @@
 
 from enum import Enum
 
-from models.official.vision.coordinate import Vector2f
+from racoon_ai.models.official.vision.coordinate import Vector2f
 
 
 class FieldShapeType(Enum):
@@ -851,13 +851,7 @@ class BallModelStraightTwoPhase:
         )
 
     def __repr__(self) -> str:
-        return (
-            "BallModelStraightTwoPhase("
-            f"{self.acc_slide}, "
-            f"{self.acc_role}, "
-            f"{self.k_switch}"
-            ")"
-        )
+        return "BallModelStraightTwoPhase(" f"{self.acc_slide}, " f"{self.acc_role}, " f"{self.k_switch}" ")"
 
     @property
     def acc_slide(self) -> float:
@@ -899,9 +893,7 @@ class BallModelChipFixedLoss:
             Chip kick velocity damping factor in Z direction for all hops
     """
 
-    def __init__(
-        self, damping_xy_first_hop: float, damping_xy_other_hop: float, damping_z: float
-    ):
+    def __init__(self, damping_xy_first_hop: float, damping_xy_other_hop: float, damping_z: float):
 
         self.__damping_xy_first_hop: float = damping_xy_first_hop
 
@@ -984,12 +976,7 @@ class GeometryModels:
         )
 
     def __repr__(self) -> str:
-        return (
-            "GeometryModels("
-            f"{self.straight_two_phase}, "
-            f"{self.chip_fixed_loss}"
-            ")"
-        )
+        return "GeometryModels(" f"{self.straight_two_phase}, " f"{self.chip_fixed_loss}" ")"
 
     @property
     def straight_two_phase(self) -> BallModelStraightTwoPhase:
@@ -1036,22 +1023,10 @@ class GeometryData:
         self.__models: GeometryModels = models
 
     def __str__(self) -> str:
-        return (
-            "GeometryData("
-            f"field={self.field!s}, "
-            f"calib={self.calib!s}, "
-            f"models={self.models!s}"
-            ")"
-        )
+        return "GeometryData(" f"field={self.field!s}, " f"calib={self.calib!s}, " f"models={self.models!s}" ")"
 
     def __repr__(self) -> str:
-        return (
-            "GeometryData("
-            f"{self.field!r}, "
-            f"{self.calib!r}, "
-            f"{self.models!r}"
-            ")"
-        )
+        return "GeometryData(" f"{self.field!r}, " f"{self.calib!r}, " f"{self.models!r}" ")"
 
     @property
     def calib(self) -> GeometryCameraCalibration:

@@ -48,14 +48,7 @@ class RobotStatus:
         )
 
     def __repr__(self) -> str:
-        return (
-            "RobotStatus("
-            f"{self.robot_id}, "
-            f"{self.infrared}, "
-            f"{self.flat_kick}, "
-            f"{self.chip_kick}"
-            ")"
-        )
+        return "RobotStatus(" f"{self.robot_id}, " f"{self.infrared}, " f"{self.flat_kick}, " f"{self.chip_kick}" ")"
 
     @property
     def robot_id(self) -> int:

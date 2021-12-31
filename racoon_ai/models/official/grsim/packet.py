@@ -10,8 +10,8 @@
 """
 
 
-from models.official.grsim.commands import SimCommands
-from models.official.grsim.replacement import Replacement
+from racoon_ai.models.official.grsim.commands import SimCommands
+from racoon_ai.models.official.grsim.replacement import Replacement
 
 
 class SimPacket:
@@ -29,20 +29,10 @@ class SimPacket:
         self.__replacement: Replacement = replacement
 
     def __str__(self) -> str:
-        return (
-            "SimPacket("
-            f"commands={self.commands!s}, "
-            f"replacement={self.replacement!s}"
-            ")"
-        )
+        return "SimPacket(" f"commands={self.commands!s}, " f"replacement={self.replacement!s}" ")"
 
     def __repr__(self) -> str:
-        return (
-            "SimPacket("
-            f"commands={self.commands}, "
-            f"replacement={self.replacement}"
-            ")"
-        )
+        return "SimPacket(" f"commands={self.commands}, " f"replacement={self.replacement}" ")"
 
     @property
     def commands(self) -> SimCommands:

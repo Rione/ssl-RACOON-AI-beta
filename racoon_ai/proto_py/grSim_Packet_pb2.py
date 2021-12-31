@@ -88,12 +88,8 @@ _GRSIM_PACKET = _descriptor.Descriptor(
     serialized_end=159,
 )
 
-_GRSIM_PACKET.fields_by_name[
-    "commands"
-].message_type = grSim__Commands__pb2._GRSIM_COMMANDS
-_GRSIM_PACKET.fields_by_name[
-    "replacement"
-].message_type = grSim__Replacement__pb2._GRSIM_REPLACEMENT
+_GRSIM_PACKET.fields_by_name["commands"].message_type = grSim__Commands__pb2._GRSIM_COMMANDS
+_GRSIM_PACKET.fields_by_name["replacement"].message_type = grSim__Replacement__pb2._GRSIM_REPLACEMENT
 DESCRIPTOR.message_types_by_name["grSim_Packet"] = _GRSIM_PACKET
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 

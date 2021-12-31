@@ -789,9 +789,7 @@ _SSL_REFEREE.fields_by_name["command"].enum_type = _SSL_REFEREE_COMMAND
 _SSL_REFEREE.fields_by_name["yellow"].message_type = _SSL_REFEREE_TEAMINFO
 _SSL_REFEREE.fields_by_name["blue"].message_type = _SSL_REFEREE_TEAMINFO
 _SSL_REFEREE.fields_by_name["designated_position"].message_type = _SSL_REFEREE_POINT
-_SSL_REFEREE.fields_by_name[
-    "gameEvent"
-].message_type = game__event__pb2._SSL_REFEREE_GAME_EVENT
+_SSL_REFEREE.fields_by_name["gameEvent"].message_type = game__event__pb2._SSL_REFEREE_GAME_EVENT
 _SSL_REFEREE_STAGE.containing_type = _SSL_REFEREE
 _SSL_REFEREE_COMMAND.containing_type = _SSL_REFEREE
 DESCRIPTOR.message_types_by_name["SSL_Referee"] = _SSL_REFEREE

@@ -18,9 +18,7 @@ class RobotCustomFeedback:
         encoder_vals (list[float]): The encoder values.
     """
 
-    def __init__(
-        self, battery_vol: float, boosted_vol: float, encoder_vals: list[float]
-    ) -> None:
+    def __init__(self, battery_vol: float, boosted_vol: float, encoder_vals: list[float]) -> None:
 
         self.__battery_vol: float = battery_vol
 
@@ -74,7 +72,5 @@ class RobotCustomFeedback:
 
 
 if __name__ == "__main__":
-    custom_feedback = RobotCustomFeedback(
-        battery_vol=3, boosted_vol=4, encoder_vals=[1, 2, 3, 4]
-    )
+    custom_feedback = RobotCustomFeedback(battery_vol=3, boosted_vol=4, encoder_vals=[1, 2, 3, 4])
     print(custom_feedback)

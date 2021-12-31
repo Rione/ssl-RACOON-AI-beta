@@ -422,13 +422,7 @@ class SimCommands:
         )
 
     def __repr__(self) -> str:
-        return (
-            "SimCommands("
-            f"{self.timestamp} ,"
-            f"{self.isteamyellow} ,"
-            f"{self.robot_commands} ,"
-            ")"
-        )
+        return "SimCommands(" f"{self.timestamp} ," f"{self.isteamyellow} ," f"{self.robot_commands} ," ")"
 
     @property
     def timestamp(self) -> float:

@@ -21,11 +21,7 @@ class RobotCustomCommand:
         self.__is_emergency_pressed: bool = False
 
     def __str__(self) -> str:
-        return (
-            "RobotCustomCommand("
-            f"is_emergency_pressed={self.is_emergency_pressed}"
-            ")"
-        )
+        return "RobotCustomCommand(" f"is_emergency_pressed={self.is_emergency_pressed}" ")"
 
     @property
     def is_emergency_pressed(self) -> bool:

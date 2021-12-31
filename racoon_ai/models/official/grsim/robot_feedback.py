@@ -11,8 +11,8 @@
 """
 
 
-from models.custom.robot_custom_feedback import RobotCustomFeedback
-from models.official.grsim.error import SimError
+from racoon_ai.models.custom.robot_custom_feedback import RobotCustomFeedback
+from racoon_ai.models.official.grsim.error import SimError
 
 
 class RobotFeedback:
@@ -47,13 +47,7 @@ class RobotFeedback:
         )
 
     def __repr__(self) -> str:
-        return (
-            "RobotFeedback("
-            f"{self.robot_id}, "
-            f"{self.dribbler_ball_contact}, "
-            f"{self.custom}"
-            ")"
-        )
+        return "RobotFeedback(" f"{self.robot_id}, " f"{self.dribbler_ball_contact}, " f"{self.custom}" ")"
 
     @property
     def robot_id(self) -> int:
@@ -102,12 +96,7 @@ class RobotControlResponse:
         self.__feedback: list[RobotFeedback] = feedback
 
     def __str__(self) -> str:
-        return (
-            "RobotControlResponse("
-            f"errors={self.errors!s}, "
-            f"feedback={self.feedback!s}"
-            ")"
-        )
+        return "RobotControlResponse(" f"errors={self.errors!s}, " f"feedback={self.feedback!s}" ")"
 
     def __repr__(self) -> str:
         return f"RobotControlResponse({self.errors}, {self.feedback})"

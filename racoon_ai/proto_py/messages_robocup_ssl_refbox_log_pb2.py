@@ -127,9 +127,7 @@ _REFBOX_LOG = _descriptor.Descriptor(
     serialized_end=185,
 )
 
-_LOG_FRAME.fields_by_name[
-    "frame"
-].message_type = messages__robocup__ssl__detection__pb2._SSL_DETECTIONFRAME
+_LOG_FRAME.fields_by_name["frame"].message_type = messages__robocup__ssl__detection__pb2._SSL_DETECTIONFRAME
 _REFBOX_LOG.fields_by_name["log"].message_type = _LOG_FRAME
 DESCRIPTOR.message_types_by_name["Log_Frame"] = _LOG_FRAME
 DESCRIPTOR.message_types_by_name["Refbox_Log"] = _REFBOX_LOG

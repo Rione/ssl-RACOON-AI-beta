@@ -18,7 +18,7 @@
 
 from enum import Enum
 
-from models.official.game_controller.common import RobotId, Team
+from racoon_ai.models.official.game_controller.common import RobotId, Team
 
 
 class Vector:
@@ -30,16 +30,12 @@ class Vector:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"Cannot compare {type(self).__name__} to {type(other).__name__}"
-            )
+            raise TypeError(f"Cannot compare {type(self).__name__} to {type(other).__name__}")
         return self.__dict__ == other.__dict__
 
     def __ne__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"Cannot compare {type(self).__name__} to {type(other).__name__}"
-            )
+            raise TypeError(f"Cannot compare {type(self).__name__} to {type(other).__name__}")
         return not self.__eq__(other)
 
     def __abs__(self) -> float:
@@ -86,34 +82,26 @@ class Vector2f(Vector):
 
     def __iadd__(self, other: object) -> "Vector2f":
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'"
-            )
+            raise TypeError(f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'")
         self.__x += other.x
         self.__y += other.y
         return self
 
     def __isub__(self, other: object) -> "Vector2f":
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'"
-            )
+            raise TypeError(f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'")
         self.__x -= other.x
         self.__y -= other.y
         return self
 
     def __add__(self, other: object) -> "Vector2f":
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'"
-            )
+            raise TypeError(f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'")
         return Vector2f(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other: object) -> "Vector2f":
         if not isinstance(other, type(self)):
-            raise TypeError(
-                f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'"
-            )
+            raise TypeError(f"unsupported operand type(s) for '{type(self)}' and '{type(other)}'")
         return Vector2f(self.x - other.x, self.y - other.y)
 
     def __abs__(self) -> float:
@@ -298,13 +286,7 @@ class TrackedBall:
         self.__visibility: float = visibility
 
     def __str__(self) -> str:
-        return (
-            "TrackedBall("
-            f"pos={self.pos!s}, "
-            f"vel={self.vel!s}, "
-            f"visibility={self.visibility:.1%}"
-            ")"
-        )
+        return "TrackedBall(" f"pos={self.pos!s}, " f"vel={self.vel!s}, " f"visibility={self.visibility:.1%}" ")"
 
     def __repr__(self) -> str:
         return f"TrackedBall({self.pos}, {self.vel}, {self.visibility})"

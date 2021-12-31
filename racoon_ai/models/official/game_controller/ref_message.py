@@ -16,8 +16,8 @@
 
 from enum import Enum
 
-from models.official.game_controller.game_event import GameEvent
-from models.official.vision.detection_tracked import Vector2f
+from racoon_ai.models.official.game_controller.game_event import GameEvent
+from racoon_ai.models.official.vision.detection_tracked import Vector2f
 
 
 class Stage(Enum):
