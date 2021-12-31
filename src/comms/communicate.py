@@ -27,7 +27,7 @@ def do_communicate():
 
         attacker = Attacker(vision)
         # defence = Defence(vision) ...
-        send_command = attacker.send_command()
+        send_command = attacker.straight_move_ball()
 
         # send_commandの型はRobotCommand
         sender.set_robotcommand(send_command)

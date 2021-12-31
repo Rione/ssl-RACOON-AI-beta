@@ -230,29 +230,29 @@ class VisionReceiver:
                     seen_id_blue.append(robot_b.robot_id)
                     blue_robots.append(detection_robot)
 
-            for robot_y in frame.robots_yellow:
-                confidence: float = robot_y.confidence
-                robot_id: int = robot_y.robot_id
-                robot_x: float = robot_y.x
-                robot_y: float = robot_y.y
-                theta: float = robot_y.orientation
-                pixel_x: float = robot_y.pixel_x
-                pixel_y: float = robot_y.pixel_y
-                height: float = robot_y.height
-                detection_robot: DetectionRobot = DetectionRobot(
-                    confidence,
-                    robot_id,
-                    robot_x,
-                    robot_y,
-                    theta,
-                    pixel_x,
-                    pixel_y,
-                    height,
-                )
+                # for robot_y in frame.robots_yellow:
+                #     confidence: float = robot_y.confidence
+                #     robot_id: int = robot_y.robot_id
+                #     robot_x: float = robot_y.x
+                #     robot_y: float = robot_y.y
+                #     theta: float = robot_y.orientation
+                #     pixel_x: float = robot_y.pixel_x
+                #     pixel_y: float = robot_y.pixel_y
+                #     height: float = robot_y.height
+                #     detection_robot: DetectionRobot = DetectionRobot(
+                #         confidence,
+                #         robot_id,
+                #         robot_x,
+                #         robot_y,
+                #         theta,
+                #         pixel_x,
+                #         pixel_y,
+                #         height,
+                #     )
 
-                if robot_id not in seen_id_yellow:
-                    seen_id_yellow.append(robot_y.robot_id)
-                    yellow_robots.append(detection_robot)
+                # if robot_id not in seen_id_yellow:
+                #     seen_id_yellow.append(robot_y.robot_id)
+                #     yellow_robots.append(detection_robot)
 
         # ロボットを整列(0-10まで)させる
         self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
