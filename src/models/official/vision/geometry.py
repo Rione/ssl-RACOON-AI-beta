@@ -77,7 +77,7 @@ class FieldLineSegment:
         p1: Vector2f,
         p2: Vector2f,
         thickness: float,
-        type: FieldShapeType = FieldShapeType.UNDEFINED,
+        field_shape_type: FieldShapeType = FieldShapeType.UNDEFINED,
     ):
         self.__name: str = name
 
@@ -91,7 +91,7 @@ class FieldLineSegment:
         self.__thickness: float = thickness
 
         # Type of the line segment.
-        self.__type: FieldShapeType = type
+        self.__field_shape_type: FieldShapeType = field_shape_type
 
     def __str__(self) -> str:
         return "FieldLineSegment("
@@ -103,7 +103,7 @@ class FieldLineSegment:
             f"p1={self.p1!s}, "
             f"p2={self.p2!s}, "
             f"thickness={self.thickness:.1f}, "
-            f"type={self.type}"
+            f"type={self.field_shape_type}"
             ")"
         )
 
@@ -124,8 +124,8 @@ class FieldLineSegment:
         return self.__thickness
 
     @property
-    def type(self) -> FieldShapeType:
-        return self.__type
+    def field_shape_type(self) -> FieldShapeType:
+        return self.__field_shape_type
 
 
 class FieldCircularArc:
@@ -156,7 +156,7 @@ class FieldCircularArc:
         a1: float,
         a2: float,
         thickness: float,
-        type: FieldShapeType = FieldShapeType.UNDEFINED,
+        field_shape_type: FieldShapeType = FieldShapeType.UNDEFINED,
     ):
 
         self.__name: str = name
@@ -171,7 +171,7 @@ class FieldCircularArc:
 
         self.__thickness: float = thickness
 
-        self.__type: FieldShapeType = type
+        self.__field_shape_type: FieldShapeType = field_shape_type
 
     def __str__(self) -> str:
         return (
@@ -182,7 +182,7 @@ class FieldCircularArc:
             f"a1={self.a1:.1f}, "
             f"a2={self.a2:.1f}, "
             f"thickness={self.thickness:.1f}, "
-            f"type={self.type}"
+            f"type={self.field_shape_type}"
             ")"
         )
 
@@ -195,7 +195,7 @@ class FieldCircularArc:
             f"{self.a1}, "
             f"{self.a2}, "
             f"{self.thickness}, "
-            f"{self.type}"
+            f"{self.field_shape_type}"
             ")"
         )
 
@@ -254,13 +254,13 @@ class FieldCircularArc:
         return self.__thickness
 
     @property
-    def type(self) -> FieldShapeType:
+    def field_shape_type(self) -> FieldShapeType:
         """type
 
         Returns:
             FieldShapeType: The type of this shape
         """
-        return self.__type
+        return self.__field_shape_type
 
 
 class GeometryFieldSize:

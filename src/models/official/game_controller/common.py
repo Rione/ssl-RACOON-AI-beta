@@ -33,30 +33,34 @@ class RobotId:
     """RobotId
 
     Args:
-        id (int): The id of the robot.
+        robot_id (int): The id of the robot.
         team (Team): The team of the robot.
     """
 
-    def __init__(self, id: int = -1, team: Team = Team.UNKNOWN) -> None:
+    def __init__(
+        self,
+        robot_id: int = -1,
+        team: Team = Team.UNKNOWN,
+    ) -> None:
 
-        self.__id: int = id
+        self.__robot_id: int = robot_id
 
         self.__team: Team = team
 
     def __str__(self) -> str:
-        return f"RobotId(id={self.id}, team={self.team!s})"
+        return f"RobotId(id={self.robot_id}, team={self.team!s})"
 
     def __repr__(self) -> str:
-        return f"RobotId({self.id}, {self.team})"
+        return f"RobotId({self.robot_id}, {self.team})"
 
     @property
-    def id(self) -> int:
+    def robot_id(self) -> int:
         """id
 
         Returns:
             int: The id of the robot.
         """
-        return self.__id
+        return self.__robot_id
 
     @property
     def team(self) -> Team:
