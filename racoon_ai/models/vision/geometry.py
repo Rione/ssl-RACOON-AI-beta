@@ -17,7 +17,7 @@
 
 from enum import Enum
 
-from racoon_ai.models.official.vision.coordinate import Vector2f
+from racoon_ai.models.vision.coordinate import Vector2f
 
 
 class FieldShapeType(Enum):

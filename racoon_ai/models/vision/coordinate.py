@@ -8,7 +8,7 @@
         - Pose3D
 """
 
-from racoon_ai.models.official.vision.detection_tracked import Vector2f, Vector3f
+from racoon_ai.models.vision.detection_tracked import Vector2f, Vector3f
 
 
 class Orientation:

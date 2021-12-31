@@ -18,7 +18,7 @@
 
 from enum import Enum
 
-from racoon_ai.models.official.game_controller.common import RobotId, Team
+from racoon_ai.models.game_controller.common import RobotId, Team
 
 
 class Vector:

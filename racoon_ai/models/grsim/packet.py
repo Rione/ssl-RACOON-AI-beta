@@ -10,8 +10,8 @@
 """
 
 
-from racoon_ai.models.official.grsim.commands import SimCommands
-from racoon_ai.models.official.grsim.replacement import Replacement
+from racoon_ai.models.grsim.commands import SimCommands
+from racoon_ai.models.grsim.replacement import Replacement
 
 
 class SimPacket:

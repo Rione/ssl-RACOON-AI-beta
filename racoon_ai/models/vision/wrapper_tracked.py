@@ -10,7 +10,7 @@
 """
 
 
-from racoon_ai.models.official.vision.detection_tracked import TrackedFrame
+from racoon_ai.models.vision.detection_tracked import TrackedFrame
 
 
 class TrackerWrapperPacket:

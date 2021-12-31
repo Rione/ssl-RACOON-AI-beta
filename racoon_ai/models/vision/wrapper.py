@@ -9,8 +9,8 @@
         https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_wrapper.proto
 """
 
-from racoon_ai.models.official.vision.detection import DetectionFrame
-from racoon_ai.models.official.vision.geometry import GeometryData
+from racoon_ai.models.vision.detection import DetectionFrame
+from racoon_ai.models.vision.geometry import GeometryData
 
 
 class WrapperPacket:

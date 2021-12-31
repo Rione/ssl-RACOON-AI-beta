@@ -9,7 +9,7 @@ import socket
 import time
 from typing import List
 
-from racoon_ai.models.official.grsim.commands import RobotCommand
+from racoon_ai.models.grsim.commands import RobotCommand
 from racoon_ai.proto_py.grSim_Commands_pb2 import grSim_Commands, grSim_Robot_Command
 from racoon_ai.proto_py.grSim_Packet_pb2 import grSim_Packet
 

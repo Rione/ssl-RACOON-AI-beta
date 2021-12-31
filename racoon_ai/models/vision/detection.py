@@ -11,7 +11,7 @@
         https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_detection.proto
 """
 
-from racoon_ai.models.official.vision.coordinate import Pose2D, Pose3D
+from racoon_ai.models.vision.coordinate import Pose2D, Pose3D
 
 
 class DetectionBall(Pose3D):

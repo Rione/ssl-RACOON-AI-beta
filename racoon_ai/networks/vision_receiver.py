@@ -11,8 +11,8 @@ from typing import List
 import racoon_ai.proto_py.messages_robocup_ssl_detection_pb2
 import racoon_ai.proto_py.messages_robocup_ssl_geometry_pb2
 import racoon_ai.proto_py.messages_robocup_ssl_wrapper_pb2
-from racoon_ai.models.official.vision.detection import DetectionBall, DetectionFrame, DetectionRobot
-from racoon_ai.models.official.vision.geometry import GeometryCameraCalibration, GeometryData, GeometryFieldSize
+from racoon_ai.models.vision.detection import DetectionBall, DetectionFrame, DetectionRobot
+from racoon_ai.models.vision.geometry import GeometryCameraCalibration, GeometryData, GeometryFieldSize
 
 
 class VisionReceiver:

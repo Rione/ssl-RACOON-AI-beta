@@ -12,7 +12,7 @@
 
 
 from racoon_ai.models.custom.robot_custom_feedback import RobotCustomFeedback
-from racoon_ai.models.official.grsim.error import SimError
+from racoon_ai.models.grsim.error import SimError
 
 
 class RobotFeedback:
