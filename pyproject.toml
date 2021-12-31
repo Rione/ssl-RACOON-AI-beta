@@ -18,8 +18,12 @@ pre-commit = "^2.16.0"
 pre-commit-hooks = "^4.0.1"
 mypy = "^0.930"
 
+[tool.black]
+line-length = 120
+
 [tool.isort]
 profile = "black"
+line_length = 120
 
 [tool.pylint.messages_control]
 # C0330, C0326: Conflict with black
@@ -28,7 +32,7 @@ profile = "black"
 disable = "C0330, C0326, R0902, R0913"
 
 [tool.pylint.format]
-max-line-length = "88"
+max-line-length = "120"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
