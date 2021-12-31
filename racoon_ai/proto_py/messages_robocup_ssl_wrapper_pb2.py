@@ -15,7 +15,6 @@ _sym_db = _symbol_database.Default()
 import proto_py.messages_robocup_ssl_detection_pb2 as messages__robocup__ssl__detection__pb2
 import proto_py.messages_robocup_ssl_geometry_pb2 as messages__robocup__ssl__geometry__pb2
 
-
 DESCRIPTOR = _descriptor.FileDescriptor(
     name="messages_robocup_ssl_wrapper.proto",
     package="",

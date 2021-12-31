@@ -11,16 +11,8 @@ from typing import List
 import proto_py.messages_robocup_ssl_detection_pb2
 import proto_py.messages_robocup_ssl_geometry_pb2
 import proto_py.messages_robocup_ssl_wrapper_pb2
-from models.official.vision.detection import (
-    DetectionBall,
-    DetectionFrame,
-    DetectionRobot,
-)
-from models.official.vision.geometry import (
-    GeometryCameraCalibration,
-    GeometryData,
-    GeometryFieldSize,
-)
+from models.official.vision.detection import DetectionBall, DetectionFrame, DetectionRobot
+from models.official.vision.geometry import GeometryCameraCalibration, GeometryData, GeometryFieldSize
 
 
 class VisionReceiver:

@@ -15,7 +15,6 @@ _sym_db = _symbol_database.Default()
 import proto_py.grSim_Commands_pb2 as grSim__Commands__pb2
 import proto_py.grSim_Replacement_pb2 as grSim__Replacement__pb2
 
-
 DESCRIPTOR = _descriptor.FileDescriptor(
     name="grSim_Packet.proto",
     package="",
