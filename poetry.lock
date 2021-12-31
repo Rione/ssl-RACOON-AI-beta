@@ -326,6 +326,25 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "types-futures"
+version = "3.3.1"
+description = "Typing stubs for futures"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "types-protobuf"
+version = "3.18.2"
+description = "Typing stubs for protobuf"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+types-futures = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.0.1"
 description = "Backported and Experimental Type Hints for Python 3.6+"
@@ -363,7 +382,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "cd5c266772116e20b5d7dca619d08c9b21eeb7a662de8d3c1cdc4ed8f531da20"
+content-hash = "7469d0ded154f6ed7c85536d6ba965338a67856144e81e134df5f491e8423746"
 
 [metadata.files]
 astroid = [
@@ -614,6 +633,14 @@ toml = [
 tomli = [
     {file = "tomli-1.2.3-py3-none-any.whl", hash = "sha256:e3069e4be3ead9668e21cb9b074cd948f7b3113fd9c8bba083f48247aab8b11c"},
     {file = "tomli-1.2.3.tar.gz", hash = "sha256:05b6166bff487dc068d322585c7ea4ef78deed501cc124060e0f238e89a9231f"},
+]
+types-futures = [
+    {file = "types-futures-3.3.1.tar.gz", hash = "sha256:bbdad92cec642693bac10fbbecf834776009db7782d91dc293bdd123be73186d"},
+    {file = "types_futures-3.3.1-py3-none-any.whl", hash = "sha256:b4bb97d1a028679929a8da2e9e63a5caccc6f68d0d6a456c41fd00e32764f144"},
+]
+types-protobuf = [
+    {file = "types-protobuf-3.18.2.tar.gz", hash = "sha256:ca21dedfe7759acbeb0cd8f5c72a74ff3c409ae0c07bc1d94eff5123ac0fa23c"},
+    {file = "types_protobuf-3.18.2-py3-none-any.whl", hash = "sha256:bcf3176ca59b42145fd60530f918b74fba01903a6cd96b94fa488791e3af0586"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.0.1-py3-none-any.whl", hash = "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"},
