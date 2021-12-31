@@ -209,6 +209,13 @@ class BallReplacement:
 
 
 class Replacement:
+    """Replacement
+
+    Attributes:
+        robot (RobotReplacement):
+        ball (BallReplacement):
+    """
+
     def __init__(
         self,
         robot: RobotReplacement,
