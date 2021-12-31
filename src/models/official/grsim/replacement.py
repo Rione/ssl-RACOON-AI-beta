@@ -18,8 +18,8 @@ class RobotReplacement:
     Attributes:
         x (float): X-coordinate of the target
         y (float): Y-coordinate of the target
-        dir (float): Direction of the target
-        id (int): ID of the robot
+        orientation (float): Direction of the target
+        robot_id (int): ID of the robot
         yellow_team (bool): Whether the robot is on the yellow team
         turnon (bool): Whether the robot is turned on or not
     """
@@ -28,8 +28,8 @@ class RobotReplacement:
         self,
         x: float,
         y: float,
-        dir: float,
-        id: int,
+        orientation: float,
+        robot_id: int,
         yellow_team: bool,
         turnon: bool = False,
     ) -> None:
@@ -38,9 +38,9 @@ class RobotReplacement:
 
         self.__y: float = y
 
-        self.__dir: float = dir
+        self.__orientation: float = orientation
 
-        self.__id: int = id
+        self.__robot_id: int = robot_id
 
         self.__yellow_team: bool = yellow_team
 
@@ -51,8 +51,8 @@ class RobotReplacement:
             "RobotReplacement("
             f"x={self.x:.2f} ,"
             f"y={self.y:.2f} ,"
-            f"dir={self.dir:.2f} ,"
-            f"id={self.id:2d} ,"
+            f"dir={self.orientation:.2f} ,"
+            f"id={self.robot_id:2d} ,"
             f"yellow_team={self.yellow_team!s} ,"
             f"turnon={self.turnon!s}"
             ")"
@@ -63,8 +63,8 @@ class RobotReplacement:
             "RobotReplacement("
             f"{self.x}, "
             f"{self.y}, "
-            f"{self.dir}, "
-            f"{self.id}, "
+            f"{self.orientation}, "
+            f"{self.robot_id}, "
             f"{self.yellow_team}, "
             f"{self.turnon}"
             ")"
@@ -89,22 +89,22 @@ class RobotReplacement:
         return self.__y
 
     @property
-    def dir(self) -> float:
+    def orientation(self) -> float:
         """dir
 
         Returns:
             float: Direction of the target
         """
-        return self.__dir
+        return self.__orientation
 
     @property
-    def id(self) -> int:
+    def robot_id(self) -> int:
         """id
 
         Returns:
             int: ID of the robot
         """
-        return self.__id
+        return self.__robot_id
 
     @property
     def yellow_team(self) -> bool:

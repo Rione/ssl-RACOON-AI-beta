@@ -58,15 +58,21 @@ class CommandSender:
         # set_robotcommandされた分だけループさせる
         # TO_DO: 複数同じロボットがappendされてたらどうする？
         for robot_command in self.__data:
-            send_data_one = grSim_Robot_Command()
-            send_data_one.id = robot_command.id
-            send_data_one.kickspeedx = robot_command.kickspeedx
-            send_data_one.kickspeedz = robot_command.kickspeedz
-            send_data_one.veltangent = robot_command.veltangent
-            send_data_one.velnormal = robot_command.velnormal
-            send_data_one.velangular = robot_command.velangular
-            send_data_one.spinner = robot_command.spinner
-            send_data_one.wheelsspeed = robot_command.wheelsspeed
+            send_data_one: grSim_Robot_Command = grSim_Robot_Command()
+            send_data_one.id = robot_command.robot_id
+            send_data_one.kickspeedx = robot_command.kickpow
+            send_data_one.kickspeedz = robot_command.kickpow_z
+            send_data_one.veltangent = robot_command.vel_fwd
+            send_data_one.velnormal = robot_command.vel_sway
+            send_data_one.velangular = robot_command.vel_angular
+            send_data_one.spinner = bool(robot_command.dribble_pow)
+            send_data_one.wheelsspeed = robot_command.use_wheels_speed
+
+            if robot_command.use_wheels_speed:
+                send_data_one.wheel1 = robot_command.wheel1
+                send_data_one.wheel2 = robot_command.wheel2
+                send_data_one.wheel3 = robot_command.wheel3
+                send_data_one.wheel4 = robot_command.wheel4
 
             send_data.robot_commands.append(send_data_one)
 

@@ -15,7 +15,7 @@ class RobotStatus:
     """RobotStatus
 
     Attributes:
-        id (int): ID of the robot
+        robot_id (int): ID of the robot
         infrared (bool):
         flat_kick (bool):
         chip_kick (bool):
@@ -23,13 +23,13 @@ class RobotStatus:
 
     def __init__(
         self,
-        id: int,
+        robot_id: int,
         infrared: bool,
         flat_kick: bool,
         chip_kick: bool,
     ) -> None:
 
-        self.__id: int = id
+        self.__robot_id: int = robot_id
 
         self.__infrared: bool = infrared
 
@@ -40,7 +40,7 @@ class RobotStatus:
     def __str__(self) -> str:
         return (
             "RobotStatus("
-            f"id={self.id:2d}, "
+            f"id={self.robot_id:2d}, "
             f"infrared={self.infrared!s}, "
             f"flat_kick={self.flat_kick!s}, "
             f"chip_kick={self.chip_kick!s}"
@@ -50,7 +50,7 @@ class RobotStatus:
     def __repr__(self) -> str:
         return (
             "RobotStatus("
-            f"{self.id}, "
+            f"{self.robot_id}, "
             f"{self.infrared}, "
             f"{self.flat_kick}, "
             f"{self.chip_kick}"
@@ -58,13 +58,13 @@ class RobotStatus:
         )
 
     @property
-    def id(self) -> int:
+    def robot_id(self) -> int:
         """id
 
         Returns:
             int: ID of the robot
         """
-        return self.__id
+        return self.__robot_id
 
     @property
     def infrared(self) -> bool:

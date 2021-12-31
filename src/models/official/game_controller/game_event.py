@@ -95,9 +95,27 @@ class GameEvent:
     def __init__(
         self,
         origin: str,
-        type: EventType = EventType.UNKNOWN_GAME_EVENT_TYPE,
+        event_type: EventType = EventType.UNKNOWN_GAME_EVENT_TYPE,
     ) -> None:
 
         self.__origin: str = origin
 
-        self.__type: EventType = type
+        self.__event_type: EventType = event_type
+
+    @property
+    def origin(self) -> str:
+        """Origin
+
+        Returns:
+            str: Origin
+        """
+        return self.__origin
+
+    @property
+    def event_type(self) -> EventType:
+        """EventType
+
+        Returns:
+            EventType: EventType
+        """
+        return self.__event_type

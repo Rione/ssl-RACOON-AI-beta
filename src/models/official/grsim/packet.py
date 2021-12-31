@@ -19,14 +19,14 @@ class SimPacket:
 
     Attributes:
         commands (SimCommands): Commands for the robots
-        replacement (Replacement): Replacement for the robots
+        replacement (Replacement): Replacement commands
     """
 
     def __init__(self, commands: SimCommands, replacement: Replacement) -> None:
 
-        self.commands: SimCommands = commands
+        self.__commands: SimCommands = commands
 
-        self.replacement: Replacement = replacement
+        self.__replacement: Replacement = replacement
 
     def __str__(self) -> str:
         return (
@@ -43,3 +43,39 @@ class SimPacket:
             f"replacement={self.replacement}"
             ")"
         )
+
+    @property
+    def commands(self) -> SimCommands:
+        """commands
+
+        Returns:
+            SimCommands: Commands for the robots
+        """
+        return self.__commands
+
+    @commands.setter
+    def commands(self, value: SimCommands) -> None:
+        """commands
+
+        Args:
+            value (SimCommands): Commands for the robots
+        """
+        self.__commands = value
+
+    @property
+    def replacement(self) -> Replacement:
+        """replacement
+
+        Returns:
+            Replacement: Replacement commands
+        """
+        return self.__replacement
+
+    @replacement.setter
+    def replacement(self, value: Replacement) -> None:
+        """replacement
+
+        Args:
+            value (Replacement): Replacement commands
+        """
+        self.__replacement = value
