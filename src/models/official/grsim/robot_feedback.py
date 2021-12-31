@@ -37,6 +37,24 @@ class RobotFeedback:
 
         self.__custom: RobotCustomFeedback = custom
 
+    def __str__(self) -> str:
+        return (
+            "RobotFeedback("
+            f"id={self.id:2d} ,"
+            f"dribbler_ball_contact={self.dribbler_ball_contact!s} ,"
+            f"custom={self.custom!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "RobotFeedback("
+            f"{self.id}, "
+            f"{self.dribbler_ball_contact}, "
+            f"{self.custom}"
+            ")"
+        )
+
     @property
     def id(self) -> int:
         """id
@@ -82,6 +100,17 @@ class RobotControlResponse:
         self.__errors: list[SimError] = errors
 
         self.__feedback: list[RobotFeedback] = feedback
+
+    def __str__(self) -> str:
+        return (
+            "RobotControlResponse("
+            f"errors={self.errors!s}, "
+            f"feedback={self.feedback!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return f"RobotControlResponse({self.errors}, {self.feedback})"
 
     @property
     def errors(self) -> list[SimError]:

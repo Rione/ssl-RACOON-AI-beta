@@ -46,6 +46,30 @@ class RobotReplacement:
 
         self.__turnon: bool = turnon
 
+    def __str__(self) -> str:
+        return (
+            "RobotReplacement("
+            f"x={self.x:.2f} ,"
+            f"y={self.y:.2f} ,"
+            f"dir={self.dir:.2f} ,"
+            f"id={self.id:2d} ,"
+            f"yellow_team={self.yellow_team!s} ,"
+            f"turnon={self.turnon!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "RobotReplacement("
+            f"{self.x}, "
+            f"{self.y}, "
+            f"{self.dir}, "
+            f"{self.id}, "
+            f"{self.yellow_team}, "
+            f"{self.turnon}"
+            ")"
+        )
+
     @property
     def x(self) -> float:
         """x
@@ -127,6 +151,26 @@ class BallReplacement:
 
         self.__vy: float = vy
 
+    def __str__(self) -> str:
+        return (
+            "BallReplacement("
+            f"x={self.x:.2f} ,"
+            f"y={self.y:.2f} ,"
+            f"vx={self.vx:.2f} ,"
+            f"vy={self.vy:.2f}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "BallReplacement("
+            f"{self.x}, "
+            f"{self.y}, "
+            f"{self.vx}, "
+            f"{self.vy}"
+            ")"
+        )
+
     @property
     def x(self) -> float:
         """x
@@ -174,6 +218,12 @@ class Replacement:
         self.__robot: RobotReplacement = robot
 
         self.__ball: BallReplacement = ball
+
+    def __str__(self) -> str:
+        return f"Replacement(robot={self.robot!s}, ball={self.ball!s})"
+
+    def __repr__(self) -> str:
+        return f"Replacement({self.robot}, {self.ball})"
 
     @property
     def robot(self) -> RobotReplacement:

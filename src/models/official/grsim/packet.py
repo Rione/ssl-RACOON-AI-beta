@@ -27,3 +27,19 @@ class SimPacket:
         self.commands: SimCommands = commands
 
         self.replacement: Replacement = replacement
+
+    def __str__(self) -> str:
+        return (
+            "SimPacket("
+            f"commands={self.commands!s}, "
+            f"replacement={self.replacement!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "SimPacket("
+            f"commands={self.commands}, "
+            f"replacement={self.replacement}"
+            ")"
+        )

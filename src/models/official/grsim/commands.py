@@ -69,6 +69,54 @@ class RobotCommand:
 
         self.wheel4: float = wheel4
 
+    def __str__(self) -> str:
+        if not self.wheelsspeed:
+            return (
+                "RobotCommand("
+                f"id={self.id} ,"
+                f"kickspeedx={self.kickspeedx} ,"
+                f"kickspeedz={self.kickspeedz} ,"
+                f"veltangent={self.veltangent} ,"
+                f"velnormal={self.velnormal} ,"
+                f"velangular={self.velangular} ,"
+                f"spinner={self.spinner} ,"
+            )
+
+        return (
+            "RobotCommand("
+            f"id={self.id:2d} ,"
+            f"kickspeedx={self.kickspeedx:.1f} ,"
+            f"kickspeedz={self.kickspeedz:.1f} ,"
+            f"veltangent={self.veltangent:.2E} ,"
+            f"velnormal={self.velnormal:.2E} ,"
+            f"velangular={self.velangular:.2E} ,"
+            f"spinner={self.spinner!s} ,"
+            f"wheelsspeed={self.wheelsspeed!s} ,"
+            f"wheel1={self.wheel1:.2E} ,"
+            f"wheel2={self.wheel2:.2E} ,"
+            f"wheel3={self.wheel3:.2E} ,"
+            f"wheel4={self.wheel4:.2E} ,"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "RobotCommand("
+            f"{self.id} ,"
+            f"{self.kickspeedx} ,"
+            f"{self.kickspeedz} ,"
+            f"{self.veltangent} ,"
+            f"{self.velnormal} ,"
+            f"{self.velangular} ,"
+            f"{self.spinner} ,"
+            f"{self.wheelsspeed} ,"
+            f"{self.wheel1} ,"
+            f"{self.wheel2} ,"
+            f"{self.wheel3} ,"
+            f"{self.wheel4} ,"
+            ")"
+        )
+
 
 class SimCommands:
     """SimCommands
@@ -91,3 +139,21 @@ class SimCommands:
         self.isteamyellow: bool = isteamyellow
 
         self.robot_commands: list[RobotCommand] = robot_commands
+
+    def __str__(self) -> str:
+        return (
+            "SimCommands("
+            f"timestamp={self.timestamp:.2f} ,"
+            f"isteamyellow={self.isteamyellow!s} ,"
+            f"robot_commands={self.robot_commands!s} ,"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "SimCommands("
+            f"{self.timestamp} ,"
+            f"{self.isteamyellow} ,"
+            f"{self.robot_commands} ,"
+            ")"
+        )

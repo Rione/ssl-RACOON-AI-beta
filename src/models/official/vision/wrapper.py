@@ -27,6 +27,17 @@ class WrapperPacket:
 
         self.__geometry: GeometryData = geomrtry
 
+    def __str__(self) -> str:
+        return (
+            "WrapperPacket("
+            f"detection={self.detection!s}, "
+            f"geometry={self.geometry!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return f"WrapperPacket({self.detection}, {self.geometry})"
+
     @property
     def detection(self) -> DetectionFrame:
         """detection

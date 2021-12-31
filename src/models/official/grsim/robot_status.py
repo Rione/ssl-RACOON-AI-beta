@@ -37,6 +37,26 @@ class RobotStatus:
 
         self.__chip_kick: bool = chip_kick
 
+    def __str__(self) -> str:
+        return (
+            "RobotStatus("
+            f"id={self.id:2d}, "
+            f"infrared={self.infrared!s}, "
+            f"flat_kick={self.flat_kick!s}, "
+            f"chip_kick={self.chip_kick!s}"
+            ")"
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "RobotStatus("
+            f"{self.id}, "
+            f"{self.infrared}, "
+            f"{self.flat_kick}, "
+            f"{self.chip_kick}"
+            ")"
+        )
+
     @property
     def id(self) -> int:
         """id
@@ -84,6 +104,12 @@ class RobotsStatus:
     def __init__(self, robots_status: list[RobotStatus]) -> None:
 
         self.__robots: list[RobotStatus] = robots_status
+
+    def __str__(self) -> str:
+        return f"RobotsStatus(robots={self.robots!s})"
+
+    def __repr__(self) -> str:
+        return f"RobotsStatus({self.robots})"
 
     @property
     def robots(self) -> list[RobotStatus]:

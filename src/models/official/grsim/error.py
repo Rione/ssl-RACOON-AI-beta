@@ -28,9 +28,15 @@ class SimError:
 
         self.__message: str = message
 
+    def __str__(self) -> str:
+        return f"[ERROR:grSim] {self.code}: {self.message}"
+
+    def __repr__(self) -> str:
+        return f"SimError({self.code}, {self.message})"
+
     @property
-    def error_code(self) -> str:
-        """error_code
+    def code(self) -> str:
+        """code
 
         Returns:
             str: Unique code of the error for automatic handling on client side
@@ -38,8 +44,8 @@ class SimError:
         return self.__code
 
     @property
-    def error_msg(self) -> str:
-        """error_msg
+    def message(self) -> str:
+        """message
 
         Returns:
             str: Human readable description of the error
