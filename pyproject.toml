@@ -11,19 +11,30 @@ protobuf = "^3.19.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
-isort = "^5.10.1"
+isort = {extras = ["colors"], version = "^5.10.1"}
 flake8 = "^4.0.1"
 pylint = "^2.12.2"
 pre-commit = "^2.16.0"
 pre-commit-hooks = "^4.0.1"
 mypy = "^0.930"
+types-protobuf = "^3.18.2"
+mypy-protobuf = "^3.1.0"
 
 [tool.black]
 line-length = 120
+extend-exclude = "racoon_ai/proto_py/"
 
 [tool.isort]
 profile = "black"
 line_length = 120
+skip_glob = ["racoon_ai/proto_py/*"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+
+[tool.pylint.master]
+ignore = "proto_py"
 
 [tool.pylint.messages_control]
 # C0330, C0326: Conflict with black

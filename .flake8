@@ -1,3 +1,9 @@
 [flake8]
 max-line-length = 120
 extend-ignore = E203
+exclude =
+  .git,
+  __pycache__,
+  dist,
+  *_pb2.py,
+  *.pyi
