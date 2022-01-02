@@ -22,19 +22,19 @@ pylint = "^2.12.2"
 
 [tool.black]
 line-length = 120
-extend-exclude = "racoon_ai/proto_py/"
+extend-exclude = "racoon_ai/proto/pb_gen"
 
 [tool.isort]
 profile = "black"
 line_length = 120
-skip_glob = ["racoon_ai/proto_py/*"]
+skip_glob = ["racoon_ai/proto/pb_gen/*"]
 
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
 
 [tool.pylint.master]
-ignore = "proto_py"
+ignore = "pb_gen"
 
 [tool.pylint.messages_control]
 # C0330, C0326: Conflict with black
