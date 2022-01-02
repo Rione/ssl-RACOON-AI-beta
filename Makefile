@@ -1,9 +1,9 @@
-GIT_ROOT  := $(shell git rev-parse --show-toplevel)
+ROOT      := .
 
-PRJ_NAME  := racoon_ai
-PROJECT   := $(GIT_ROOT)/$(PRJ_NAME)
-SRC       := $(PROJECT) $(GIT_ROOT)/cmd
-VENV      := $(GIT_ROOT)/.venv
+PROJECT   := racoon_ai
+PROTO     := $(ROOT)/$(PROJECT)/proto
+SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd
+VENV      := $(ROOT)/.venv
 
 .PHONY: all
 all: run
@@ -63,8 +63,25 @@ install: $(VENV)
 	poetry install
 
 .PHONY: build
-build: clean-deps $(SRC)
-	protoc --proto_path=$(GIT_ROOT)/proto/ --plugin=protoc-gen-mypy=$(VENV)/bin/protoc-gen-mypy --python_out=$(PROJECT)/proto_py --mypy_out=$(PROJECT)/proto_py $(GIT_ROOT)/proto/*.proto
+build: build-proto build-src
+
+.PHONY: build-proto
+build-proto: $(PROTO) clean-deps
+	@protoc \
+		--proto_path=$(PROTO)/pb_src \
+		--plugin=protoc-gen-mypy=$(VENV)/bin/protoc-gen-mypy \
+		--python_out=$(PROTO)/pb_gen \
+		--mypy_out=$(PROTO)/pb_gen \
+			$(PROTO)/pb_src/*.proto
+
+	@poetry run protol \
+		--in-place \
+		--python-out $(PROTO)/pb_gen \
+		protoc --proto-path=$(PROTO)/pb_src \
+			$(PROTO)/pb_src/*.proto
+
+.PHONY: build-src
+build-src: $(SRC) clean-deps
 	poetry build -vv
 
 
@@ -95,25 +112,25 @@ lint: flake8 pylint black-check isort-check
 flake8:
 	@echo ""
 	@echo "Running flake8..."
-	@poetry run flake8 --config ./.flake8 --statistics --exit-zero --benchmark $(SRC)
+	@poetry run flake8 --config $(ROOT)/.flake8 --statistics --exit-zero --benchmark $(SRC)
 
 .PHONY: pylint
 pylint:
 	@echo ""
 	@echo "Running pylint..."
-	@poetry run pylint --exit-zero --rcfile=$(GIT_ROOT)/pyproject.toml --output-format=colorized --reports=y $(SRC)
+	@poetry run pylint --exit-zero --rcfile=$(ROOT)/pyproject.toml --output-format=colorized --reports=y $(SRC)
 
 .PHONY: black-check
 black-check:
 	@echo ""
 	@echo "Checking code formatting with black..."
-	@poetry run black --verbose --check --color --config $(GIT_ROOT)/pyproject.toml $(SRC)
+	@poetry run black --verbose --check --color --config $(ROOT)/pyproject.toml $(SRC)
 
 .PHONY: isort-check
 isort-check:
 	@echo ""
 	@echo "Checking code formatting with isort..."
-	@poetry run isort --verbose --check-only --settings-file $(GIT_ROOT)/pyproject.toml --color $(SRC)
+	@poetry run isort --verbose --check-only --settings-file ./pyproject.toml --color $(SRC)
 
 
 # Format ######################################################################
@@ -123,8 +140,8 @@ format: black isort
 
 .PHONY: black
 black:
-	poetry run black --config $(GIT_ROOT)/pyproject.toml $(SRC)
+	poetry run black --config $(ROOT)/pyproject.toml $(SRC)
 
 .PHONY: isort
 isort:
-	poetry run isort --verbose --setting-file $(GIT_ROOT)/pyproject.toml --color $(SRC)
+	poetry run isort --verbose --setting-file $(ROOT)/pyproject.toml --color $(SRC)

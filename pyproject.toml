@@ -18,6 +18,7 @@ mypy = "^0.930"
 mypy-protobuf = "^3.1.0"
 pre-commit = "^2.16.0"
 pre-commit-hooks = "^4.0.1"
+protoletariat = "^0.7.1"
 pylint = "^2.12.2"
 
 [tool.black]
