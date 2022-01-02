@@ -92,7 +92,7 @@ venv.bak/
 .pytype/
 
 # protobuf generated files
-racoon_ai/proto_py/*.py
+racoon_ai/**/*_pb2.py*
 
 ### IntelliJ ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
