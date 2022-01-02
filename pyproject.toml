@@ -34,6 +34,9 @@ skip_glob = ["racoon_ai/proto/pb_gen/*"]
 python_version = "3.10"
 ignore_missing_imports = true
 
+[tool.pylint.basic]
+good-names = ["x", "y", "z"]
+
 [tool.pylint.master]
 ignore = "pb_gen"
 
