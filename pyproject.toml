@@ -35,7 +35,7 @@ python_version = "3.10"
 ignore_missing_imports = true
 
 [tool.pylint.basic]
-good-names = ["x", "y", "z"]
+good-names = ["i", "j", "k", "x", "y", "z"]
 
 [tool.pylint.master]
 ignore = "pb_gen"
