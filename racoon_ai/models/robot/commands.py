@@ -12,6 +12,7 @@
 
 from dataclasses import dataclass, field
 from time import time
+from typing import Optional
 
 
 @dataclass()
@@ -80,3 +81,25 @@ class SimCommands:
     isteamyellow: bool = field(default=False)
 
     robot_commands: list[RobotCommand] = field(default_factory=list[RobotCommand])
+
+    def append_robot_command(self, robot_command: RobotCommand) -> None:
+        """append_robot_command
+
+        Args:
+            robot_command (RobotCommand): Robot command to add
+        """
+        self.robot_commands.append(robot_command)
+
+    def get_robot_command(self, robot_id: int) -> Optional[RobotCommand]:
+        """get_robot_command
+
+        Args:
+            robot_id (int): ID of the robot
+
+        Returns:
+            Optional[RobotCommand]: Robot command
+        """
+        for robot_command in self.robot_commands:
+            if robot_command.robot_id == robot_id:
+                return robot_command
+        return None
