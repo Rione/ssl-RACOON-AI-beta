@@ -34,20 +34,22 @@ skip_glob = ["racoon_ai/proto/pb_gen/*"]
 python_version = "3.10"
 ignore_missing_imports = true
 
-[tool.pylint.basic]
-good-names = ["i", "j", "k", "x", "y", "z"]
+[tool.pylint]
+  [tool.pylint.basic]
+  good-names = ["i", "j", "k", "x", "y", "z"]
 
-[tool.pylint.master]
-ignore = "pb_gen"
+  [tool.pylint.master]
+  ignore = "pb_gen"
 
-[tool.pylint.messages_control]
-# C0330, C0326: Conflict with black
-# R0902: Too many instance attributes
-# R0913: Too many arguments
-disable = "C0330, C0326, R0902, R0913"
+  [tool.pylint.messages_control]
+  # C0330, C0326: Conflict with black
+  # W0511: Used when a warning note as FIXME or XXX is detected.
+  # R0902: Too many instance attributes
+  # R0913: Too many arguments
+  disable = "C0330, C0326, W0511, R0902, R0913"
 
-[tool.pylint.format]
-max-line-length = "120"
+  [tool.pylint.format]
+  max-line-length = "120"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
