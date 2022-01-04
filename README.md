@@ -49,9 +49,10 @@ Pythonのバージョンは3.10です。
 
 依存関係管理とパッケージングには、[poetry](https://python-poetry.org)を使用します。(下記は ubuntu 環境でのコマンド例です)  
 
+以下、Python3.10環境下の前提でのコマンド例です。
 ```sh
 # Install poetry
-$ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+$ curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/install-poetry.py | python3
 
 # Follow the description, add installed package to your PATH
 $ export $PATH="$PATH:<PATH_TO_POETRY_BIN>"
