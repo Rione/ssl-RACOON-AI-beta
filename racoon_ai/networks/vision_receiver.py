@@ -6,7 +6,6 @@
 """
 
 import socket
-from operator import itemgetter
 from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
@@ -30,7 +29,7 @@ class VisionReceiver(Network):
 
         self.__num_of_cameras: int = 4
 
-        self.__balls: list[SSL_DetectionBall] = []
+        self.__ball: Optional[SSL_DetectionBall] = None
 
         self.__blue_robots: list[SSL_DetectionRobot] = []
 
@@ -82,15 +81,16 @@ class VisionReceiver(Network):
         ]
 
         # SSL_DetectionFrameをパースして、SSL_DetectionBall
-        self.__balls = [ball for frame in dframes for ball in frame.balls] if not self.__balls else self.__balls
+        balls: list[SSL_DetectionBall] = [ball for frame in dframes for ball in frame.balls]
+        self.__ball = balls[0] if len(balls) else None
 
         # SSL_DetectionFrameをパースして、SSL_DetectionRobot
         blue_robots = [robot for frame in dframes for robot in frame.robots_blue]
         yellow_robots = [robot for frame in dframes for robot in frame.robots_yellow]
 
         # ロボットを整列(0-10まで)させる
-        self.__blue_robots = sorted(blue_robots, key=itemgetter("robot_id"))
-        self.__yellow_robots = sorted(yellow_robots, key=itemgetter("robot_id"))
+        self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
+        self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
 
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
@@ -114,16 +114,13 @@ class VisionReceiver(Network):
         return self.__num_of_cameras
 
     @property
-    def balls(self) -> list[SSL_DetectionBall]:
+    def ball(self) -> SSL_DetectionBall:
         """balls
 
         Returns:
-            Optional[list[SSL_DetectionBall]] | None
-
-        Note:
-            2回目以降の参照は、前の値をそのまま出力
+            SSL_DetectionBall
         """
-        return self.__balls
+        return self.__ball or SSL_DetectionBall()
 
     @property
     def blue_robots(self) -> list[SSL_DetectionRobot]:
@@ -167,16 +164,3 @@ class VisionReceiver(Network):
             List[SSL_DetectionRobot]
         """
         return self.__blue_robots + self.__yellow_robots
-
-
-# 以下、テストコード。コメントアウトして実行すると
-# 青チームロボットのロボットIDがそれぞれ出力される。
-test = VisionReceiver()
-try:
-    test.receive()
-    print(test.blue_robots)
-except KeyboardInterrupt:
-    del test
-# blue = test.get_blue_robots()
-# for robot in blue:
-#     print(robot.robot_id)

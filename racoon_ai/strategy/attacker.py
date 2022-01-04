@@ -63,7 +63,7 @@ class Attacker:
         self.__vision = vision
         self.__send_cmds: list[RobotCommand]
         self.__our_robots: list[SSL_DetectionRobot] = self.__vision.blue_robots
-        self.__balls: list[SSL_DetectionBall] = self.__vision.balls
+        self.__ball: SSL_DetectionBall = self.__vision.ball
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -85,7 +85,7 @@ class Attacker:
 
     def _straight_move_ball(self) -> RobotCommand:
         radian_ball_robot = radian_normalize(
-            radian(self.__balls[0], self.__our_robots[0]) - self.__our_robots[0].orientation
+            radian(self.__ball, self.__our_robots[0]) - self.__our_robots[0].orientation
         )
 
         command = RobotCommand(0)
