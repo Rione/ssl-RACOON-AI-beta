@@ -2,6 +2,7 @@
 
 """communicate.py"""
 
+from racoon_ai.models.robot.commands import SimCommands
 from racoon_ai.networks.command_sender import CommandSender
 from racoon_ai.networks.vision_receiver import VisionReceiver
 from racoon_ai.strategy.attacker import Attacker
@@ -20,16 +21,17 @@ def do_communicate():
 
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     while True:
+        # 送信用のコマンドリストを初期化
+        sim_cmds = SimCommands(isteamyellow=False)
+
         # CommandSenderのインスタンス
         sender = CommandSender()
 
         vision.receive()
 
         attacker = Attacker(vision)
+        attacker.main()
         # defence = Defence(vision) ...
-        send_command = attacker.straight_move_ball()
 
-        # send_commandの型はRobotCommand
-        sender.set_robotcommand(send_command)
-
-        sender.send()
+        sim_cmds.robot_commands += attacker.send_cmds
+        sender.send(sim_cmds)

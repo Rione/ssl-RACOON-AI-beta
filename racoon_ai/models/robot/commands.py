@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from time import time
 from typing import Optional
 
+from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Robot_Command
+
 
 @dataclass()
 class RobotCommand:
@@ -52,6 +54,33 @@ class RobotCommand:
 
     wheels: tuple[float, float, float, float] = field(default=(0, 0, 0, 0), init=False, kw_only=True)
 
+    def to_proto(self) -> grSim_Robot_Command:
+        """to_proto
+
+        Returns:
+            grSim_Robot_Command: grSim_Robot_Command
+        """
+        proto = grSim_Robot_Command()
+
+        # Required
+        proto.id = self.robot_id
+        proto.kickspeedx = self.kickpow
+        proto.kickspeedz = self.kickpow_z if self.chip_enabled else 0
+        proto.veltangent = self.vel_fwd
+        proto.velnormal = self.vel_sway
+        proto.velangular = self.vel_angular
+        proto.spinner = bool(self.dribble_pow)
+        proto.wheelsspeed = self.use_wheels_speed
+
+        # Optional
+        if self.use_wheels_speed:
+            proto.wheel1 = self.wheels[0]
+            proto.wheel2 = self.wheels[1]
+            proto.wheel3 = self.wheels[2]
+            proto.wheel4 = self.wheels[3]
+
+        return proto
+
 
 @dataclass()
 class RobotCustomCommand:
@@ -82,14 +111,6 @@ class SimCommands:
 
     robot_commands: list[RobotCommand] = field(default_factory=list[RobotCommand])
 
-    def append_robot_command(self, robot_command: RobotCommand) -> None:
-        """append_robot_command
-
-        Args:
-            robot_command (RobotCommand): Robot command to add
-        """
-        self.robot_commands.append(robot_command)
-
     def get_robot_command(self, robot_id: int) -> Optional[RobotCommand]:
         """get_robot_command
 
@@ -103,3 +124,11 @@ class SimCommands:
             if robot_command.robot_id == robot_id:
                 return robot_command
         return None
+
+    def to_proto(self) -> list[grSim_Robot_Command]:
+        """to_proto
+
+        Returns:
+            list[grSim_Robot_Command]: grSim_Robot_Command
+        """
+        return [robot_command.to_proto() for robot_command in self.robot_commands]

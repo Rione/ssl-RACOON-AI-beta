@@ -6,18 +6,38 @@
 """
 
 import math
+from typing import TypeAlias
 
-from racoon_ai.models.official.grsim.commands import RobotCommand
+from racoon_ai.models.coordinate import Point
+from racoon_ai.models.robot.commands import RobotCommand
+from racoon_ai.networks.vision_receiver import VisionReceiver
+from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
+
+RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
 
 
-def radian(object1, object2):
-    if not (object1.x == object2.x):
-        return math.atan2(object1.y - object2.y, object1.x - object2.x)
-    else:
-        return 0
+def radian(object1: RadFactors, object2: RadFactors) -> float:
+    """radian
+
+    Args:
+        object1 (Point | SSL_DetectionBall | SSL_DetectionRobot): Calculatable object.
+        object2 (Point | SSL_DetectionBall | SSL_DetectionRobot): Calculatable object.
+
+    Returns:
+        float: degree of two objects in radian
+    """
+    return math.atan2(object1.y - object2.y, object1.x - object2.x)
 
 
-def radian_normalize(rad):
+def radian_normalize(rad: float) -> float:
+    """radian_normalize
+
+    Args:
+        rad (float): radian value
+
+    Returns:
+        float: normalized radian value
+    """
     if rad > math.pi:
         rad = rad - 2 * math.pi
     if rad < -math.pi:
@@ -27,54 +47,50 @@ def radian_normalize(rad):
 
 
 class Attacker:
-    def __init__(self, vision):
+    """Attacker
+
+    Args:
+        vision (VisionReceiver): VisionReceiver instance.
+
+    Attributes:
+        vision (VisionReceiver): VisionReceiver instance.
+        send_cmds (list[RobotCommand]): RobotCommand list.
+        our_robots (list[SSL_DetectionRobot]): Our robots.
+        balls (list[SSL_DetectionBall]): Balls.
+    """
+
+    def __init__(self, vision: VisionReceiver):
         self.__vision = vision
-        self.__attacker_id = 0
-        self.__kickspeedx = 0
-        self.__kickspeedz = 0
-        self.__veltangent = 0
-        self.__velnormal = 0
-        self.__velangular = 0
-        self.__spinner = 0
+        self.__send_cmds: list[RobotCommand]
+        self.__our_robots: list[SSL_DetectionRobot] = self.__vision.blue_robots
+        self.__balls: list[SSL_DetectionBall] = self.__vision.balls
 
-        self.__our_robots = self.__vision.get_blue_robots()
-        self.__balls = self.__vision.get_balls()
+    @property
+    def send_cmds(self) -> list[RobotCommand]:
+        """send_cmds
 
-    def some_logics(self):
-        pass
+        Returns:
+            list[RobotCommand]: send_cmds
+        """
+        return self.__send_cmds
 
-    def send_command(self):
-        send_command = RobotCommand(
-            self.__attacker_id,
-            self.__kickspeedx,
-            self.__kickspeedz,
-            self.__veltangent,
-            self.__velnormal,
-            self.__velangular,
-            self.__spinner,
-            False,
-            0,
-            0,
-            0,
-            0,
+    def main(self) -> None:
+        """main
+
+        Returns:
+            None
+        """
+        self.__send_cmds = []
+        self.__send_cmds.append(self._straight_move_ball())
+
+    def _straight_move_ball(self) -> RobotCommand:
+        radian_ball_robot = radian_normalize(
+            radian(self.__balls[0], self.__our_robots[0]) - self.__our_robots[0].orientation
         )
-        return send_command
 
-    def straight_move_ball(self):
-        radian_ball_robot = radian_normalize(radian(self.__balls[0], self.__our_robots[0]) - self.__our_robots[0].theta)
-
-        send_command = RobotCommand(
-            self.__attacker_id,
-            self.__kickspeedx,
-            self.__kickspeedz,
-            math.cos(radian_ball_robot),
-            math.sin(radian_ball_robot),
-            radian_ball_robot,
-            self.__spinner,
-            False,
-            0,
-            0,
-            0,
-            0,
-        )
-        return send_command
+        command = RobotCommand(0)
+        command.kickpow = 0
+        command.vel_fwd = math.cos(radian_ball_robot)
+        command.vel_sway = math.sin(radian_ball_robot)
+        command.vel_angular = radian_ball_robot
+        return command
