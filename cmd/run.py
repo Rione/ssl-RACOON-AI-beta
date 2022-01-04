@@ -50,3 +50,7 @@ def main() -> None:
     finally:
         del vision
         del sender
+
+
+if __name__ == "__main__":
+    main()
