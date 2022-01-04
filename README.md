@@ -51,6 +51,10 @@ Pythonのバージョンは3.10です。
 
 以下、Python3.10環境下の前提でのコマンド例です。
 ```sh
+
+# Uninstall current poetry
+$ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --uninstall
+
 # Install poetry
 $ curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/install-poetry.py | python3
 
