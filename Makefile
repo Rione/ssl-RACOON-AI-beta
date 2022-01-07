@@ -8,6 +8,10 @@ VENV      := $(ROOT)/.venv
 .PHONY: all
 all: run
 
+.PHONY: doctor
+doctor:
+	$(ROOT)/bin/verchew --exit-code
+
 
 # help ########################################################################
 
@@ -55,11 +59,11 @@ help-long:
 # Main ########################################################################
 
 .PHONY: run
-run: build
+run: build install
 	poetry run cmd/run.py
 
 .PHONY: install
-install: $(VENV)
+install: $(VENV) poetry.lock
 	poetry install
 
 .PHONY: build
@@ -91,7 +95,7 @@ build-src: $(SRC) clean-deps
 .PHONY: clean
 clean: clean-deps clean-pyc
 
-.PHONY: clean-deps
+.PHONY: doctor clean-deps
 clean-deps:
 	poetry install --remove-untracked --no-root
 
@@ -106,7 +110,7 @@ clean-pyc:
 # Lint ########################################################################
 
 .PHONY: lint
-lint: flake8 pylint black-check isort-check
+lint: flake8 pylint mypy black-check isort-check
 
 .PHONY: flake8
 flake8:
@@ -120,6 +124,12 @@ pylint:
 	@echo "Running pylint..."
 	@poetry run pylint --exit-zero --rcfile=$(ROOT)/pyproject.toml --output-format=colorized --reports=y $(SRC)
 
+.PHONY: mypy
+mypy:
+	@echo ""
+	@echo "Running mypy..."
+	@poetry run mypy --config-file=$(ROOT)/pyproject.toml --pretty $(SRC) || true
+
 .PHONY: black-check
 black-check:
 	@echo ""
@@ -130,7 +140,7 @@ black-check:
 isort-check:
 	@echo ""
 	@echo "Checking code formatting with isort..."
-	@poetry run isort --verbose --check-only --settings-file ./pyproject.toml --color $(SRC)
+	@poetry run isort --verbose --check-only --settings-file $(ROOT)/pyproject.toml --color $(SRC)
 
 
 # Format ######################################################################
