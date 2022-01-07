@@ -4,6 +4,7 @@ extend-ignore = E203
 exclude =
   .git,
   __pycache__,
+  bin,
   dist,
   *_pb2.py,
   *.pyi

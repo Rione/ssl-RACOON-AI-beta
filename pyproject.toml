@@ -23,23 +23,37 @@ pylint = "^2.12.2"
 
 [tool.black]
 line-length = 120
-extend-exclude = "racoon_ai/proto/pb_gen"
+extend-exclude = [
+  "^/racoon_ai/proto/pb_gen/.*$",
+  "^/bin/*$"
+]
 
 [tool.isort]
 profile = "black"
 line_length = 120
-skip_glob = ["racoon_ai/proto/pb_gen/*"]
+skip_glob = [
+  "racoon_ai/proto/pb_gen/*",
+  ".cache/*",
+  "bin/*"
+]
 
 [tool.mypy]
+exclude = "^/.cache/.*$"
 python_version = "3.10"
-ignore_missing_imports = true
+no_implicit_optional = true
+strict = true
+cache_dir = ".cache/mypy"
 
 [tool.pylint]
   [tool.pylint.basic]
   good-names = ["i", "j", "k", "x", "y", "z"]
 
   [tool.pylint.master]
-  ignore = "pb_gen"
+  ignore-paths = [
+    "^racoon_ai/proto/pb_gen/.*$",
+    "^.cache/.*$",
+    "^bin/.*$"
+  ]
 
   [tool.pylint.messages_control]
   # C0330, C0326: Conflict with black
