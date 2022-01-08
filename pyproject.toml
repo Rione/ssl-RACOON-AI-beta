@@ -1,31 +1,69 @@
 [tool.poetry]
-name = "racoon-ai"
+name = "racoon_ai"
 version = "0.0.1"
 description = "Ri-one Accurate Operation AI"
 authors = ["Ri-one-SSL <rionesslq@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10.0"
-protobuf = "^3.19.1"
+python = "3.10.*"
+protobuf = "3.19.1"
+types-protobuf = "^3.18.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
-isort = "^5.10.1"
 flake8 = "^4.0.1"
-pylint = "^2.12.2"
+isort = {extras = ["colors"], version = "^5.10.1"}
+mypy = "^0.930"
+mypy-protobuf = "^3.1.0"
 pre-commit = "^2.16.0"
 pre-commit-hooks = "^4.0.1"
+protoletariat = "^0.7.1"
+pylint = "^2.12.2"
+
+[tool.black]
+line-length = 120
+extend-exclude = [
+  "^/racoon_ai/proto/pb_gen/.*$",
+  "^/bin/*$"
+]
 
 [tool.isort]
 profile = "black"
-target-version = ["py3.10"]
+line_length = 120
+skip_glob = [
+  "racoon_ai/proto/pb_gen/*",
+  ".cache/*",
+  "bin/*"
+]
 
-[tool.pylint.messages_control]
-disable = "C0330, C0326"
+[tool.mypy]
+exclude = "^/.cache/.*$"
+python_version = "3.10"
+no_implicit_optional = true
+strict = true
+cache_dir = ".cache/mypy"
 
-[tool.pylint.format]
-max-line-length = "88"
+[tool.pylint]
+  [tool.pylint.basic]
+  good-names = ["i", "j", "k", "x", "y", "z"]
+
+  [tool.pylint.master]
+  ignore-paths = [
+    "^racoon_ai/proto/pb_gen/.*$",
+    "^.cache/.*$",
+    "^bin/.*$"
+  ]
+
+  [tool.pylint.messages_control]
+  # C0330, C0326: Conflict with black
+  # W0511: Used when a warning note as FIXME or XXX is detected.
+  # R0902: Too many instance attributes
+  # R0913: Too many arguments
+  disable = "C0330, C0326, W0511, R0902, R0913"
+
+  [tool.pylint.format]
+  max-line-length = "120"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

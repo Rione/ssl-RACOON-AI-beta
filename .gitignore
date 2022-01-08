@@ -92,7 +92,7 @@ venv.bak/
 .pytype/
 
 # protobuf generated files
-src/proto_py/*.py
+racoon_ai/**/*_pb2.py*
 
 ### IntelliJ ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
@@ -198,3 +198,11 @@ modules.xml
 # CodeStream plugin
 # https://plugins.jetbrains.com/plugin/12206-codestream
 .idea/codestream.xml
+
+
+### Astah ###
+# Binary
+*.asta
+
+# Lock file
+*.asta.lock
