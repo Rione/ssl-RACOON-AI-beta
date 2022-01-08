@@ -2,7 +2,7 @@ ROOT      := .
 
 PROJECT   := racoon_ai
 PROTO     := $(ROOT)/$(PROJECT)/proto
-SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd
+SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd $(ROOT)/tests
 VENV      := $(ROOT)/.venv
 
 .PHONY: all
@@ -95,8 +95,8 @@ build-src: $(SRC) clean-deps
 .PHONY: clean
 clean: clean-deps clean-pyc
 
-.PHONY: doctor clean-deps
-clean-deps:
+.PHONY: clean-deps
+clean-deps: doctor
 	poetry install --remove-untracked --no-root
 
 .PHONY: clean-pyc
@@ -116,7 +116,7 @@ lint: flake8 pylint mypy black-check isort-check
 flake8:
 	@echo ""
 	@echo "Running flake8..."
-	@poetry run flake8 --config $(ROOT)/.flake8 --statistics --exit-zero --benchmark $(SRC)
+	@poetry run flake8 --config $(ROOT)/.flake8 --statistics --exit-zero --benchmark $(ROOT)
 
 .PHONY: pylint
 pylint:
@@ -128,19 +128,19 @@ pylint:
 mypy:
 	@echo ""
 	@echo "Running mypy..."
-	@poetry run mypy --config-file=$(ROOT)/pyproject.toml --pretty $(SRC) || true
+	@poetry run mypy --config-file=$(ROOT)/pyproject.toml --pretty $(ROOT) || true
 
 .PHONY: black-check
 black-check:
 	@echo ""
 	@echo "Checking code formatting with black..."
-	@poetry run black --verbose --check --color --config $(ROOT)/pyproject.toml $(SRC)
+	@poetry run black --verbose --check --color --config $(ROOT)/pyproject.toml $(ROOT)
 
 .PHONY: isort-check
 isort-check:
 	@echo ""
 	@echo "Checking code formatting with isort..."
-	@poetry run isort --verbose --check-only --settings-file $(ROOT)/pyproject.toml --color $(SRC)
+	@poetry run isort --verbose --check-only --settings-file $(ROOT)/pyproject.toml --color $(ROOT)
 
 
 # Format ######################################################################
@@ -150,8 +150,8 @@ format: black isort
 
 .PHONY: black
 black:
-	poetry run black --config $(ROOT)/pyproject.toml $(SRC)
+	poetry run black --config $(ROOT)/pyproject.toml $(ROOT)
 
 .PHONY: isort
 isort:
-	poetry run isort --verbose --setting-file $(ROOT)/pyproject.toml --color $(SRC)
+	poetry run isort --verbose --setting-file $(ROOT)/pyproject.toml --color $(ROOT)
