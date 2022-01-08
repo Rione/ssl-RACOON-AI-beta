@@ -5,23 +5,28 @@
     This module is for the RefReceiver class.
 """
 
+from racoon_ai.models.network import Network
 
-class RefReceiver(object):
+
+class RefReceiver(Network):
     """RefReceiver
 
     Args:
     """
 
-    def __init__(self):
+    def __init__(self, port: int = 10003, host: str = "224.5.23.1") -> None:
 
-        self.__port = port
+        super().__init__(port, multicast_group=host)
 
-        self.__multicast_group = multicast_group
-
-        self.__data = data
-
-    def receive(self):
+    def __del__(self) -> None:
         pass
 
-    def get_refcommand(self):
-        pass
+    def receive(self) -> None:
+        """receive
+
+        Recieve the refereee messages from the gc.
+
+        Return:
+            None
+        """
+        raise NotImplementedError

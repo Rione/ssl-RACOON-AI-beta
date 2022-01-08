@@ -24,7 +24,7 @@ class Point:
     z: float = field(default=0)
 
     def __abs__(self) -> float:
-        return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
+        return float((self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5)
 
     def __add__(self, other: "Point") -> "Point":
         """Add two points"""

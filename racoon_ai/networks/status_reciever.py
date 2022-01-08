@@ -5,16 +5,29 @@
     This module is for the StatusReceiver class.
 """
 
+from racoon_ai.models.network import Network
 
-class StatusReceiver(object):
+
+class StatusReceiver(Network):
     """StatusReceiver
 
     Args:
+        port (int): The port to listen on.
     """
 
-    def __init__(self):
+    def __init__(self, port: int = 30011) -> None:
 
-        self.__port = None
+        super().__init__(port)
 
-    def __recieve(self):
+    def __del__(self) -> None:
         pass
+
+    def recieve(self) -> None:
+        """recieve
+
+        Recieve the status from the robots.
+
+        Return:
+            None
+        """
+        raise NotImplementedError
