@@ -6,8 +6,7 @@
 """
 
 from racoon_ai.models.robot.commands import SimCommands
-from racoon_ai.networks.command_sender import CommandSender
-from racoon_ai.networks.vision_receiver import VisionReceiver
+from racoon_ai.networks import CommandSender, VisionReceiver
 from racoon_ai.strategy.attacker import Attacker
 
 # from src.observer.observer import Observer
