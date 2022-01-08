@@ -1,13 +1,13 @@
 #!/usr/bin/env python3.10
 
-"""response_receiver.py
+"""status_receiver.py
 
-    This module is for the ResponseReceiver class.
+    This module is for the StatusReceiver class.
 """
 
 
-class ResponseReceiver(object):
-    """ResponseReceiver
+class StatusReceiver(object):
+    """StatusReceiver
 
     Args:
     """
