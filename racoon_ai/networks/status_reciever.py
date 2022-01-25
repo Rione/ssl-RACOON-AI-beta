@@ -56,7 +56,7 @@ class StatusReceiver(Network):
             if robot.infrared:
                 self.__infrared[robot.robot_id] = True
 
-    def getInfrared(self, robot_id: int):
+    def get_infrared(self, robot_id: int) -> bool:
         """getInfrared
 
         Return Robots Infrared Sensor Status
