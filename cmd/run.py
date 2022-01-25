@@ -5,9 +5,10 @@
     This is the main script.
 """
 
-from racoon_ai.models.robot.commands import SimCommands
 from racoon_ai.networks import CommandSender, VisionReceiver
+from racoon_ai.observer.observer import Observer
 from racoon_ai.strategy.attacker import Attacker
+from racoon_ai.strategy.role import Role
 
 # from src.observer.observer import Observer
 
@@ -20,6 +21,7 @@ def main() -> None:
     Returns:
         None
     """
+    sender = CommandSender()
     try:
         # VisionReceiverのインスタンス
         vision = VisionReceiver()
@@ -27,26 +29,33 @@ def main() -> None:
         # RefereeReceiverのインスタンス
         # ref = RefereeReceiver()
 
-        # observer = Observer(vision, ref) 出力例: observer.ball.speedのように
+        observer = Observer()
+        role = Role()
+        attacker = Attacker(observer, role)
+
+        # CommandSenderのインスタンス
 
         # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
         while True:
             # 送信用のコマンドリストを初期化
-            sim_cmds = SimCommands(isteamyellow=False)
-
-            # CommandSenderのインスタンス
-            sender = CommandSender()
+            # sim_cmds = SimCommands(isteamyellow=False)
 
             vision.receive()
 
-            attacker = Attacker(vision)
-            attacker.main()
-            # defence = Defence(vision) ...
+            observer.vision_receiver(vision)
+            observer.ball_status()
 
-            sim_cmds.robot_commands += attacker.send_cmds
-            sender.send(sim_cmds)
+            role.vision_receive(vision, attacker)
+            role.decide_role()
+
+            attacker.vision_receive(vision)
+            sender.send(attacker.main())
+
+    # except KeyboardInterrupt:
 
     finally:
+        sender.stop_robots()
+
         del vision
         del sender
 

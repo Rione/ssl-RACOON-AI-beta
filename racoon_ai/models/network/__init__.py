@@ -18,6 +18,6 @@ class Network:
 
     port: int = field()
 
-    multicast_group: str = field(default="127.0.0.1", kw_only=True)
+    multicast_group: str = field(default="224.5.23.2", kw_only=True)
 
     local_address: str = field(default="0.0.0.0", kw_only=True)

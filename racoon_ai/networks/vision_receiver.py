@@ -6,6 +6,7 @@
 """
 
 import socket
+import struct
 from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
@@ -40,8 +41,11 @@ class VisionReceiver(Network):
         self.__field_size: Optional[list[SSL_GeometryFieldSize]] = None
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        mreq = struct.pack("4sl", socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
+        self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         # self.__sock.setsockopt(
         #     socket.IPPROTO_IP,
         #     socket.IP_ADD_MEMBERSHIP,
@@ -92,6 +96,14 @@ class VisionReceiver(Network):
         self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
         self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
 
+        count = -1
+        pre_robot_id = -1
+        for robot in self.__blue_robots:
+            count = count + 1
+            if robot.robot_id == pre_robot_id:
+                self.__blue_robots.pop(count)
+                count = count - 1
+            pre_robot_id = robot.robot_id
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
 
