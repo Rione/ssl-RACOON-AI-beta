@@ -59,7 +59,7 @@ cache_dir = ".cache/mypy"
   # W0511: Used when a warning note as FIXME or XXX is detected.
   # R0902: Too many instance attributes
   # R0913: Too many arguments
-  disable = "C0330, C0326, W0511, R0902, R0913"
+  disable = "C0330, C0326, W0511, R0902, R0913, E1101"
 
   [tool.pylint.format]
   max-line-length = "120"

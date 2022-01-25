@@ -5,7 +5,7 @@
     This is the main script.
 """
 
-from racoon_ai.networks import CommandSender, VisionReceiver
+from racoon_ai.networks import CommandSender, StatusReceiver, VisionReceiver
 from racoon_ai.observer.observer import Observer
 from racoon_ai.strategy.attacker import Attacker
 from racoon_ai.strategy.role import Role
@@ -25,6 +25,7 @@ def main() -> None:
     try:
         # VisionReceiverのインスタンス
         vision = VisionReceiver()
+        status = StatusReceiver()
 
         # RefereeReceiverのインスタンス
         # ref = RefereeReceiver()
@@ -41,6 +42,7 @@ def main() -> None:
             # sim_cmds = SimCommands(isteamyellow=False)
 
             vision.receive()
+            status.receive()
 
             observer.vision_receiver(vision)
             observer.ball_status()
