@@ -52,7 +52,7 @@ class CommandSender(Network):
             Simcommands: commands
         """
 
-        for _ in range(10000):
+        for _ in range(100):
             commands = SimCommands()
             for robot in range(11):
                 command = RobotCommand(robot)

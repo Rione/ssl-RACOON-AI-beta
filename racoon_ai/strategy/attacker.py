@@ -97,6 +97,25 @@ class Attacker(object):
         self.__ball = vision.ball
         self.__their_robots = vision.yellow_robots
 
+    def _stop(self, id1: int, id2: int, commands: SimCommands) -> None:
+        command1 = RobotCommand(id1)
+        command1.vel_fwd = 0
+        command1.vel_sway = 0
+        command1.vel_angular = 0
+        command1.kickpow = 0
+        command1.dribble_pow = 0
+
+        command2 = RobotCommand(id2)
+        command2.vel_fwd = 0
+        command2.vel_sway = 0
+        command2.vel_angular = 0
+        command2.kickpow = 0
+        command2.dribble_pow = 0
+
+        commands.robot_commands.append(command1)
+        if command1 != command2:
+            commands.robot_commands.append(command2)
+
     def main(self) -> SimCommands:
         """main
 
@@ -104,33 +123,50 @@ class Attacker(object):
             None
         """
         commands = SimCommands()
+        target_radian = 0.0
+        if len(self.__our_robots) == 0:
+            self._stop(0, 1, commands)
+        elif len(self.__our_robots) == 1:
+            for robot in self.__our_robots:
+                if robot.robot_id == 0:
+                    self._stop(1, 1, commands)
+                elif robot.robot_id == 1:
+                    self._stop(0, 0, commands)
+
         for robot in self.__our_robots:
+            goal_position = Point(-1400, 0, 0)
+            # print(math.degrees(radian_normalize(radian(self.__ball, robot) - robot.orientation)))
             if robot.robot_id >= 2:
                 break
             elif robot.robot_id == self.__role.get_pass() and self.__kick_flag is False:
-                distance_ball_robot = distance(robot, self.__ball)
-                radian_ball_robot = radian_normalize(radian(self.__ball, robot) - robot.orientation)
-                if distance_ball_robot < 123 and abs(math.degrees(radian_ball_robot)) < 15:
-                    goal_position = Point(6000, 0, 0)
-                    distance_goal_robot = distance(goal_position, robot)
-                    if distance_goal_robot < 4500:
+                # print(self.__status.get_infrared(0))
+                # if self.__status.get_infrared(0) is True:
+                distance_ball = distance(self.__ball, robot)
+                _radian = radian_normalize(radian(self.__ball, robot) - robot.orientation)
+                goal_position = Point(-1400, 0, 0)
+                distance_goal_robot = distance(goal_position, self.__ball)
+                if distance_ball < 110 and abs(math.degrees(_radian)) < 8:
+                    if distance_goal_robot < 1150:
                         self.__arrive_flag = True
                         command = self._kick_ball(robot, goal_position)
                     else:
                         command = self._kick_ball(robot, self.__our_robots[self.__role.get_pass_receive()])
                 else:
-                    command = self._wrap_calc(robot)
+                    if distance_goal_robot < 1150:
+                        command = self._wrap_calc(robot, goal_position)
+                    else:
+                        command = self._wrap_calc(robot, self.__our_robots[self.__role.get_pass_receive()])
             elif robot.robot_id == self.__role.get_pass() and self.__kick_flag is True:
                 if robot.robot_id == 1:
                     target_position = Point(
-                        self.__ball.x + 1821.0,
-                        self.__ball.y - 2121.0,
+                        300,
+                        -700,
                         0,
                     )
                 else:
                     target_position = Point(
-                        self.__ball.x + 1800.0,
-                        self.__ball.y + 2121.0,
+                        -800,
+                        600,
                         0,
                     )
                 if (
@@ -141,21 +177,21 @@ class Attacker(object):
                 else:
                     self.__arrive_flag = False
 
-                command = self._move_point(robot, self.__ball, target_position)
+                command, target_radian = self._move_point(robot, self.__ball, target_position)
             else:
                 if self.__kick_flag is True:
                     command = self._pass_receive(robot)
                 else:
                     if robot.robot_id == 1:
                         target_position = Point(
-                            self.__ball.x + 1800.0,
-                            self.__ball.y - 2121.0,
+                            300,
+                            -700,
                             0,
                         )
                     else:
                         target_position = Point(
-                            self.__ball.x + 1800.0,
-                            self.__ball.y + 2121.0,
+                            -800,
+                            600,
                             0,
                         )
                     if (
@@ -166,10 +202,14 @@ class Attacker(object):
                     else:
                         self.__arrive_flag = False
 
-                    command = self._move_point(robot, self.__ball, target_position)
-            command = self._wrap_calc(robot)
-            command = self._avoid_collision(robot, command)
-            commands.robot_commands.append(command)
+                    command, target_radian = self._move_point(robot, self.__ball, target_position)
+            command = self._avoid_collision(robot, command, target_radian)
+            # command = self._wrap_calc(robot)
+            if self.__ball.x == 0.0:
+                self._stop(0, 1, commands)
+            else:
+                commands.robot_commands.append(command)
+
         return commands
 
     def _wrap_aroud(self, robot: SSL_DetectionRobot) -> RobotCommand:
@@ -218,16 +258,18 @@ class Attacker(object):
         print(radian_around)
         return command
 
-    def _wrap_calc(self, robot: SSL_DetectionRobot) -> RobotCommand:
+    def _wrap_calc(self, robot: SSL_DetectionRobot, target: RadFactors) -> RobotCommand:
         command = RobotCommand(robot.robot_id)
         distance_ball = distance(self.__ball, robot)
         _radian = radian_normalize(radian(self.__ball, robot) - robot.orientation)
+        radian_target_robot = radian_normalize(radian(target, robot) - robot.orientation)
 
         a_constant = -0.001902256
-        b_constant = 2.047918685
+        b_constant = 2.307918685
         c_constant = -1.932145886
 
         degree = math.degrees(_radian)
+        degree = degree - 2.0
         if degree < 0:
             degree = abs(degree)
             wrap_degree = -(degree * degree * a_constant + degree * b_constant + c_constant - 360.0)
@@ -237,15 +279,23 @@ class Attacker(object):
             wrap_degree = wrap_degree - 360
         wrap_radian = math.radians(wrap_degree)
 
-        if distance_ball > 1000:
+        if distance_ball > 500:
             wrap_radian = _radian
 
         speed = distance_ball / 1000.0
-        if speed > 1:
-            speed = 1.0
+        if speed > 0.25:
+            speed = 0.25
+        elif speed < 0.13:
+            speed = 0.13
+
+        # speed = 0
+        if target.x == -1400:
+            angular = 0.08
+        else:
+            angular = 0.12
         command.vel_fwd = math.cos(wrap_radian) * speed
         command.vel_sway = math.sin(wrap_radian) * speed
-        command.vel_angular = -robot.orientation * 2.0
+        command.vel_angular = radian_target_robot * angular
         command.kickpow = 0
         command.dribble_pow = 0
         return command
@@ -254,7 +304,7 @@ class Attacker(object):
         command = RobotCommand(robot.robot_id)
         target_position = Point(0, 0, 0)
         distance_ball_robot = distance(robot, self.__ball)
-        print(self.__observer.get_ball_slope())
+        # print(self.__observer.get_ball_slope())
         if distance_ball_robot < 250:
             self.__kick_flag = False
 
@@ -270,44 +320,47 @@ class Attacker(object):
         radian_target_robot = radian_normalize(radian(target_position, robot) - robot.orientation)
         distance_target_robot = distance(target_position, robot)
         speed = distance_target_robot / 1000
-        if speed > 1:
-            speed = 1
-        fwd = math.cos(radian_target_robot) * speed * 2
-        sway = math.sin(radian_target_robot) * speed * 2
+        if speed > 0.3:
+            speed = 0.3
+        elif speed < 0.18:
+            speed = 0.18
+        fwd = math.cos(radian_target_robot) * speed
+        sway = math.sin(radian_target_robot) * speed
 
         command.vel_fwd = fwd
         command.vel_sway = sway
-        command.vel_angular = angular
+        command.vel_angular = angular * 0.12
+        command.dribble_pow = 1
 
         return command
 
     def _move_point(
         self, robot: SSL_DetectionRobot, angular_target: RadFactors, target_position: RadFactors
-    ) -> RobotCommand:
+    ) -> tuple[RobotCommand, float]:
         command = RobotCommand(robot.robot_id)
-        radian_angular_target_robot = radian_normalize(radian(angular_target, robot) - robot.orientation)
+        radian_angular_target_robot = radian_normalize(radian(self.__ball, robot) - robot.orientation)
         radian_target_robot = radian_normalize(radian(target_position, robot) - robot.orientation)
         distance_target_robot = distance(target_position, robot) / 1000
-        if distance_target_robot >= 1:
-            distance_target_robot = 1
-
+        if distance_target_robot >= 0.3:
+            distance_target_robot = 0.3
+        angular_target.x = 10
         command.kickpow = 0
         command.vel_fwd = math.cos(radian_target_robot) * distance_target_robot
         command.vel_sway = math.sin(radian_target_robot) * distance_target_robot
-        command.vel_angular = radian_angular_target_robot
-        return command
+        command.vel_angular = radian_angular_target_robot * 0.12
+        return command, radian_target_robot
 
     def _straight_move_ball(self, robot: SSL_DetectionRobot) -> RobotCommand:
         command = RobotCommand(robot.robot_id)
         radian_ball_robot = radian_normalize(radian(self.__ball, robot) - robot.orientation)
         distance_target_robot = distance(self.__ball, robot) / 1000
-        if distance_target_robot >= 1:
-            distance_target_robot = 1
+        if distance_target_robot >= 0.2:
+            distance_target_robot = 0.2
 
         command.kickpow = 0
         command.vel_fwd = math.cos(radian_ball_robot) * distance_target_robot
         command.vel_sway = math.sin(radian_ball_robot) * distance_target_robot
-        command.vel_angular = radian_ball_robot * 2
+        command.vel_angular = radian_ball_robot * 0.1
         command.dribble_pow = 0
         return command
 
@@ -317,49 +370,82 @@ class Attacker(object):
         radian_target_robot = radian_normalize(radian(target_position, robot) - robot.orientation)
         distance_ball_robot = distance(self.__ball, robot)
         speed_limit = distance_ball_robot / 1000.0
-        if speed_limit >= 1.0:
-            speed_limit = 1.0
+        if speed_limit >= 0.15:
+            speed_limit = 0.15
 
         angular = radian_target_robot
 
-        kick_power = 0
-        if abs(math.degrees(radian_target_robot)) < 5 and self.__arrive_flag is True:
-            kick_power = 3
-            self.__kick_flag = True
+        kick_power = 0.0
+        # if abs(math.degrees(radian_target_robot)) < 10 and self.__arrive_flag is True:
+        if abs(math.degrees(radian_target_robot)) < 8 and self.__arrive_flag is True:
+            if target_position.x == -1400:
+                kick_power = 10.0
+                self.__kick_flag = True
+            else:
+                if robot.robot_id == 1:
+                    kick_power = 1.05
+                    self.__kick_flag = True
+                else:
+                    kick_power = 0.85
+                    self.__kick_flag = True
+
+        spin = angular * 0.12
+        if spin > 0:
+            spin = 0.03
+        else:
+            spin = -0.03
 
         command.vel_fwd = math.cos(radian_ball_robot) * speed_limit
         command.vel_sway = math.sin(radian_ball_robot) * speed_limit
-        command.vel_angular = angular * 2
+        command.vel_angular = spin
         command.kickpow = kick_power
         command.dribble_pow = 1
         return command
 
-    def _avoid_collision(self, robot: SSL_DetectionRobot, command: RobotCommand) -> RobotCommand:
+    def _avoid_collision(self, robot: SSL_DetectionRobot, command: RobotCommand, target_radian: float) -> RobotCommand:
         if self.__observer.get_ball_slope() == 0:
             self.__kick_flag = False
-        nearest_robot, min_distance = self._det_near_robot(robot)
-        if min_distance < 300:
-            degree_invasion = radian(self.__their_robots[nearest_robot], robot) - robot.orientation
-            if degree_invasion > 0:
-                avoid_degree = degree_invasion + math.pi / 2
-                command.vel_fwd = math.cos(avoid_degree)
-                command.vel_sway = math.sin(avoid_degree)
-            else:
-                avoid_degree = degree_invasion - math.pi / 2
-                command.vel_fwd = math.cos(avoid_degree - math.pi)
-                command.vel_sway = math.sin(avoid_degree - math.pi)
+        nearest_robot, min_distance, min_radian = self._det_near_robot(robot)
+        # if robot.robot_id == 0:
+        #    print(min_radian, target_radian)
+        if min_distance < 380 and ((min_radian > 0 and target_radian > 0) or (min_radian < 0 and target_radian < 0)):
+            for robot_their in range(4):
+                if self.__their_robots[robot_their].robot_id == nearest_robot:
+                    degree_invasion = radian(self.__their_robots[robot_their], robot) - robot.orientation
+                    if degree_invasion > 0:
+                        avoid_degree = degree_invasion + math.pi / 2
+                        command.vel_fwd = math.cos(avoid_degree) * 0.25
+                        command.vel_sway = math.sin(avoid_degree) * 0.25
+                    else:
+                        avoid_degree = degree_invasion - math.pi / 2
+                        command.vel_fwd = math.cos(avoid_degree - math.pi) * 0.25
+                        command.vel_sway = math.sin(avoid_degree - math.pi) * 0.25
 
         return command
 
-    def _det_near_robot(self, robot: SSL_DetectionRobot) -> tuple[int, float]:
+    def _det_near_robot(self, robot: SSL_DetectionRobot) -> tuple[int, float, float]:
         min_robot_id = -1
         min_distance = 10000000.0
-        for their_count in range(5):
-            dist = distance(self.__their_robots[their_count], robot)
-            if dist < min_distance:
-                min_distance = dist
-                min_robot_id = their_count
-        return min_robot_id, min_distance
+        min_radian = 0.0
+        for robot_their in range(4):
+            if robot.robot_id == 0 and self.__their_robots[robot_their].robot_id == 3:
+                min_robot_id = 3
+                min_radian = radian_normalize(radian(self.__their_robots[robot_their], robot) - robot.orientation)
+                min_distance = distance(self.__their_robots[robot_their], robot)
+            elif robot.robot_id == 1 and self.__their_robots[robot_their].robot_id == 4:
+                min_robot_id = 4
+                min_radian = radian_normalize(radian(self.__their_robots[robot_their], robot) - robot.orientation)
+                min_distance = distance(self.__their_robots[robot_their], robot)
+
+        # print(self.__their_robots)
+        # for robot_their in range(4):
+        #     dist = distance(self.__their_robots[robot_their], robot)
+        #     if dist < min_distance:
+        #         if self.__their_robots[robot_their].robot_id == 3 or self.__their_robots[robot_their].robot_id == 4:
+        #             min_radian = radian_normalize(radian(self.__their_robots[0], robot) - robot.orientation)
+        #             min_distance = dist
+        #             min_robot_id = self.__their_robots[robot_their].robot_id
+        return min_robot_id, min_distance, min_radian
 
         # robot_difference_x = self.__pre_robots[robot.robot_id].x - robot.x
         # robot_difference_y = self.__pre_robots[robot.robot_id].y - robot.y

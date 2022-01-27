@@ -7,10 +7,11 @@
 
 import socket
 import struct
-from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
-from racoon_ai.proto.pb_gen.grSim_Robotstatus_pb2 import Robot_Status, Robots_Status
+from racoon_ai.proto.pb_gen.grSim_Robotstatus_pb2 import Robots_Status
+
+# from typing import Optional
 
 
 class StatusReceiver(Network):
@@ -24,7 +25,7 @@ class StatusReceiver(Network):
 
         super().__init__(port)
 
-        self.__robots_status: Optional[Robots_Status] = None
+        # self.__robots_status: Optional[Robots_Status] = None
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -55,6 +56,8 @@ class StatusReceiver(Network):
         for robot in robotsstatus.robots_status:
             if robot.infrared:
                 self.__infrared[robot.robot_id] = True
+            else:
+                self.__infrared[robot.robot_id] = False
 
     def get_infrared(self, robot_id: int) -> bool:
         """getInfrared
@@ -64,4 +67,5 @@ class StatusReceiver(Network):
         Return:
             Bool
         """
+        # print(self.__infrared)
         return self.__infrared[robot_id]

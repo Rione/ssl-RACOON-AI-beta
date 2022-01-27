@@ -22,13 +22,13 @@ class VisionReceiver(Network):
         invert (bool): データを反転させるかどうか (default: False)
     """
 
-    def __init__(self, port: int = 10020, invert: bool = False) -> None:
+    def __init__(self, port: int = 10006, invert: bool = False) -> None:
 
         super().__init__(port)
 
         self.__inverted: bool = invert
 
-        self.__num_of_cameras: int = 4
+        self.__num_of_cameras: int = 1
 
         self.__ball: Optional[SSL_DetectionBall] = None
 
