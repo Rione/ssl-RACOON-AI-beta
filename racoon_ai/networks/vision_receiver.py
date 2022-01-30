@@ -6,6 +6,8 @@
 """
 
 import socket
+from operator import attrgetter
+from struct import pack
 from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
@@ -42,12 +44,12 @@ class VisionReceiver(Network):
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.__sock.setsockopt(
-        #     socket.IPPROTO_IP,
-        #     socket.IP_ADD_MEMBERSHIP,
-        #     socket.inet_aton(self.multicast_group) + socket.inet_aton(self.local_address),
-        # )
-        self.__sock.bind(("", port))
+        self.__sock.bind((self.multicast_group, self.port))
+
+        # マルチキャストグループに接続
+        # NOTE: INADDR_ANYは、すべてのIFで受信する
+        mreq: bytes = pack("4sL", socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
+        self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
         while self.__geometries is None or len(self.__geometries) <= (self.__num_of_cameras - 1):
@@ -89,8 +91,8 @@ class VisionReceiver(Network):
         yellow_robots = [robot for frame in dframes for robot in frame.robots_yellow]
 
         # ロボットを整列(0-10まで)させる
-        self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
-        self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
+        self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
+        self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
 
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
@@ -163,4 +165,4 @@ class VisionReceiver(Network):
         Returns:
             List[SSL_DetectionRobot]
         """
-        return self.__blue_robots + self.__yellow_robots
+        return self.blue_robots + self.yellow_robots
