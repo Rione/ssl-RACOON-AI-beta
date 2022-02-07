@@ -43,8 +43,8 @@ class CommandSender(Network):
         send_packet = grSim_Packet(commands=send_data)
         packet: bytes = send_packet.SerializeToString()
 
-        self.__sock.sendto(packet, (self.multicast_group, self.port))
-        # self.__sock.sendto(packet, ("127.0.0.1", self.port))
+        # self.__sock.sendto(packet, (self.multicast_group, self.port))
+        self.__sock.sendto(packet, ("127.0.0.1", self.port))
 
     def stop_robots(self) -> None:
         """

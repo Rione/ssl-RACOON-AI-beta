@@ -28,7 +28,7 @@ class VisionReceiver(Network):
 
         self.__inverted: bool = invert
 
-        self.__num_of_cameras: int = 1
+        self.__num_of_cameras: int = 4
 
         self.__ball: Optional[SSL_DetectionBall] = None
 

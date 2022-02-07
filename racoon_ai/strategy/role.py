@@ -59,8 +59,6 @@ class Role(object):
             min_distance = 10000000.0
             self.__pass = -1
             for robot in self.__our_robots:
-                if robot.robot_id >= 2:
-                    break
                 distance_robot_ball = distance(robot, self.__ball)
                 if distance_robot_ball < min_distance:
                     min_distance = distance_robot_ball
