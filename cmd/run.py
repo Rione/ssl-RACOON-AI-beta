@@ -7,9 +7,9 @@
 
 from racoon_ai.models.robot.commands import SimCommands
 from racoon_ai.networks import CommandSender, VisionReceiver
-from racoon_ai.strategy.attacker import Attacker
-
-# from src.observer.observer import Observer
+from racoon_ai.observer.observer import Observer
+from racoon_ai.strategy.offense import Offense
+from racoon_ai.strategy.role import Role
 
 
 def main() -> None:
@@ -18,35 +18,45 @@ def main() -> None:
     This function is for the main function.
 
     Returns:
-        None
+        None`
     """
+    sender = CommandSender()
     try:
         # VisionReceiverのインスタンス
         vision = VisionReceiver()
+        # status = StatusReceiver()
 
         # RefereeReceiverのインスタンス
         # ref = RefereeReceiver()
 
-        # observer = Observer(vision, ref) 出力例: observer.ball.speedのように
+        observer = Observer()
+        role = Role()
+        offense = Offense(observer, role)
 
         # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
         while True:
-            # 送信用のコマンドリストを初期化
             sim_cmds = SimCommands(isteamyellow=False)
 
-            # CommandSenderのインスタンス
-            sender = CommandSender()
-
             vision.receive()
+            # status.receive()
 
-            attacker = Attacker(vision)
-            attacker.main()
-            # defence = Defence(vision) ...
+            observer.vision_receiver(vision)
+            observer.ball_status()
 
-            sim_cmds.robot_commands += attacker.send_cmds
+            # Roleの処理
+            role.vision_receive(vision, offense)
+            role.decide_role()
+
+            # offenseの処理
+            offense.vision_receive(vision)
+            offense.main()
+
+            # Simulation又はRobotに送信
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
-
     finally:
+        sender.stop_robots()
+
         del vision
         del sender
 
