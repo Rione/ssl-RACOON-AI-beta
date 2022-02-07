@@ -78,7 +78,7 @@ class Offense:
     def _pass_receive(self, robot: SSL_DetectionRobot) -> RobotCommand:
         command = RobotCommand(robot.robot_id)
         target_position = Point(0, 0, 0)
-        distance_ball_robot = distance(self.__our_robots[1], self.__ball)
+        distance_ball_robot = distance(self.__our_robots[robot.robot_id], self.__ball)
 
         if distance_ball_robot < 150:
             self.__kick_flag = False
@@ -113,8 +113,9 @@ class Offense:
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0
-        if speed >= 1500:
-            speed = 1500
+        # スピード制限
+        if speed >= 1.0:
+            speed = 1.0
         else:
             dribble_power = 1.0
 
