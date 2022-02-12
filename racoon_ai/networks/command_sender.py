@@ -26,11 +26,7 @@ class CommandSender(Network):
 
         # 送信ソケット作成
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.__sock.setsockopt(
-            socket.IPPROTO_IP,
-            socket.IP_MULTICAST_IF,
-            socket.inet_aton(self.local_address),
-        )
+        self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
         self.__sock.close()
