@@ -30,13 +30,14 @@ class CommandSender(Network):
     def __del__(self) -> None:
         self.__sock.close()
 
-    def send(self, sim_cmds: SimCommands) -> None:
+    def send(self, sim_cmds: SimCommands, online_id: list[int], real_mode: bool) -> None:
         """
         送信実行
         :return: None
         """
         # TODO: 複数同じロボットがappendされてたらどうする？
         send_data = grSim_Commands(robot_commands=sim_cmds.to_proto())
+
         send_data.isteamyellow = sim_cmds.isteamyellow
         send_data.timestamp = sim_cmds.timestamp
 
@@ -44,15 +45,32 @@ class CommandSender(Network):
         packet: bytes = send_packet.SerializeToString()
 
         # self.__sock.sendto(packet, (self.multicast_group, self.port))
-        self.__sock.sendto(packet, ("127.0.0.1", self.port))
 
-    def stop_robots(self) -> None:
+        # FOR REAL ENVIROMENT
+        # 実機環境
+        if real_mode:
+            for i in sim_cmds.robot_commands:
+                robotip: int = 100 + i.robot_id
+                if i.robot_id in online_id:
+                    try:
+                        # 192.168.100.1xx: xxにはロボットIDが入る。
+                        # そのIPに送信している
+                        self.__sock.sendto(packet, ("192.168.100." + str(robotip), self.port))
+                    except OSError:
+                        # オンラインじゃないIPアドレスに送信するとOSエラーが返ってくるのでキャッチする
+                        print("OSError: Host " + "192.168.100." + str(robotip) + " is down!")
+        else:
+            # CHANGE SEND IP
+            # grSimに合うよう変更してください
+            self.__sock.sendto(packet, ("localhost", self.port))
+
+    def stop_robots(self, online_id: list[int], real_mode: bool) -> None:
         """
         Returns:
             Simcommands: commands
         """
 
-        for _ in range(100):
+        for _ in range(10):
             commands = SimCommands()
             for robot in range(11):
                 command = RobotCommand(robot)
@@ -63,4 +81,4 @@ class CommandSender(Network):
                 command.dribble_pow = 0
 
                 commands.robot_commands.append(command)
-            self.send(commands)
+            self.send(commands, online_id, real_mode)

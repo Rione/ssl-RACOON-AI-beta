@@ -2,7 +2,7 @@ ROOT      := .
 
 PROJECT   := racoon_ai
 PROTO     := $(ROOT)/$(PROJECT)/proto
-SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd $(ROOT)/tests
+SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd
 VENV      := $(ROOT)/.venv
 
 .PHONY: all
