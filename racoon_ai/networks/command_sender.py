@@ -56,6 +56,7 @@ class CommandSender(Network):
                         # 192.168.100.1xx: xxにはロボットIDが入る。
                         # そのIPに送信している
                         self.__sock.sendto(packet, ("192.168.100." + str(robotip), self.port))
+
                     except OSError:
                         # オンラインじゃないIPアドレスに送信するとOSエラーが返ってくるのでキャッチする
                         print("OSError: Host " + "192.168.100." + str(robotip) + " is down!")
