@@ -4,20 +4,11 @@
 
     This is the kicker_test script.
 """
-import os
+import sys
 import time
 
 from racoon_ai.models.robot.commands import RobotCommand, SimCommands
 from racoon_ai.networks.command_sender import CommandSender
-
-
-def beep(freq: int, dur: int = 100) -> None:
-    """
-    ビープ音を鳴らす.
-    @param freq 周波数
-    @param dur  継続時間（ms）
-    """
-    os.system("play -n synth %s sin %s" % (dur / 1000, freq))
 
 
 def main() -> None:
@@ -70,7 +61,6 @@ def main() -> None:
 
                 time.sleep(0.016)
 
-            beep(440, 100)
     finally:
         sender.stop_robots(online_id, real_mode)
         print("終了します")
