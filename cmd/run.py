@@ -20,9 +20,15 @@ def main() -> None:
     Returns:
         None`
     """
-    # sendポートをportで変更可能
-    sender = CommandSender(port=20012)
 
+    # ここに通信可能なロボットIDを入力してください！
+    # 通信できないロボットがいるとOSErrorになります（継続可）
+    online_id: list[int] = [1, 3]
+
+    # 実機環境で実行するときにはTrueにしてください
+    real_mode: bool = True
+
+    sender = CommandSender()
     try:
 
         # VisionReceiverのインスタンス, receiveポートをportで変更可能
@@ -56,9 +62,10 @@ def main() -> None:
 
             # Simulation又はRobotに送信
             sim_cmds.robot_commands += offense.send_cmds
-            sender.send(sim_cmds)
+            sender.send(sim_cmds, online_id, real_mode)
     finally:
-        sender.stop_robots()
+        sender.stop_robots(online_id, real_mode)
+
         del vision
         del sender
 
