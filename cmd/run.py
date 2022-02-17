@@ -18,7 +18,7 @@ def main() -> None:
     This function is for the main function.
 
     Returns:
-        None`
+        None
     """
 
     # ここに通信可能なロボットIDを入力してください！
@@ -26,7 +26,7 @@ def main() -> None:
     online_id: list[int] = [1, 3]
 
     # 実機環境で実行するときにはTrueにしてください
-    real_mode: bool = True
+    real_mode: bool = False
 
     sender = CommandSender()
     try:
