@@ -30,8 +30,9 @@ def main() -> None:
 
     sender = CommandSender()
     try:
-        # VisionReceiverのインスタンス
-        vision = VisionReceiver()
+
+        # VisionReceiverのインスタンス, receiveポートをportで変更可能
+        vision = VisionReceiver(port=10007)
         # status = StatusReceiver()
 
         # RefereeReceiverのインスタンス

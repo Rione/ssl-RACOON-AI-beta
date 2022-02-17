@@ -71,6 +71,27 @@ def main() -> None:
 
                 # ジョイスティックのボタンの入力
                 if e.type == JOYAXISMOTION:
+
+                    # PS3 DUALSHOCK: MARU
+                    if joystick.get_button(13):
+                        command.use_wheels_speed = True
+                        command.wheels = int(joystick.get_axis(1) * 10) * 0.1 * 100, 0.0, 0.0, 0.0
+
+                    # PS3 DUALSHOCK: BATSU
+                    if joystick.get_button(14):
+                        command.use_wheels_speed = True
+                        command.wheels = 0.0, int(joystick.get_axis(1) * 10) * 0.1 * 100, 0.0, 0.0
+
+                    # PS3 DUALSHOCK: SANKAKU
+                    if joystick.get_button(15):
+                        command.use_wheels_speed = True
+                        command.wheels = 0.0, 0.0, int(joystick.get_axis(1) * 10) * 0.1 * 100, 0.0
+
+                    # PS3 DUALSHOCK: SHIKAKU
+                    if joystick.get_button(12):
+                        command.use_wheels_speed = True
+                        command.wheels = 0.0, 0.0, 0.0, int(joystick.get_axis(1) * 10) * 0.1 * 100
+
                     command.vel_fwd = int(joystick.get_axis(1) * 10) * 0.1 * -1
                     command.vel_sway = int(joystick.get_axis(0) * 10) * 0.1 * -1
                     command.vel_angular = int(joystick.get_axis(2) * 10) * 0.1 * 0.3 * -1
@@ -83,12 +104,6 @@ def main() -> None:
                     time.sleep(0.016)
 
                 elif e.type == JOYBUTTONDOWN:
-                    if int(e.button) == 9:
-                        command.dribble_pow = 1
-                        sim_cmds.robot_commands.append(command)
-                        sender.send(sim_cmds, online_id, real_mode)
-                        time.sleep(0.016)
-
                     if int(e.button) == 11:
                         command.kickpow = 1
                         sim_cmds.robot_commands.append(command)
