@@ -3,6 +3,8 @@
 """
     This is the main script.
 """
+from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
+
 from .models.robot.commands import SimCommands
 from .networks import CommandSender, VisionReceiver
 from .observer.observer import Observer
@@ -19,6 +21,15 @@ def main() -> None:
         None
     """
 
+    # Settings for logger
+    fmt = Formatter("[%(levelname)s] %(asctime)s %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    hdlr = StreamHandler()
+    hdlr.setFormatter(fmt)
+    logger = getLogger("racoon_ai")
+    logger.setLevel(INFO)
+    logger.addHandler(hdlr)
+    logger.debug("Logger initialized")
+
     # ここに通信可能なロボットIDを入力してください！
     # 通信できないロボットがいるとOSErrorになります（継続可）
     online_id: list[int] = [1, 3]
@@ -32,7 +43,7 @@ def main() -> None:
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     try:
         # VisionReceiverのインスタンス, receiveポートをportで変更可能
-        vision = VisionReceiver(port=10007)
+        vision = VisionReceiver(port=10020)
 
         # status = StatusReceiver()
 
@@ -44,6 +55,8 @@ def main() -> None:
         role = Role()
 
         offense = Offense(observer, role)
+
+        logger.info("Roop started")
 
         while True:
             # 送信用のコマンドリストを初期化
@@ -66,10 +79,15 @@ def main() -> None:
             sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds, online_id, real_mode)
 
+    except KeyboardInterrupt:
+        logger.info("KeyboardInterrupt received", exc_info=False)
+
     finally:
+        logger.info("Cleaning up...")
         sender.stop_robots(online_id, real_mode)
         del vision
         del sender
+        shutdown()
 
 
 if __name__ == "__main__":

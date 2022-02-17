@@ -4,7 +4,6 @@
 
     This module is for the StatusReceiver class.
 """
-
 import socket
 import struct
 
