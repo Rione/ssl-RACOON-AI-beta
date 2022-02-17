@@ -31,7 +31,7 @@ class VisionReceiver(Network):
 
         self.__num_of_cameras: int = 4
 
-        self.__ball: Optional[SSL_DetectionBall] = None
+        self.__balls: list[SSL_DetectionBall] = []
 
         self.__blue_robots: list[SSL_DetectionRobot] = []
 
@@ -84,7 +84,7 @@ class VisionReceiver(Network):
 
         # SSL_DetectionFrameをパースして、SSL_DetectionBall
         balls: list[SSL_DetectionBall] = [ball for frame in dframes for ball in frame.balls]
-        self.__ball = balls[0] if len(balls) else None
+        self.__balls = sorted(balls, key=attrgetter("confidence"), reverse=True) if balls else []
 
         # SSL_DetectionFrameをパースして、SSL_DetectionRobot
         blue_robots = [robot for frame in dframes for robot in frame.robots_blue]
@@ -116,13 +116,13 @@ class VisionReceiver(Network):
         return self.__num_of_cameras
 
     @property
-    def ball(self) -> SSL_DetectionBall:
+    def balls(self) -> list[SSL_DetectionBall]:
         """balls
 
         Returns:
-            SSL_DetectionBall
+            List[SSL_DetectionBall]
         """
-        return self.__ball or SSL_DetectionBall()
+        return self.__balls
 
     @property
     def blue_robots(self) -> list[SSL_DetectionRobot]:
@@ -166,3 +166,11 @@ class VisionReceiver(Network):
             List[SSL_DetectionRobot]
         """
         return self.blue_robots + self.yellow_robots
+
+    def get_ball(self) -> SSL_DetectionBall:
+        """balls
+
+        Returns:
+            SSL_DetectionBall
+        """
+        return self.balls[0] if self.balls else SSL_DetectionBall()

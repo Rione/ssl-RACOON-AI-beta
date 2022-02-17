@@ -60,10 +60,9 @@ class Attacker:
     """
 
     def __init__(self, vision: VisionReceiver):
-        self.__vision = vision
         self.__send_cmds: list[RobotCommand]
-        self.__our_robots: list[SSL_DetectionRobot] = self.__vision.blue_robots
-        self.__ball: SSL_DetectionBall = self.__vision.ball
+        self.__our_robots: list[SSL_DetectionRobot] = vision.blue_robots
+        self.__ball: SSL_DetectionBall = vision.get_ball()
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
