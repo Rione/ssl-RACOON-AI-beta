@@ -5,7 +5,13 @@
     This module is for the StatusReceiver class.
 """
 
-from racoon_ai.models.network import Network
+import socket
+import struct
+
+from racoon_ai.models.network import BUFFSIZE, Network
+from racoon_ai.proto.pb_gen.grSim_Robotstatus_pb2 import Robots_Status
+
+# from typing import Optional
 
 
 class StatusReceiver(Network):
@@ -19,10 +25,21 @@ class StatusReceiver(Network):
 
         super().__init__(port)
 
-    def __del__(self) -> None:
-        pass
+        # self.__robots_status: Optional[Robots_Status] = None
+        # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
+        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    def recieve(self) -> None:
+        mreq = struct.pack("4sl", socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
+        self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+        self.__sock.bind(("", port))
+
+        self.__infrared: list[bool] = [False] * 16
+
+    def __del__(self) -> None:
+        self.__sock.close()
+
+    def receive(self) -> None:
         """recieve
 
         Recieve the status from the robots.
@@ -30,4 +47,25 @@ class StatusReceiver(Network):
         Return:
             None
         """
-        raise NotImplementedError
+        packet: bytes = self.__sock.recv(BUFFSIZE)
+
+        robotsstatus = Robots_Status()
+
+        robotsstatus.ParseFromString(packet)
+
+        for robot in robotsstatus.robots_status:
+            if robot.infrared:
+                self.__infrared[robot.robot_id] = True
+            else:
+                self.__infrared[robot.robot_id] = False
+
+    def get_infrared(self, robot_id: int) -> bool:
+        """getInfrared
+
+        Return Robots Infrared Sensor Status
+
+        Return:
+            Bool
+        """
+        # print(self.__infrared)
+        return self.__infrared[robot_id]

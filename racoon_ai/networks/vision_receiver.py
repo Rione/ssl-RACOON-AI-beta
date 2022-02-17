@@ -23,7 +23,7 @@ class VisionReceiver(Network):
         invert (bool): データを反転させるかどうか (default: False)
     """
 
-    def __init__(self, port: int = 10020, invert: bool = False) -> None:
+    def __init__(self, port: int = 10006, invert: bool = False) -> None:
 
         super().__init__(port)
 
@@ -42,7 +42,7 @@ class VisionReceiver(Network):
         self.__field_size: Optional[list[SSL_GeometryFieldSize]] = None
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__sock.bind((self.multicast_group, self.port))
 
@@ -94,6 +94,14 @@ class VisionReceiver(Network):
         self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
         self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
 
+        count = -1
+        pre_robot_id = -1
+        for robot in self.__blue_robots:
+            count = count + 1
+            if robot.robot_id == pre_robot_id:
+                self.__blue_robots.pop(count)
+                count = count - 1
+            pre_robot_id = robot.robot_id
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
 
