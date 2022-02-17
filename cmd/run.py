@@ -20,10 +20,13 @@ def main() -> None:
     Returns:
         None`
     """
-    sender = CommandSender()
+    # sendポートをportで変更可能
+    sender = CommandSender(port=20012)
+
     try:
-        # VisionReceiverのインスタンス
-        vision = VisionReceiver()
+
+        # VisionReceiverのインスタンス, receiveポートをportで変更可能
+        vision = VisionReceiver(port=10007)
         # status = StatusReceiver()
 
         # RefereeReceiverのインスタンス
@@ -56,7 +59,6 @@ def main() -> None:
             sender.send(sim_cmds)
     finally:
         sender.stop_robots()
-
         del vision
         del sender
 

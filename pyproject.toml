@@ -10,6 +10,7 @@ python = "3.10.*"
 protobuf = "3.19.1"
 protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
+PyQt5 = "^5.15.6"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
