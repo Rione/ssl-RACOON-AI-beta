@@ -56,7 +56,7 @@ class Offense:
             None
         """
         self.__our_robots = vision.blue_robots
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
         # self.__their_robots = vision.yellow_robots
 
     def main(self) -> None:

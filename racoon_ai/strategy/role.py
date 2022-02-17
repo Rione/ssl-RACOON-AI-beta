@@ -50,7 +50,7 @@ class Role(object):
             None
         """
         self.__our_robots = vision.blue_robots
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
 
         self.__attacker = attacker
 

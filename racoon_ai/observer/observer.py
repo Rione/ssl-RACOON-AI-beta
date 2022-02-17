@@ -43,7 +43,7 @@ class Observer(object):
         Return:
             None
         """
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
         self.__their_robots = vision.yellow_robots
 
     def ball_status(self) -> None:
