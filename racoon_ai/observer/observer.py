@@ -5,6 +5,7 @@
     This module is for the Observer class.
 """
 import math
+from logging import getLogger
 from typing import TypeAlias
 
 from racoon_ai import common
@@ -29,6 +30,8 @@ class Observer(object):
     """
 
     def __init__(self) -> None:
+        self.__logger = getLogger(__name__)
+        self.__logger.info("Initializing...")
         self.__ball: SSL_DetectionBall
         self.__ball_slope: float = 0.00
         self.__ball_intercept: float = 0.00
