@@ -6,6 +6,7 @@
 """
 import socket
 import struct
+from logging import getLogger
 
 from racoon_ai.models.network import BUFFSIZE, Network
 from racoon_ai.proto.pb_gen.grSim_Robotstatus_pb2 import Robots_Status
@@ -24,6 +25,8 @@ class StatusReceiver(Network):
 
         super().__init__(port)
 
+        self.__logger = getLogger(__name__)
+
         # self.__robots_status: Optional[Robots_Status] = None
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -36,7 +39,9 @@ class StatusReceiver(Network):
         self.__infrared: list[bool] = [False] * 16
 
     def __del__(self) -> None:
+        self.__logger.debug("Destructor called")
         self.__sock.close()
+        self.__logger.info("Socket closed")
 
     def receive(self) -> None:
         """recieve

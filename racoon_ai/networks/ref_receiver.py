@@ -5,6 +5,8 @@
     This module is for the RefReceiver class.
 """
 
+from logging import getLogger
+
 from racoon_ai.models.network import Network
 from racoon_ai.proto.pb_gen.ssl_gc_referee_message_pb2 import Referee
 
@@ -19,8 +21,10 @@ class RefReceiver(Network):
 
         super().__init__(port, multicast_group=host)
 
+        self.__logger = getLogger(__name__)
+
     def __del__(self) -> None:
-        pass
+        self.__logger.debug("Destructor called")
 
     def receive(self) -> None:
         """receive
