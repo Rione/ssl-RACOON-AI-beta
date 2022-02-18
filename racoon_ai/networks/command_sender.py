@@ -7,7 +7,6 @@
 
 import socket
 from logging import getLogger
-from typing import Optional
 
 from racoon_ai.models.network import Network
 from racoon_ai.models.robot import RobotCommand, SimCommands
@@ -19,12 +18,15 @@ class CommandSender(Network):
     """CommandSender
 
     Args:
-        is_yellow (bool): True if the robot is yellow.
+        host (str, optional): IP address of the target.
+            Defaults to `224.5.23.2`.
+        port (int, optional): Port number of the target.
+            Defaults to `20011`.
     """
 
-    def __init__(self, *, host: Optional[str] = None, port: int = 20011) -> None:
+    def __init__(self, *, host: str = "224.5.23.2", port: int = 20011) -> None:
 
-        super().__init__(port, multicast_address=host)
+        super().__init__(port, address=host)
 
         self.__logger = getLogger(__name__)
 
@@ -51,8 +53,6 @@ class CommandSender(Network):
         send_packet = grSim_Packet(commands=send_data)
         packet: bytes = send_packet.SerializeToString()
 
-        # self.__sock.sendto(packet, (self.multicast_group, self.port))
-
         # FOR REAL ENVIROMENT
         # 実機環境
         if real_mode:
@@ -69,10 +69,7 @@ class CommandSender(Network):
                         # オンラインじゃないIPアドレスに送信するとOSエラーが返ってくるのでキャッチする
                         print("OSError: Host " + "192.168.100." + str(robotip) + " is down!")
         else:
-            # CHANGE SEND IP
-            # grSimに合うよう変更してください
-            self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-            self.__sock.sendto(packet, (self.multicast_address, self.port))
+            self.__sock.sendto(packet, (self.address, self.port))
 
     def stop_robots(self, online_id: list[int], real_mode: bool) -> None:
         """

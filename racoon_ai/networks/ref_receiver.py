@@ -15,11 +15,15 @@ class RefReceiver(Network):
     """RefReceiver
 
     Args:
+        host (str, optional): IP address of game controller.
+            Defaults to `224.5.23.1`.
+        port (int, optional): Port number of game controller.
+            Defaults to `10003`.
     """
 
     def __init__(self, *, host: str = "224.5.23.1", port: int = 10003) -> None:
 
-        super().__init__(port, multicast_address=host)
+        super().__init__(port, address=host)
 
         self.__logger = getLogger(__name__)
 
