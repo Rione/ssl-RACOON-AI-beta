@@ -17,9 +17,9 @@ class RefReceiver(Network):
     Args:
     """
 
-    def __init__(self, port: int = 10003, host: str = "224.5.23.1") -> None:
+    def __init__(self, *, host: str = "224.5.23.1", port: int = 10003) -> None:
 
-        super().__init__(port, multicast_group=host)
+        super().__init__(port, multicast_address=host)
 
         self.__logger = getLogger(__name__)
 
