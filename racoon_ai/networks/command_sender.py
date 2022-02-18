@@ -9,7 +9,7 @@ import socket
 from logging import getLogger
 
 from racoon_ai.models.network import Network
-from racoon_ai.models.robot.commands import RobotCommand, SimCommands
+from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
 
