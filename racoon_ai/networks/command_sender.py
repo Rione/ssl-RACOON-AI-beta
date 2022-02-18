@@ -7,6 +7,7 @@
 
 import socket
 from logging import getLogger
+from typing import Optional
 
 from racoon_ai.models.network import Network
 from racoon_ai.models.robot import RobotCommand, SimCommands
@@ -21,15 +22,14 @@ class CommandSender(Network):
         is_yellow (bool): True if the robot is yellow.
     """
 
-    def __init__(self, port: int = 20011) -> None:
+    def __init__(self, *, host: Optional[str] = None, port: int = 20011) -> None:
 
-        super().__init__(port)
+        super().__init__(port, multicast_address=host)
 
         self.__logger = getLogger(__name__)
 
         # 送信ソケット作成
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
@@ -42,10 +42,11 @@ class CommandSender(Network):
         :return: None
         """
         # TODO: 複数同じロボットがappendされてたらどうする？
-        send_data = grSim_Commands(robot_commands=sim_cmds.to_proto())
-
-        send_data.isteamyellow = sim_cmds.isteamyellow
-        send_data.timestamp = sim_cmds.timestamp
+        send_data = grSim_Commands(
+            timestamp=sim_cmds.timestamp,
+            isteamyellow=sim_cmds.isteamyellow,
+            robot_commands=sim_cmds.to_proto(),
+        )
 
         send_packet = grSim_Packet(commands=send_data)
         packet: bytes = send_packet.SerializeToString()
@@ -61,6 +62,7 @@ class CommandSender(Network):
                     try:
                         # 192.168.100.1xx: xxにはロボットIDが入る。
                         # そのIPに送信している
+
                         self.__sock.sendto(packet, ("192.168.100." + str(robotip), self.port))
 
                     except OSError:
@@ -69,7 +71,8 @@ class CommandSender(Network):
         else:
             # CHANGE SEND IP
             # grSimに合うよう変更してください
-            self.__sock.sendto(packet, ("localhost", self.port))
+            self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+            self.__sock.sendto(packet, (self.multicast_address, self.port))
 
     def stop_robots(self, online_id: list[int], real_mode: bool) -> None:
         """

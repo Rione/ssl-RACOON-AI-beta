@@ -24,9 +24,9 @@ class VisionReceiver(Network):
         invert (bool): データを反転させるかどうか (default: False)
     """
 
-    def __init__(self, port: int = 10006, invert: bool = False) -> None:
+    def __init__(self, *, host: Optional[str] = None, port: int = 10006, invert: bool = False) -> None:
 
-        super().__init__(port)
+        super().__init__(port, multicast_address=host)
 
         self.__logger = getLogger(__name__)
 
@@ -47,11 +47,11 @@ class VisionReceiver(Network):
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.__sock.bind((self.multicast_group, self.port))
+        self.__sock.bind((self.multicast_address, self.port))
 
         # マルチキャストグループに接続
         # NOTE: INADDR_ANYは、すべてのIFで受信する
-        mreq: bytes = pack("4sL", socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
+        mreq: bytes = pack("4sL", socket.inet_aton(self.multicast_address), socket.INADDR_ANY)
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
