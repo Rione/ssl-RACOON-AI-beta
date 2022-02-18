@@ -6,6 +6,7 @@
 """
 
 import socket
+from logging import getLogger
 from operator import attrgetter
 from struct import pack
 from typing import Optional
@@ -26,6 +27,8 @@ class VisionReceiver(Network):
     def __init__(self, port: int = 10006, invert: bool = False) -> None:
 
         super().__init__(port)
+
+        self.__logger = getLogger(__name__)
 
         self.__inverted: bool = invert
 
@@ -56,7 +59,9 @@ class VisionReceiver(Network):
             self.receive()
 
     def __del__(self) -> None:
+        self.__logger.debug("Destructor called")
         self.__sock.close()
+        self.__logger.info("Socket closed")
 
     def receive(self) -> None:
         """recieve

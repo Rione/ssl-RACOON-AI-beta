@@ -6,6 +6,7 @@
 """
 
 import math
+from logging import getLogger
 from typing import Any, TypeAlias
 
 from racoon_ai.common import distance, move_point, radian, radian_normalize
@@ -31,6 +32,8 @@ class Offense:
     """
 
     def __init__(self, observer: Observer, role: Any):
+        self.__logger = getLogger(__name__)
+        self.__logger.info("Initializing...")
         self.__observer = observer
         self.__role: Any = role
         self.__send_cmds: list[RobotCommand]

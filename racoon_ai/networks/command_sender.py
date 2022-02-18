@@ -6,6 +6,7 @@
 """
 
 import socket
+from logging import getLogger
 
 from racoon_ai.models.network import Network
 from racoon_ai.models.robot.commands import RobotCommand, SimCommands
@@ -24,12 +25,16 @@ class CommandSender(Network):
 
         super().__init__(port)
 
+        self.__logger = getLogger(__name__)
+
         # 送信ソケット作成
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
+        self.__logger.debug("Destructor called")
         self.__sock.close()
+        self.__logger.info("Socket closed")
 
     def send(self, sim_cmds: SimCommands, online_id: list[int], real_mode: bool) -> None:
         """

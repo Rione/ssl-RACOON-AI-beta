@@ -6,6 +6,7 @@
 """
 
 import math
+from logging import getLogger
 from typing import Any, TypeAlias
 
 from racoon_ai.models.coordinate import Point
@@ -37,6 +38,8 @@ class Role(object):
     """
 
     def __init__(self) -> None:
+        self.__logger = getLogger(__name__)
+        self.__logger.info("Initializing...")
         self.__our_robots: list[SSL_DetectionRobot]
         self.__pass: int = 0
         self.__pass_receive: int = 0
