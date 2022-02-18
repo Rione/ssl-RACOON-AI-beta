@@ -5,24 +5,12 @@
     This module is for the Role class.
 """
 
-import math
 from logging import getLogger
-from typing import Any, TypeAlias
+from typing import Any
 
-from racoon_ai.models.coordinate import Point
+from racoon_ai.common import distance
 from racoon_ai.networks import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
-
-RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
-
-
-def distance(object1: RadFactors, object2: RadFactors) -> float:
-    """distance
-
-    Returns:
-        float: distance value
-    """
-    return math.sqrt(math.pow(object1.x - object2.x, 2) + math.pow(object1.y - object2.y, 2))
 
 
 class Role:
