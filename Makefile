@@ -60,7 +60,7 @@ help-long:
 
 .PHONY: run
 run: build install
-	poetry run cmd/run.py
+	poetry run python -m $(PROJECT)
 
 .PHONY: install
 install: $(VENV) poetry.lock

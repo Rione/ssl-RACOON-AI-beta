@@ -5,7 +5,7 @@
 """
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
-from .models.robot.commands import SimCommands
+from .models.robot import SimCommands
 from .networks import CommandSender, VisionReceiver
 from .observer.observer import Observer
 from .strategy.offense import Offense
