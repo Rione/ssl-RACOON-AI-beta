@@ -1,13 +1,18 @@
 #!/usr/bin/env python3.10
-"""offense.py
+# flake8: ignore-errors
+# pylint: disable-all
+# type: ignore
+"""main.py
 
-    This module is for the Offense class.
+    This module is for the Gui class.
 """
-from turtle import window_width
 
-from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import QPoint, Qt  # pylint: disable=no-name-in-module
+from PyQt5.QtGui import QColor, QPainter  # pylint: disable=no-name-in-module
+from PyQt5.QtWidgets import QWidget  # pylint: disable=no-name-in-module
+
+from racoon_ai.networks import VisionReceiver
+from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
 
 
 class Gui(QWidget):
@@ -25,6 +30,22 @@ class Gui(QWidget):
         self.__geometry_height: int = 850
         self.__window_width: float
         self.__window_height: float
+        self.__ui: QPainter
+        self.__ball: SSL_DetectionBall
+        self.__flag: bool = False
+
+    def vision_receive(self, vision: VisionReceiver) -> None:
+        """vision_receive
+
+        Returns:
+            None
+        """
+        self.__flag = True
+        self.__our_robots = vision.blue_robots
+        self.__ball = vision.ball
+        self.update()
+
+        # print(self.__ball.x)
 
     def _initui(self) -> None:
         self.resize(1300, 850)
@@ -46,13 +67,34 @@ class Gui(QWidget):
         self.__window_height = coat_height / 850
 
     def paintEvent(self, event) -> None:
-        ui = QPainter(self)
-        ui.setPen(QColor(Qt.white))
-        ui.setBrush(QColor(Qt.green))
-        # print(self.__window_width)
-        ui.drawRect(
-            int(20 * self.__window_width),
-            int(30 * self.__window_height),
-            int(520 * self.__window_width),
-            int(680 * self.__window_height),
+        if self.__flag is True:
+            self.__ui = QPainter(self)
+            self.__ui.setPen(QColor(Qt.white))
+
+            self.__ui.setBrush(QColor(Qt.green))
+            self._drawRect(20, 30, 520, 680)
+            self._drawRect(60, 70, 440, 600)
+            self._drawEllipse(280, 370, 30, 30)
+
+            self._drawRect(220, 610, 120, 60)
+            self._drawRect(220, 70, 120, 60)
+
+            self._drawRect(250, 669, 60, 10)
+            self._drawRect(250, 60, 60, 10)
+
+            self.__ui.setBrush(QColor("orange"))
+            self._drawEllipse(int((self.__ball.y * 0.05) + 280), int((self.__ball.x * 0.05) + 370), 2, 2)
+
+            self.__ui.end()
+
+    def _drawRect(self, val1: int, val2: int, val3: int, val4: int) -> None:
+        self.__ui.drawRect(
+            int(val1 * self.__window_width),
+            int(val2 * self.__window_height),
+            int(val3 * self.__window_width),
+            int(val4 * self.__window_height),
         )
+
+    def _drawEllipse(self, val1: int, val2: int, val3: int, val4: int) -> None:
+        center_circle = QPoint(int(val1 * self.__window_width), int(val2 * self.__window_height))
+        self.__ui.drawEllipse(center_circle, val3, val4)
