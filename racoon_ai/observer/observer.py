@@ -17,7 +17,7 @@ from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, S
 RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
 
 
-class Observer(object):
+class Observer:
     """Observer
     Args:
         vision (VisionReceiver): VisionReceiver instance.

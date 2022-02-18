@@ -25,7 +25,7 @@ def distance(object1: RadFactors, object2: RadFactors) -> float:
     return math.sqrt(math.pow(object1.x - object2.x, 2) + math.pow(object1.y - object2.y, 2))
 
 
-class Role(object):
+class Role:
     """Observer
     Args:
         vision (VisionReceiver): VisionReceiver instance.
