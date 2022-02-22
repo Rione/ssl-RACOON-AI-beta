@@ -24,21 +24,27 @@ class CommandSender(Network):
             Defaults to `20011`.
     """
 
-    def __init__(self, *, host: str = "224.5.23.2", port: int = 20011) -> None:
+    def __init__(self, *, host: str = "224.5.23.2", port: int = 20011, is_real: bool = False) -> None:
 
         super().__init__(port, address=host)
 
         self.__logger = getLogger(__name__)
 
+        self.__is_real = is_real
+
         # 送信ソケット作成
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+        if not is_real:
+            # Set the multicast time-to-live
+            self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
         self.__sock.close()
         self.__logger.info("Socket closed")
 
-    def send(self, sim_cmds: SimCommands, online_id: list[int], real_mode: bool) -> None:
+    def send(self, sim_cmds: SimCommands, online_id: list[int]) -> None:
         """
         送信実行
         :return: None
@@ -55,7 +61,7 @@ class CommandSender(Network):
 
         # FOR REAL ENVIROMENT
         # 実機環境
-        if real_mode:
+        if self.__is_real:
             for i in sim_cmds.robot_commands:
                 robotip: int = 100 + i.robot_id
                 if i.robot_id in online_id:
@@ -71,7 +77,7 @@ class CommandSender(Network):
         else:
             self.__sock.sendto(packet, (self.address, self.port))
 
-    def stop_robots(self, online_id: list[int], real_mode: bool) -> None:
+    def stop_robots(self, online_id: list[int]) -> None:
         """
         Returns:
             Simcommands: commands
@@ -88,4 +94,4 @@ class CommandSender(Network):
                 command.dribble_pow = 0
 
                 commands.robot_commands.append(command)
-            self.send(commands, online_id, real_mode)
+            self.send(commands, online_id)

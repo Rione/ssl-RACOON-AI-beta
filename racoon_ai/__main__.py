@@ -35,10 +35,8 @@ def main() -> None:
     online_id: list[int] = [1, 3]
 
     # 実機環境で実行するときにはTrueにしてください
-    real_mode: bool = True
-
-    # CommandSenderのインスタンス
-    sender = CommandSender()
+    real_flag: bool = True
+    sender = CommandSender(is_real=real_flag)
 
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     try:
@@ -77,14 +75,14 @@ def main() -> None:
 
             # Simulation又はRobotに送信
             sim_cmds.robot_commands += offense.send_cmds
-            sender.send(sim_cmds, online_id, real_mode)
+            sender.send(sim_cmds, online_id)
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
 
     finally:
         logger.info("Cleaning up...")
-        sender.stop_robots(online_id, real_mode)
+        sender.stop_robots(online_id)
         del vision
         del sender
         shutdown()
