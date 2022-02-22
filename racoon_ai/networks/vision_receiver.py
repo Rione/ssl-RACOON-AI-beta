@@ -21,16 +21,17 @@ class VisionReceiver(Network):
     """VisionReceiver
 
     Args:
-        invert (bool): データを反転させるかどうか (default: False)
+        host (str, optional): IPv4 address of the vision server
+            Defaults to `224.5.23.2`.
+        port (int, optional): Port number of the vision server
+            Defaults to `10020`.
     """
 
-    def __init__(self, *, host: Optional[str] = None, port: int = 10006, invert: bool = False) -> None:
+    def __init__(self, *, host: str = "224.5.23.2", port: int = 10020) -> None:
 
-        super().__init__(port, multicast_address=host)
+        super().__init__(port, address=host)
 
         self.__logger = getLogger(__name__)
-
-        self.__inverted: bool = invert
 
         self.__num_of_cameras: int = 4
 
@@ -47,11 +48,11 @@ class VisionReceiver(Network):
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.__sock.bind((self.multicast_address, self.port))
+        self.__sock.bind((self.address, self.port))
 
         # マルチキャストグループに接続
         # NOTE: INADDR_ANYは、すべてのIFで受信する
-        mreq: bytes = pack("4sL", socket.inet_aton(self.multicast_address), socket.INADDR_ANY)
+        mreq: bytes = pack("4sL", socket.inet_aton(self.address), socket.INADDR_ANY)
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
@@ -109,15 +110,6 @@ class VisionReceiver(Network):
             pre_robot_id = robot.robot_id
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
-
-    @property
-    def inverted(self) -> bool:
-        """inverted
-
-        Return:
-            bool: データを反転させるかどうか
-        """
-        return self.__inverted
 
     @property
     def num_of_cameras(self) -> int:
