@@ -7,7 +7,7 @@
 """
 import sys
 
-from PyQt5.QtWidgets import QApplication  # pylint: disable=no-name-in-module
+from PyQt5.QtWidgets import QApplication
 
 from racoon_ai.gui.main import Gui
 from racoon_ai.models.robot.commands import SimCommands
