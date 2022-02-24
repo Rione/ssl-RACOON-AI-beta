@@ -5,18 +5,16 @@
     This module is for the Observer class.
 """
 import math
-from typing import TypeAlias
+from logging import getLogger
 
 from racoon_ai import common
 from racoon_ai.models.coordinate import Point
-from racoon_ai.models.robot.commands import RobotCommand
+from racoon_ai.models.robot import RobotCommand
 from racoon_ai.networks.vision_receiver import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
 
-RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
 
-
-class Observer(object):
+class Observer:
     """Observer
     Args:
         vision (VisionReceiver): VisionReceiver instance.
@@ -29,6 +27,8 @@ class Observer(object):
     """
 
     def __init__(self) -> None:
+        self.__logger = getLogger(__name__)
+        self.__logger.info("Initializing...")
         self.__ball: SSL_DetectionBall
         self.__ball_slope: float = 0.00
         self.__ball_intercept: float = 0.00
@@ -43,7 +43,7 @@ class Observer(object):
         Return:
             None
         """
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
         self.__their_robots = vision.yellow_robots
 
     def ball_status(self) -> None:

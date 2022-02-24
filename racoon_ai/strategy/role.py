@@ -5,27 +5,18 @@
     This module is for the Role class.
 """
 
-import math
-from typing import Any, TypeAlias
-
+from logging import getLogger
+from typing import Any
 
 from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.vision_receiver import VisionReceiver
+from racoon_ai.common import distance
+from racoon_ai.networks import VisionReceiver
+
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
 
-RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
 
-
-def distance(object1: RadFactors, object2: RadFactors) -> float:
-    """distance
-
-    Returns:
-        float: distance value
-    """
-    return math.sqrt(math.pow(object1.x - object2.x, 2) + math.pow(object1.y - object2.y, 2))
-
-
-class Role(object):
+class Role:
     """Observer
     Args:
         vision (VisionReceiver): VisionReceiver instance.
@@ -38,7 +29,9 @@ class Role(object):
     """
 
     def __init__(self) -> None:
-        self.__our_robots: list[SSL_DetectionRobot] = []
+        self.__logger = getLogger(__name__)
+        self.__logger.info("Initializing...")
+        self.__our_robots: list[SSL_DetectionRobot]
         self.__pass: int = 0
         self.__pass_receive: int = 0
         self.__keeper: int = 0
@@ -56,7 +49,7 @@ class Role(object):
             None
         """
         self.__our_robots = vision.blue_robots
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
 
     def decide_keeper(self) -> None:
         self.__keeper = 0

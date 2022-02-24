@@ -6,7 +6,9 @@
 """
 
 import socket
-import struct
+from logging import getLogger
+from operator import attrgetter
+from struct import pack
 from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
@@ -19,18 +21,21 @@ class VisionReceiver(Network):
     """VisionReceiver
 
     Args:
-        invert (bool): データを反転させるかどうか (default: False)
+        host (str, optional): IPv4 address of the vision server
+            Defaults to `224.5.23.2`.
+        port (int, optional): Port number of the vision server
+            Defaults to `10020`.
     """
 
-    def __init__(self, port: int = 10006, invert: bool = False) -> None:
+    def __init__(self, *, host: str = "224.5.23.2", port: int = 10020) -> None:
 
-        super().__init__(port)
+        super().__init__(port, address=host)
 
-        self.__inverted: bool = invert
+        self.__logger = getLogger(__name__)
 
         self.__num_of_cameras: int = 4
 
-        self.__ball: Optional[SSL_DetectionBall] = None
+        self.__balls: list[SSL_DetectionBall] = []
 
         self.__blue_robots: list[SSL_DetectionRobot] = []
 
@@ -43,22 +48,21 @@ class VisionReceiver(Network):
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.__sock.bind((self.address, self.port))
 
-        mreq = struct.pack("4sl", socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
+        # マルチキャストグループに接続
+        # NOTE: INADDR_ANYは、すべてのIFで受信する
+        mreq: bytes = pack("4sL", socket.inet_aton(self.address), socket.INADDR_ANY)
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-        # self.__sock.setsockopt(
-        #     socket.IPPROTO_IP,
-        #     socket.IP_ADD_MEMBERSHIP,
-        #     socket.inet_aton(self.multicast_group) + socket.inet_aton(self.local_address),
-        # )
-        self.__sock.bind(("", port))
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
         while self.__geometries is None or len(self.__geometries) <= (self.__num_of_cameras - 1):
             self.receive()
 
     def __del__(self) -> None:
+        self.__logger.debug("Destructor called")
         self.__sock.close()
+        self.__logger.info("Socket closed")
 
     def receive(self) -> None:
         """recieve
@@ -86,15 +90,15 @@ class VisionReceiver(Network):
 
         # SSL_DetectionFrameをパースして、SSL_DetectionBall
         balls: list[SSL_DetectionBall] = [ball for frame in dframes for ball in frame.balls]
-        self.__ball = balls[0] if len(balls) else None
+        self.__balls = sorted(balls, key=attrgetter("confidence"), reverse=True) if balls else []
 
         # SSL_DetectionFrameをパースして、SSL_DetectionRobot
         blue_robots = [robot for frame in dframes for robot in frame.robots_blue]
         yellow_robots = [robot for frame in dframes for robot in frame.robots_yellow]
 
         # ロボットを整列(0-10まで)させる
-        self.__blue_robots = sorted(blue_robots, key=lambda __x: __x.robot_id)
-        self.__yellow_robots = sorted(yellow_robots, key=lambda __x: __x.robot_id)
+        self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
+        self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
 
         count = -1
         pre_robot_id = -1
@@ -108,15 +112,6 @@ class VisionReceiver(Network):
         self.__field_size = [geometry.field for geometry in self.__geometries]
 
     @property
-    def inverted(self) -> bool:
-        """inverted
-
-        Return:
-            bool: データを反転させるかどうか
-        """
-        return self.__inverted
-
-    @property
     def num_of_cameras(self) -> int:
         """num_of_cameras
 
@@ -126,13 +121,13 @@ class VisionReceiver(Network):
         return self.__num_of_cameras
 
     @property
-    def ball(self) -> SSL_DetectionBall:
+    def balls(self) -> list[SSL_DetectionBall]:
         """balls
 
         Returns:
-            SSL_DetectionBall
+            List[SSL_DetectionBall]
         """
-        return self.__ball or SSL_DetectionBall()
+        return self.__balls
 
     @property
     def blue_robots(self) -> list[SSL_DetectionRobot]:
@@ -175,4 +170,12 @@ class VisionReceiver(Network):
         Returns:
             List[SSL_DetectionRobot]
         """
-        return self.__blue_robots + self.__yellow_robots
+        return self.blue_robots + self.yellow_robots
+
+    def get_ball(self) -> SSL_DetectionBall:
+        """balls
+
+        Returns:
+            SSL_DetectionBall
+        """
+        return self.balls[0] if self.balls else SSL_DetectionBall()
