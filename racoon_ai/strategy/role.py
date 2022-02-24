@@ -73,8 +73,10 @@ class Role(object):
         self.__defence_quantity = 3
 
         self.decide_offense()
-        #self.decide_defence()
+        self.decide_defence()
+        print(self.__keeper)
         print(self.__offense)
+        print(self.__defense)
 
     def decide_offense(self) -> None:
         offense = [[None for j in range(3)] for i in range(len(self.__our_robots))]
@@ -83,9 +85,20 @@ class Role(object):
             offense[i][1] = self.__our_robots[i].x
             offense[i][2] = self.__our_robots[i].y
         offense.sort(reverse=True, key=lambda x: x[1])
-        offense = offense[:3]
+        offense = offense[:self.__offense_quantity]
         offense.sort(reverse=True, key=lambda x: x[2])
         self.__offense = [row[0] for row in offense]
 
-    def decide_defence(self) -> list:
-        return self.__defence
+    def decide_defence(self) -> None:
+        defense = [[None for j in range(3)] for i in range(len(self.__our_robots)-1-self.__offense_quantity)]
+        num = 0
+        for i in range(len(self.__our_robots)):
+            if i != self.__keeper and i not in self.__offense:
+                defense[num][0] = i
+                defense[num][1] = self.__our_robots[i].x
+                defense[num][2] = self.__our_robots[i].y
+                num += 1
+        defense.sort(reverse=False, key=lambda x: x[1])
+        defense = defense[:self.__defence_quantity]
+        defense.sort(reverse=True, key=lambda x: x[2])
+        self.__defense = [row[0] for row in defense]
