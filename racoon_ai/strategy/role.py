@@ -8,6 +8,7 @@
 import math
 from typing import Any, TypeAlias
 
+
 from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.vision_receiver import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
@@ -37,13 +38,18 @@ class Role(object):
     """
 
     def __init__(self) -> None:
-        self.__our_robots: list[SSL_DetectionRobot]
+        self.__our_robots: list[SSL_DetectionRobot] = []
         self.__pass: int = 0
         self.__pass_receive: int = 0
+        self.__keeper: int = 0
+        self.__offense: list = []
+        self.__defence: list = []
         self.__ball: SSL_DetectionBall
-        self.__attacker: Any
+        self.__offense: Any
+        self.__offense_quantity: int = 0
+        self.__defence_quantity: int = 0
 
-    def vision_receive(self, vision: VisionReceiver, attacker: Any) -> None:
+    def vision_receive(self, vision: VisionReceiver) -> None:
         """vision_receive
 
         Returns:
@@ -52,23 +58,8 @@ class Role(object):
         self.__our_robots = vision.blue_robots
         self.__ball = vision.ball
 
-        self.__attacker = attacker
-
-    def _decide_pass(self) -> None:
-        if self.__attacker.get_kick_flag() is False:
-            min_distance = 10000000.0
-            self.__pass = -1
-            for robot in self.__our_robots:
-                distance_robot_ball = distance(robot, self.__ball)
-                if distance_robot_ball < min_distance:
-                    min_distance = distance_robot_ball
-                    self.__pass = robot.robot_id
-
-    def _decide_pass_receive(self) -> None:
-        if self.__pass == 1:
-            self.__pass_receive = 0
-        else:
-            self.__pass_receive = 1
+    def decide_keeper(self) -> None:
+        self.__keeper = 0
 
     def decide_role(self) -> None:
         """decide_role
@@ -76,21 +67,25 @@ class Role(object):
         Returns:
             None
         """
-        self._decide_pass()
-        self._decide_pass_receive()
+        self.decide_keeper()
 
-    def get_pass(self) -> int:
-        """get_pass
+        self.__offense_quantity = 3
+        self.__defence_quantity = 3
 
-        Returns:
-            int
-        """
-        return self.__pass
+        self.decide_offense()
+        #self.decide_defence()
+        print(self.__offense)
 
-    def get_pass_receive(self) -> int:
-        """get_pass_receive
+    def decide_offense(self) -> None:
+        offense = [[None for j in range(3)] for i in range(len(self.__our_robots))]
+        for i in range(len(self.__our_robots)):
+            offense[i][0] = i
+            offense[i][1] = self.__our_robots[i].x
+            offense[i][2] = self.__our_robots[i].y
+        offense.sort(reverse=True, key=lambda x: x[1])
+        offense = offense[:3]
+        offense.sort(reverse=True, key=lambda x: x[2])
+        self.__offense = [row[0] for row in offense]
 
-        Returns:
-            int
-        """
-        return self.__pass_receive
+    def decide_defence(self) -> list:
+        return self.__defence

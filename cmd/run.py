@@ -20,10 +20,10 @@ def main() -> None:
     Returns:
         None`
     """
-    sender = CommandSender()
+    sender = CommandSender(port=20025)
     try:
         # VisionReceiverのインスタンス
-        vision = VisionReceiver()
+        vision = VisionReceiver(port=10025)
         # status = StatusReceiver()
 
         # RefereeReceiverのインスタンス
@@ -44,7 +44,7 @@ def main() -> None:
             observer.ball_status()
 
             # Roleの処理
-            role.vision_receive(vision, offense)
+            role.vision_receive(vision)
             role.decide_role()
 
             # offenseの処理
