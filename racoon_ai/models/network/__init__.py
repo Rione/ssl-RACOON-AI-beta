@@ -7,7 +7,7 @@ from logging import getLogger
 BUFFSIZE: int = 2048
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Network:
     """Network
 
@@ -20,5 +20,4 @@ class Network:
     address: str = field(kw_only=True)
 
     def __post_init__(self) -> None:
-        self.__logger = getLogger(type(self).__module__)
-        self.__logger.info("Initializing on %s:%d", self.address, self.port)
+        getLogger(type(self).__module__).info("Initializing on %s:%d", self.address, self.port)
