@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.10
+# pylint: skip-file
 
 """drbr_test.py
 
@@ -20,14 +21,10 @@ def main() -> None:
         None`
     """
 
-    sender = CommandSender()
-
     robot_id: str = input("テストするロボットIDを入力してください: ")
+    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
     drr_sec: str = input("ドリブラーに送信する秒数を入力してください: ")
     sim_cmds = SimCommands(isteamyellow=False)
-
-    online_id: list[int] = [int(robot_id)]
-    real_mode: bool = True
 
     try:
         # Simulation又はRobotに送信
@@ -40,12 +37,11 @@ def main() -> None:
 
         sim_cmds.robot_commands.append(command)
 
-        sender.send(sim_cmds, online_id, real_mode)
+        sender.send(sim_cmds)
 
         print("ドリブラー信号を送信しています.")
         time.sleep(float(drr_sec))
     finally:
-        sender.stop_robots(online_id, real_mode)
         print("終了します")
         del sender
 
