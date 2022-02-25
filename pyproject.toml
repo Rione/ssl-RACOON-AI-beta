@@ -10,8 +10,8 @@ python = "3.10.*"
 protobuf = "3.19.1"
 protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
-
-pygame = "^2.1.2"
+PyQt5 = {version = "^5.15.6", optional = true, extras = ["Qt"]}
+pygame = {version = "^2.1.2", optional = true, extras = ["pygame"]}
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
@@ -21,6 +21,10 @@ mypy = "^0.930"
 mypy-protobuf = "^3.1.0"
 pre-commit = "^2.16.0"
 pylint = "^2.12.2"
+
+[tool.poetry.extras]
+Qt = ["PyQt5"]
+pygame = ["pygame"]
 
 [tool.black]
 line-length = 120

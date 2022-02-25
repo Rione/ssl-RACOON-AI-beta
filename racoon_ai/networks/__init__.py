@@ -9,10 +9,10 @@
         - StatusReceiver
 """
 
-from racoon_ai.networks.command_sender import CommandSender
-from racoon_ai.networks.ref_receiver import RefReceiver
-from racoon_ai.networks.status_reciever import StatusReceiver
-from racoon_ai.networks.vision_receiver import VisionReceiver
+from .command_sender import CommandSender
+from .ref_receiver import RefReceiver
+from .status_reciever import StatusReceiver
+from .vision_receiver import VisionReceiver
 
 __all__ = [
     "CommandSender",

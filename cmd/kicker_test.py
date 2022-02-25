@@ -1,4 +1,6 @@
 #!/usr/bin/env python3.10
+# pylint: skip-file
+# mypy: ignore-errors
 
 """kicker_test.py
 
@@ -18,14 +20,12 @@ def main() -> None:
         None`
     """
 
-    sender = CommandSender()
-
     robot_id: str = input("テストするロボットIDを入力してください: ")
+
+    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
+
     kick_pow: str = input("キッカーに送信する強度を入力してください(0.0-1.0) ")
     sim_cmds = SimCommands(isteamyellow=False)
-
-    online_id: list[int] = [int(robot_id)]
-    real_mode: bool = True
 
     try:
         # Simulation又はRobotに送信
@@ -39,11 +39,10 @@ def main() -> None:
         sim_cmds.robot_commands.append(command)
         input("Enter(Return)を押すと発射します.")
 
-        sender.send(sim_cmds, online_id, real_mode)
+        sender.send(sim_cmds)
 
         print("キッカー信号を送信しました.")
     finally:
-        sender.stop_robots(online_id, real_mode)
         print("終了します")
         del sender
 

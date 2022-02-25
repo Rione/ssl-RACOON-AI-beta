@@ -2,6 +2,7 @@
 # pylint: disable=C0114
 
 from dataclasses import dataclass, field
+from logging import getLogger
 
 BUFFSIZE: int = 2048
 
@@ -11,13 +12,13 @@ class Network:
     """Network
 
     Attributes:
-        port (int)
-        multicast_group (str)
-        local_address (str)
+        port (int): The distination port
+        address (str): The distination address
     """
 
     port: int = field()
+    address: str = field(kw_only=True)
 
-    multicast_group: str = field(default="224.5.23.2", kw_only=True)
-
-    local_address: str = field(default="0.0.0.0", kw_only=True)
+    def __post_init__(self) -> None:
+        self.__logger = getLogger(type(self).__module__)
+        self.__logger.info("Initializing on %s:%d", self.address, self.port)

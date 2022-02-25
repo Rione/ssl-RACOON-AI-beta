@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.10
 # mypy: ignore-errors
+# pylint: skip-file
 
 """joystick_mode.py
 
@@ -8,7 +9,7 @@
 
 import time
 
-import pygame
+import pygame  # type: ignore
 from pygame.locals import JOYAXISMOTION, JOYBUTTONDOWN  # pylint: disable=no-name-in-module
 
 from racoon_ai.models.robot.commands import RobotCommand, SimCommands
@@ -37,13 +38,10 @@ def main() -> None:
     # pygameの初期化
     pygame.init()
 
-    # センダーの設定
-    sender = CommandSender()
-
     robot_id: str = input("テストするロボットIDを入力してください: ")
 
-    online_id: list[int] = [int(robot_id)]
-    real_mode: bool = True
+    # センダーの設定
+    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
 
     # ループ
     active = True
@@ -99,7 +97,7 @@ def main() -> None:
 
                     sim_cmds.robot_commands.append(command)
 
-                    sender.send(sim_cmds, online_id, real_mode)
+                    sender.send(sim_cmds)
 
                     time.sleep(0.016)
 
@@ -107,11 +105,10 @@ def main() -> None:
                     if int(e.button) == 11:
                         command.kickpow = 1
                         sim_cmds.robot_commands.append(command)
-                        sender.send(sim_cmds, online_id, real_mode)
+                        sender.send(sim_cmds)
                         time.sleep(0.016)
 
     finally:
-        sender.stop_robots(online_id, real_mode)
         print("終了します")
         del sender
 
