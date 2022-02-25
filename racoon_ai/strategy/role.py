@@ -82,10 +82,8 @@ class Role:
         """
 
         offense: list[list[float]] = []
-
-        for i in range(len(self.__our_robots)):  # pylint: disable=consider-using-enumerate
-            offense.append([i, self.__our_robots[i].x, self.__our_robots[i].y])
-
+        for robot in self.__our_robots:
+            offense.append([robot.robot_id, robot.x, robot.y])
         offense.sort(reverse=True, key=lambda x: x[1])
         offense = offense[: self.__offense_quantity]
         offense.sort(reverse=True, key=lambda x: x[2])
@@ -98,10 +96,11 @@ class Role:
         Returns:
             None
         """
+
         defense: list[list[float]] = []
-        for i in range(len(self.__our_robots)):  # pylint: disable=consider-using-enumerate
-            if i != self.__keeper and i not in self.__offense:
-                defense.append([i, self.__our_robots[i].x, self.__our_robots[i].y])
+        for robot in self.__our_robots:
+            if robot.robot_id != self.__keeper and robot.robot_id not in self.__offense:
+                defense.append([robot.robot_id, robot.x, robot.y])
         defense.sort(reverse=False, key=lambda x: x[1])
         defense = defense[: self.__defence_quantity]
         defense.sort(reverse=True, key=lambda x: x[2])
