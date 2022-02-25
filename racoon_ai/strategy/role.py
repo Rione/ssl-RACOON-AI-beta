@@ -67,27 +67,11 @@ class Role:
         self.__offense_quantity = 3
         self.__defence_quantity = 3
 
-        self.decide_offense()
         self.decide_defense()
+        self.decide_offense()
         print(self.__keeper)
         print(self.__offense)
         print(self.__defense)
-
-    def decide_offense(self) -> None:
-        """decide_offense
-
-        オフェンスの決定を行います
-        Returns:
-            None
-        """
-
-        offense: list[list[float]] = []
-        for robot in self.__our_robots:
-            offense.append([robot.robot_id, robot.x, robot.y])
-        offense.sort(reverse=True, key=lambda x: x[1])
-        offense = offense[: self.__offense_quantity]
-        offense.sort(reverse=True, key=lambda x: x[2])
-        self.__offense = [int(row[0]) for row in offense]
 
     def decide_defense(self) -> None:
         """decide_defense
@@ -99,9 +83,26 @@ class Role:
 
         defense: list[list[float]] = []
         for robot in self.__our_robots:
-            if robot.robot_id != self.__keeper and robot.robot_id not in self.__offense:
+            if robot.robot_id != self.__keeper:
                 defense.append([robot.robot_id, robot.x, robot.y])
         defense.sort(reverse=False, key=lambda x: x[1])
         defense = defense[: self.__defence_quantity]
         defense.sort(reverse=True, key=lambda x: x[2])
         self.__defense = [int(row[0]) for row in defense]
+
+    def decide_offense(self) -> None:
+        """decide_offense
+
+        オフェンスの決定を行います
+        Returns:
+            None
+        """
+
+        offense: list[list[float]] = []
+        for robot in self.__our_robots:
+            if robot.robot_id != self.__keeper and robot.robot_id not in self.__defense:
+                offense.append([robot.robot_id, robot.x, robot.y])
+        offense.sort(reverse=True, key=lambda x: x[1])
+        offense = offense[: self.__offense_quantity]
+        offense.sort(reverse=True, key=lambda x: x[2])
+        self.__offense = [int(row[0]) for row in offense]
