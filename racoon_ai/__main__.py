@@ -40,7 +40,7 @@ def main() -> None:
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     try:
         # VisionReceiverのインスタンス, receiveポートをportで変更可能
-        vision = VisionReceiver(port=10020)
+        vision = VisionReceiver(port=10025)
 
         # status = StatusReceiver()
 
@@ -67,7 +67,7 @@ def main() -> None:
             observer.ball_status()
 
             # Roleの処理
-            role.vision_receive(vision, offense)
+            role.vision_receive(vision)
             role.decide_role()
 
             # offenseの処理

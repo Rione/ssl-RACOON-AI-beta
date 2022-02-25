@@ -99,15 +99,20 @@ class VisionReceiver(Network):
         # ロボットを整列(0-10まで)させる
         self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
         self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
+        comp: bool = True
+        while comp:
+            count = -1
+            pre_robot_id = -1
+            comp = False
+            for robot in self.__blue_robots:
+                count = count + 1
+                if robot.robot_id == pre_robot_id:
+                    self.__blue_robots.pop(count)
+                    count = count - 1
+                    comp = True
+                else:
+                    pre_robot_id = robot.robot_id
 
-        count = -1
-        pre_robot_id = -1
-        for robot in self.__blue_robots:
-            count = count + 1
-            if robot.robot_id == pre_robot_id:
-                self.__blue_robots.pop(count)
-                count = count - 1
-            pre_robot_id = robot.robot_id
         # フィールドサイズを取得
         self.__field_size = [geometry.field for geometry in self.__geometries]
 
