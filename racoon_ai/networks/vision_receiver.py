@@ -9,7 +9,6 @@ import socket
 from logging import getLogger
 from operator import attrgetter
 from struct import pack
-from typing import Optional
 
 from racoon_ai.models.network import BUFFSIZE, Network
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionFrame, SSL_DetectionRobot
@@ -41,9 +40,7 @@ class VisionReceiver(Network):
 
         self.__yellow_robots: list[SSL_DetectionRobot] = []
 
-        self.__geometries: Optional[list[SSL_GeometryData]] = None
-
-        self.__field_size: Optional[list[SSL_GeometryFieldSize]] = None
+        self.__geometries: list[SSL_GeometryData] = []
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -56,7 +53,7 @@ class VisionReceiver(Network):
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
-        while self.__geometries is None or len(self.__geometries) <= (self.__num_of_cameras - 1):
+        while len(self.__geometries) <= (self.__num_of_cameras - 1):
             self.receive()
 
     def __del__(self) -> None:
@@ -100,17 +97,6 @@ class VisionReceiver(Network):
         self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
         self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
 
-        count = -1
-        pre_robot_id = -1
-        for robot in self.__blue_robots:
-            count = count + 1
-            if robot.robot_id == pre_robot_id:
-                self.__blue_robots.pop(count)
-                count = count - 1
-            pre_robot_id = robot.robot_id
-        # フィールドサイズを取得
-        self.__field_size = [geometry.field for geometry in self.__geometries]
-
     @property
     def num_of_cameras(self) -> int:
         """num_of_cameras
@@ -136,9 +122,6 @@ class VisionReceiver(Network):
 
         Return:
             List[DetectionRobot]
-
-        Note:
-            2回目以降の参照は、前の値をそのまま出力
         """
         return self.__blue_robots
 
@@ -149,22 +132,11 @@ class VisionReceiver(Network):
 
         Return:
             List[DetectionRobot]
-
-        Note:
-            2回目以降の参照は、前の値をそのまま出力
         """
         return self.__yellow_robots
 
     @property
-    def field_size(self) -> Optional[list[SSL_GeometryFieldSize]]:
-        """field_size
-
-        Returns:
-            List[SSL_GeometryFieldSize] | None
-        """
-        return self.__field_size
-
-    def get_all_robots(self) -> list[SSL_DetectionRobot]:
+    def all_robots(self) -> list[SSL_DetectionRobot]:
         """get_all_robots
 
         Returns:
@@ -172,10 +144,11 @@ class VisionReceiver(Network):
         """
         return self.blue_robots + self.yellow_robots
 
-    def get_ball(self) -> SSL_DetectionBall:
-        """balls
+    @property
+    def field_size(self) -> list[SSL_GeometryFieldSize]:
+        """field_size
 
         Returns:
-            SSL_DetectionBall
+            List[SSL_GeometryFieldSize]
         """
-        return self.balls[0] if self.balls else SSL_DetectionBall()
+        return [geometry.field for geometry in self.__geometries]
