@@ -47,7 +47,7 @@ class Point:
 
 
 @dataclass()
-class Pose:
+class Pose(Point):
     """Pose
 
     Attributes:
@@ -57,10 +57,7 @@ class Pose:
         z (float): The z-coordinate of the pose in millimeters.
     """
 
-    x: float
-    y: float
     theta: float = field(default=0)
-    z: float = field(default=0)
 
 
 @dataclass()
