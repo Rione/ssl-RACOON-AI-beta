@@ -8,7 +8,7 @@
 import socket
 from logging import getLogger
 
-from racoon_ai.models.network import Network
+from racoon_ai.models.network import IPNetAddr
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
@@ -46,13 +46,13 @@ class CommandSender:
 
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
-        self.__dists: list[Network]
+        self.__dists: list[IPNetAddr]
 
         if is_real and online_ids:
             host_ips: list[str] = [f"192.168.100.{robot_id:03d}" for robot_id in online_ids]
-            self.__dists = [Network(port, address=host, mod_name=__name__) for host in host_ips]
+            self.__dists = [IPNetAddr(host, port, mod_name=__name__) for host in host_ips]
         else:
-            self.__dists = [Network(port, address=host, mod_name=__name__)]
+            self.__dists = [IPNetAddr(host, port, mod_name=__name__)]
             self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
@@ -82,11 +82,11 @@ class CommandSender:
         return self.__online_ids
 
     @property
-    def dists(self) -> list[Network]:
+    def dists(self) -> list[IPNetAddr]:
         """dists
 
         Returns:
-            list[Network]: dists
+            list[IPNetAddr]: distinations
         """
         return self.__dists
 
@@ -105,8 +105,8 @@ class CommandSender:
         packet: bytes = send_packet.SerializeToString()
 
         for dist in self.dists:
-            self.__logger.debug("Sending to %s:%d (%s)", dist.address, dist.port, "real" if self.is_real else "sim")
-            self.__sock.sendto(packet, (dist.address, dist.port))
+            self.__logger.debug("Sending to %s:%d (%s)", dist.host, dist.port, ("real" if self.is_real else "sim"))
+            self.__sock.sendto(packet, (dist.host, dist.port))
 
     def __stop_robots(self) -> None:
         """stop_robots

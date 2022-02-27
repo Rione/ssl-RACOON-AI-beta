@@ -7,11 +7,11 @@
 
 from logging import getLogger
 
-from racoon_ai.models.network import Network
+from racoon_ai.models.network import IPNetAddr
 from racoon_ai.proto.pb_gen.ssl_gc_referee_message_pb2 import Referee
 
 
-class RefReceiver(Network):
+class RefReceiver(IPNetAddr):
     """RefReceiver
 
     Args:
@@ -23,7 +23,7 @@ class RefReceiver(Network):
 
     def __init__(self, *, host: str = "224.5.23.1", port: int = 10003) -> None:
 
-        super().__init__(port, address=host)
+        super().__init__(host, port)
 
         self.__logger = getLogger(__name__)
 

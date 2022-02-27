@@ -10,25 +10,23 @@ from logging import getLogger
 from operator import attrgetter
 from struct import pack
 
-from racoon_ai.models.network import BUFFSIZE, Network
+from racoon_ai.models.network import BUFFSIZE, IPNetAddr
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionFrame, SSL_DetectionRobot
 from racoon_ai.proto.pb_gen.ssl_vision_geometry_pb2 import SSL_GeometryData, SSL_GeometryFieldSize
 from racoon_ai.proto.pb_gen.ssl_vision_wrapper_pb2 import SSL_WrapperPacket
 
 
-class VisionReceiver(Network):
+class VisionReceiver(IPNetAddr):
     """VisionReceiver
 
     Args:
-        host (str, optional): IPv4 address of the vision server
-            Defaults to `224.5.23.2`.
-        port (int, optional): Port number of the vision server
-            Defaults to `10020`.
+        host (str): IP or hostname of the server
+        port (int): Port number of the vision server
     """
 
-    def __init__(self, *, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, host: str = "224.5.23.2", port: int = 10020) -> None:
 
-        super().__init__(port, address=host)
+        super().__init__(host, port)
 
         self.__logger = getLogger(__name__)
 
@@ -45,29 +43,26 @@ class VisionReceiver(Network):
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.__sock.bind((self.address, self.port))
+        self.__sock.bind((self.host, self.port))
 
         # マルチキャストグループに接続
         # NOTE: INADDR_ANYは、すべてのIFで受信する
-        mreq: bytes = pack("4sL", socket.inet_aton(self.address), socket.INADDR_ANY)
+        mreq: bytes = pack("4sL", socket.inet_aton(self.host), socket.INADDR_ANY)
         self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
         while len(self.__geometries) <= (self.__num_of_cameras - 1):
-            self.receive()
+            self.recv()
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
         self.__sock.close()
         self.__logger.info("Socket closed")
 
-    def receive(self) -> None:
-        """recieve
+    def recv(self) -> None:
+        """recv
 
-        受信を行います
-
-        Return:
-            None
+        Recieve a packet from the vision server.
         """
 
         # カメラの台数分ループさせる
