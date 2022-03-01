@@ -7,10 +7,7 @@
         - Vector3f
 """
 
-from dataclasses import dataclass, field
 
-
-@dataclass()
 class Point:
     """Point
 
@@ -20,9 +17,21 @@ class Point:
         z (float): The z coordinate
     """
 
-    x: float
-    y: float
-    z: float = field(default=0)
+    def __init__(self, x: float, y: float, z: float = 0) -> None:
+        self.__x: float = x
+        self.__y: float = y
+        self.__z: float = z
+
+    def __str__(self) -> str:
+        return f"(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f})"
+
+    def __repr__(self) -> str:
+        return f"Point({self.x}, {self.y}, {self.z})"
+
+    def __eq__(self, obj: object) -> bool:
+        if not isinstance(obj, Point):
+            return False
+        return (self.x == obj.x) and (self.y == obj.y) and (self.z == obj.z)
 
     def __abs__(self) -> float:
         return float((self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5)
@@ -45,8 +54,34 @@ class Point:
         self.z -= other.z
         return self
 
+    @property
+    def x(self) -> float:
+        """x"""
+        return self.__x
 
-@dataclass()
+    @x.setter
+    def x(self, x: float) -> None:
+        self.__x = x
+
+    @property
+    def y(self) -> float:
+        """y"""
+        return self.__y
+
+    @y.setter
+    def y(self, y: float) -> None:
+        self.__y = y
+
+    @property
+    def z(self) -> float:
+        """z"""
+        return self.__z
+
+    @z.setter
+    def z(self, z: float) -> None:
+        self.__z = z
+
+
 class Pose(Point):
     """Pose
 
@@ -57,22 +92,50 @@ class Pose(Point):
         z (float): The z-coordinate of the pose in millimeters.
     """
 
-    theta: float = field(default=0)
+    def __init__(self, x: float, y: float, theta: float = 0, z: float = 0) -> None:
+        super().__init__(x, y, z)
+        self.__theta: float = theta
+
+    def __str__(self) -> str:
+        return f"(x={self.x:.1f}, y={self.y:.1f}, theta={self.theta:.1f}, z={self.z:.1f})"
+
+    def __repr__(self) -> str:
+        return f"Pose({self.x}, {self.y}, {self.theta}, {self.z})"
+
+    def __eq__(self, obj: object) -> bool:
+        if not isinstance(obj, Pose):
+            return False
+        return (self.x == obj.x) and (self.y == obj.y) and (self.z == obj.z) and (self.theta == obj.theta)
+
+    @property
+    def theta(self) -> float:
+        """theta"""
+        return self.__theta
+
+    @theta.setter
+    def theta(self, theta: float) -> None:
+        self.__theta = theta
 
 
-@dataclass()
 class Vector3f:
     """Vector3f
 
-    Attributes:
+    Attributes:s
         x (float): The x value
         y (float): The y value
         z (float): The z value
     """
 
-    x: float
-    y: float
-    z: float = field(default=0)
+    def __init__(self, x: float, y: float, z: float) -> None:
+        self.__x: float = x
+        self.__y: float = y
+        self.__z: float = z
+
+    def __str__(self) -> str:
+        return f"({self.x:.1f}, {self.y:.1f}, {self.z:.1f})"
+
+    def __repr__(self) -> str:
+        return f"Vector3f({self.x}, {self.y}, {self.z})"
 
     def __abs__(self) -> float:
         return float((self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5)
@@ -94,6 +157,33 @@ class Vector3f:
         self.y -= other.y
         self.z -= other.z
         return self
+
+    @property
+    def x(self) -> float:
+        """x"""
+        return self.__x
+
+    @x.setter
+    def x(self, x: float) -> None:
+        self.__x = x
+
+    @property
+    def y(self) -> float:
+        """y"""
+        return self.__y
+
+    @y.setter
+    def y(self, y: float) -> None:
+        self.__y = y
+
+    @property
+    def z(self) -> float:
+        """z"""
+        return self.__z
+
+    @z.setter
+    def z(self, z: float) -> None:
+        self.__z = z
 
     def dot_prod(self, other: "Vector3f") -> float:
         """dot_prod
