@@ -35,7 +35,8 @@ class Gui(QWidget, QPainter):
         self.__ball: SSL_DetectionBall
         self.__role = QLabel("<h1><i>Role</i></h1>", self)
         self.__at = QLabel("<h3><i>AT</i></h3>", self)
-        self.__ai = QLabel("<h3><i>RACOON-AI</i></h3>", self)
+        self.__ai = QLabel("RACOON-AI", self)
+        # self.__ai.setText()
         # self.__of0 = QLabel("<h3><i>OF0</i></h3>", self)
         # self.__of1 = QLabel("<h3><i>OF1</i></h3>", self)
         # self.__of2 = QLabel("<h3><i>OF2</i></h3>", self)
@@ -57,7 +58,7 @@ class Gui(QWidget, QPainter):
         """
         self.__our_robots = vision.blue_robots
         self.__their_robots = vision.yellow_robots
-        self.__ball = vision.ball
+        self.__ball = vision.balls[0]
         self.update()
 
         # print(self.__ball.x)
@@ -66,11 +67,26 @@ class Gui(QWidget, QPainter):
         self.resize(self.__geometry_width, self.__geometry_height)
         self.move(0, 0)
         self.setWindowTitle("RACOON-AI")
-        label = QLabel(self)
-        # label.setFixedSize(150, 150)
-        pixmap = QPixmap("game.jpg")
-        label.setPixmap(pixmap.scaledToHeight(32))
-        label.move(550, 10)
+
+        field = QLabel(self)
+        field_pixmap = QPixmap("field.png")
+        field.setPixmap(field_pixmap.scaledToHeight(34))
+        field.move(600, 8)
+
+        psp = QLabel(self)
+        psp_pixmap = QPixmap("game.png")
+        psp.setPixmap(psp_pixmap.scaledToHeight(28))
+        psp.move(690, 10)
+
+        monitor = QLabel(self)
+        monitor_pixmap = QPixmap("monitor.png")
+        monitor.setPixmap(monitor_pixmap.scaledToHeight(24))
+        monitor.move(785, 12)
+
+        setting = QLabel(self)
+        setting_pixmap = QPixmap("setting.png")
+        setting.setPixmap(setting_pixmap.scaledToHeight(20))
+        setting.move(885, 15)
 
         self.show()
 
@@ -88,9 +104,12 @@ class Gui(QWidget, QPainter):
 
     def paintEvent(self, event) -> None:
         self.__ui = QPainter(self)
+        self.__ui.setBrush(QColor(40, 40, 40))
+        self._drawRect(0, 0, 1000, 1000)
+
         self.__ui.setPen(QColor(Qt.white))
 
-        self.__ui.setBrush(QColor(Qt.gray))
+        self.__ui.setBrush(QColor(Qt.darkGray))
         self._drawRect(20, 30, 520, 680)
         self._drawRect(60, 70, 440, 600)
         self._drawEllipse(280, 370, 30, 30)

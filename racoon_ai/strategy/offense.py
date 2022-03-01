@@ -7,7 +7,6 @@
 
 import math
 from logging import getLogger
-from typing import Any
 
 from racoon_ai.common import distance, move_point, radian, radian_normalize
 from racoon_ai.models.coordinate import Point
@@ -29,11 +28,11 @@ class Offense:
         balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: Observer, role: Any):
+    def __init__(self, observer: Observer):
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
-        self.__role: Any = role
+        # self.__role: Any = role
         self.__send_cmds: list[RobotCommand]
         self.__our_robots: list[SSL_DetectionRobot]
         self.__ball: SSL_DetectionBall
@@ -70,7 +69,7 @@ class Offense:
         self.__send_cmds = []
 
         # 一番ボールに近いロボットがボールに向かって前進
-        self.__send_cmds.append(self._straight_move_ball(self.__our_robots[self.__role.get_pass()]))
+        self.__send_cmds.append(self._straight_move_ball(self.__our_robots[1]))
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
         target_position = Point(2000, 2000, 0)

@@ -30,11 +30,7 @@ class Role:
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = 0
-        self.__offense: list[int] = []
-        self.__defense: list[int] = []
         # self.__ball: SSL_DetectionBall
-        self.__offense_quantity: int = 0
-        self.__defence_quantity: int = 0
 
     def vision_receive(self, vision: VisionReceiver) -> None:
         """vision_receive
@@ -64,14 +60,8 @@ class Role:
         """
         self.decide_keeper()
 
-        self.__offense_quantity = 3
-        self.__defence_quantity = 3
-
         self.decide_defense()
         self.decide_offense()
-        print(self.__keeper)
-        print(self.__offense)
-        print(self.__defense)
 
     def decide_defense(self) -> None:
         """decide_defense
@@ -86,9 +76,7 @@ class Role:
             if robot.robot_id != self.__keeper:
                 defense.append([robot.robot_id, robot.x, robot.y])
         defense.sort(reverse=False, key=lambda x: x[1])
-        defense = defense[: self.__defence_quantity]
         defense.sort(reverse=True, key=lambda x: x[2])
-        self.__defense = [int(row[0]) for row in defense]
 
     def decide_offense(self) -> None:
         """decide_offense
@@ -97,12 +85,3 @@ class Role:
         Returns:
             None
         """
-
-        offense: list[list[float]] = []
-        for robot in self.__our_robots:
-            if robot.robot_id != self.__keeper and robot.robot_id not in self.__defense:
-                offense.append([robot.robot_id, robot.x, robot.y])
-        offense.sort(reverse=True, key=lambda x: x[1])
-        offense = offense[: self.__offense_quantity]
-        offense.sort(reverse=True, key=lambda x: x[2])
-        self.__offense = [int(row[0]) for row in offense]
