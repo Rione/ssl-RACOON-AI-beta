@@ -6,7 +6,8 @@
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
 from .models.robot import SimCommands
-from .networks import CommandSender, VisionReceiver
+from .networks.reciever import VisionReceiver
+from .networks.sender import CommandSender
 from .observer import Observer
 from .strategy.offense import Offense
 

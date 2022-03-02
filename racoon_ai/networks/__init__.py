@@ -9,14 +9,9 @@
         - StatusReceiver
 """
 
-from .command_sender import CommandSender
-from .ref_receiver import RefReceiver
-from .status_reciever import StatusReceiver
-from .vision_receiver import VisionReceiver
+from . import reciever, sender
 
 __all__ = [
-    "CommandSender",
-    "RefReceiver",
-    "StatusReceiver",
-    "VisionReceiver",
+    "reciever",
+    "sender",
 ]
