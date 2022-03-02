@@ -10,7 +10,7 @@ from typing import Any, TypeAlias
 
 from racoon_ai.common import distance, radian, radian_normalize
 from racoon_ai.models.coordinate import Point
-from racoon_ai.networks.vision_receiver import VisionReceiver
+from racoon_ai.networks.receiver import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
 
 RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot

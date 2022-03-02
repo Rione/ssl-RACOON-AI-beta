@@ -7,7 +7,7 @@
 
 from logging import getLogger
 
-from racoon_ai.networks.reciever import VisionReceiver
+from racoon_ai.networks.receiver import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionRobot
 
 
