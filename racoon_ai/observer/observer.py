@@ -11,7 +11,7 @@ from time import time
 
 from racoon_ai.models.ball import Ball
 from racoon_ai.models.robot import Robot
-from racoon_ai.networks import VisionReceiver
+from racoon_ai.networks.reciever import VisionReceiver
 
 
 class Observer:

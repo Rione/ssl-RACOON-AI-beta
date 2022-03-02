@@ -9,7 +9,7 @@ from logging import getLogger
 from typing import Any
 
 from racoon_ai.common import distance
-from racoon_ai.networks import VisionReceiver
+from racoon_ai.networks.reciever import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
 
 
