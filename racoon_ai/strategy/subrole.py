@@ -5,10 +5,9 @@
     This module is for the Role class.
 """
 
-import math
-from typing import Any, TypeAlias
+from typing import TypeAlias
 
-from racoon_ai.common import distance, radian, radian_normalize
+from racoon_ai.common import distance
 from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.vision_receiver import VisionReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
@@ -16,8 +15,8 @@ from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, S
 RadFactors: TypeAlias = Point | SSL_DetectionBall | SSL_DetectionRobot
 
 
-class SubRole(object):
-    """Observer
+class SubRole:
+    """SubRole
     Args:
         vision (VisionReceiver): VisionReceiver instance.
 
@@ -30,59 +29,51 @@ class SubRole(object):
 
     def __init__(self) -> None:
         self.__our_robots: list[SSL_DetectionRobot]
-        self.__pass: int = 0
-        self.__pass_receive: int = 0
+        self.__attacker: int = -1
+        self.__receiver: int = -1
         self.__ball: SSL_DetectionBall
-        self.__offense: Any
 
-    def vision_receive(self, vision: VisionReceiver, offense: Any) -> None:
+    def vision_receive(self, vision: VisionReceiver) -> None:
         """vision_receive
 
         Returns:
             None
         """
         self.__our_robots = vision.blue_robots
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
 
-        self.__offense = offense
-
-    def _decide_pass(self) -> None:
-        if self.__offense.get_kick_flag() is False:
-            min_distance = 10000000.0
-            self.__pass = -1
-            for robot in self.__our_robots:
-                distance_robot_ball = distance(robot, self.__ball)
-                if distance_robot_ball < min_distance:
-                    min_distance = distance_robot_ball
-                    self.__pass = robot.robot_id
-
-    def _decide_pass_receive(self) -> None:
-        if self.__pass == 1:
-            self.__pass_receive = 0
-        else:
-            self.__pass_receive = 1
-
-    def decide_role(self) -> None:
-        """decide_role
+    def decide_sub_role(self) -> None:
+        """decide_sub_role
 
         Returns:
             None
         """
-        self._decide_pass()
-        self._decide_pass_receive()
+        self.decide_attacker()
+        self.decide_receiver()
+        print(self.__attacker)
+        print(self.__receiver)
 
-    def get_pass(self) -> int:
-        """get_pass
-
-        Returns:
-            int
-        """
-        return self.__pass
-
-    def get_pass_receive(self) -> int:
-        """get_pass_receive
+    def decide_attacker(self) -> None:
+        """decide_attacker
 
         Returns:
-            int
+           None
         """
-        return self.__pass_receive
+        attacker: list[list[float]] = []
+        for robot in self.__our_robots:
+            attacker.append([robot.robot_id, distance(self.__ball, robot)])
+        attacker.sort(reverse=False, key=lambda x: x[1])
+        self.__attacker = int(attacker[0][0])
+
+    def decide_receiver(self) -> None:
+        """decide_receiver
+
+        Return:
+          None
+        """
+        receiver: list[list[float]] = []
+        for robot in self.__our_robots:
+            if robot.robot_id != self.__attacker:
+                receiver.append([robot.robot_id, distance(self.__ball, self.__our_robots[self.__attacker])])
+        receiver.sort(reverse=False, key=lambda x: x[1])
+        self.__receiver = int(receiver[0][0])

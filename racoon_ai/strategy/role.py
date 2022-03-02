@@ -45,6 +45,7 @@ class Role:
                     None
         """
         self.__our_robots = vision.blue_robots
+        # self.__a = vision.
         # self.__ball = vision.get_ball()
 
     def decide_keeper(self) -> None:

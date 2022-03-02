@@ -10,6 +10,7 @@ from .networks import CommandSender, VisionReceiver
 from .observer.observer import Observer
 from .strategy.offense import Offense
 from .strategy.role import Role
+from .strategy.subrole import SubRole
 
 
 def main() -> None:
@@ -51,6 +52,8 @@ def main() -> None:
 
         role = Role()
 
+        sub_role = SubRole()
+
         offense = Offense(observer, role)
 
         sender = CommandSender(is_real, online_ids)
@@ -67,8 +70,11 @@ def main() -> None:
             observer.ball_status()
 
             # Roleの処理
-            role.vision_receive(vision)
-            role.decide_role()
+            # role.vision_receive(vision)
+            # role.decide_role()
+
+            sub_role.vision_receive(vision)
+            sub_role.decide_sub_role()
 
             # offenseの処理
             offense.vision_receive(vision)

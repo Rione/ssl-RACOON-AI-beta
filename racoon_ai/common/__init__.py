@@ -24,6 +24,17 @@ def radian(object1: RadFactors, object2: RadFactors) -> float:
     return math.atan2(object1.y - object2.y, object1.x - object2.x)
 
 
+def sub_radian(object1: RadFactors, object2: RadFactors) -> float:
+    """sub_radian
+    Args:
+        object1 (Point | SSL_DetectionBall | SSL_DetectionRobot): Calculatable object.
+        object2 (Point | SSL_DetectionBall | SSL_DetectionRobot): Calculatable object.
+    Returns:
+        float: degree of two objects in radian (not atan2)
+    """
+    return math.atan((object1.y - object2.y) / (object1.x - object2.x))
+
+
 def radian_normalize(rad: float) -> float:
     """radian_normalize
 
@@ -62,8 +73,7 @@ def move_point(robot: SSL_DetectionRobot, target_angular: RadFactors, target_pos
     distance_target_robot = distance(target_position, robot)
 
     speed = distance_target_robot / 1000.0
-    if speed >= MAX_SPEED:
-        speed = MAX_SPEED
+    speed = min(speed, MAX_SPEED)
 
     command.vel_fwd = math.cos(radian_target_robot) * speed
     command.vel_sway = math.sin(radian_target_robot) * speed
