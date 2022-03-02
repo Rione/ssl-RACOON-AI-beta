@@ -6,11 +6,9 @@
 """
 
 from logging import getLogger
-from typing import Any
 
-from racoon_ai.common import distance
 from racoon_ai.networks.reciever import VisionReceiver
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
+from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionRobot
 
 
 class Role:
@@ -29,59 +27,82 @@ class Role:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__our_robots: list[SSL_DetectionRobot]
-        self.__pass: int = 0
-        self.__pass_receive: int = 0
-        self.__ball: SSL_DetectionBall
-        self.__attacker: Any
+        # self.__pass: int = 0
+        # self.__pass_receive: int = 0
+        self.__keeper: int = 0
+        self.__offense: list[int] = []
+        self.__defense: list[int] = []
+        # self.__ball: SSL_DetectionBall
+        self.__offense_quantity: int = 0
+        self.__defence_quantity: int = 0
 
-    def vision_receive(self, vision: VisionReceiver, attacker: Any) -> None:
+    def vision_receive(self, vision: VisionReceiver) -> None:
         """vision_receive
+        racoon_ai/strategy/role.py:35:8: W0238: Unused private member `Role.__defence` (unused-private-member)
 
+                vision情報の受け取り
+                Returns:
+                    None
+        """
+        self.__our_robots = vision.blue_robots
+        # self.__ball = vision.get_ball()
+
+    def decide_keeper(self) -> None:
+        """decide_keeper
+
+        キーパーの決定を行います
         Returns:
             None
         """
-        self.__our_robots = vision.blue_robots
-        self.__ball = vision.get_ball()
-
-        self.__attacker = attacker
-
-    def _decide_pass(self) -> None:
-        if self.__attacker.get_kick_flag() is False:
-            min_distance = 10000000.0
-            self.__pass = -1
-            for robot in self.__our_robots:
-                distance_robot_ball = distance(robot, self.__ball)
-                if distance_robot_ball < min_distance:
-                    min_distance = distance_robot_ball
-                    self.__pass = robot.robot_id
-
-    def _decide_pass_receive(self) -> None:
-        if self.__pass == 1:
-            self.__pass_receive = 0
-        else:
-            self.__pass_receive = 1
+        self.__keeper = 0
 
     def decide_role(self) -> None:
         """decide_role
-
+          ロールの決定を行います
         Returns:
             None
         """
-        self._decide_pass()
-        self._decide_pass_receive()
+        self.decide_keeper()
 
-    def get_pass(self) -> int:
-        """get_pass
+        self.__offense_quantity = 3
+        self.__defence_quantity = 3
 
+        self.decide_defense()
+        self.decide_offense()
+        print(self.__keeper)
+        print(self.__offense)
+        print(self.__defense)
+
+    def decide_defense(self) -> None:
+        """decide_defense
+
+        defenseの決定を行います
         Returns:
-            int
+            None
         """
-        return self.__pass
 
-    def get_pass_receive(self) -> int:
-        """get_pass_receive
+        defense: list[list[float]] = []
+        for robot in self.__our_robots:
+            if robot.robot_id != self.__keeper:
+                defense.append([robot.robot_id, robot.x, robot.y])
+        defense.sort(reverse=False, key=lambda x: x[1])
+        defense = defense[: self.__defence_quantity]
+        defense.sort(reverse=True, key=lambda x: x[2])
+        self.__defense = [int(row[0]) for row in defense]
 
+    def decide_offense(self) -> None:
+        """decide_offense
+
+        オフェンスの決定を行います
         Returns:
-            int
+            None
         """
-        return self.__pass_receive
+
+        offense: list[list[float]] = []
+        for robot in self.__our_robots:
+            if robot.robot_id != self.__keeper and robot.robot_id not in self.__defense:
+                offense.append([robot.robot_id, robot.x, robot.y])
+        offense.sort(reverse=True, key=lambda x: x[1])
+        offense = offense[: self.__offense_quantity]
+        offense.sort(reverse=True, key=lambda x: x[2])
+        self.__offense = [int(row[0]) for row in offense]
