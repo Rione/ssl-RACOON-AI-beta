@@ -88,9 +88,8 @@ class VisionReceiver(IPNetAddr):
         blue_robots = [robot for frame in dframes for robot in frame.robots_blue]
         yellow_robots = [robot for frame in dframes for robot in frame.robots_yellow]
 
-        # ロボットを整列(0-10まで)させる
-        self.__blue_robots = sorted(blue_robots, key=attrgetter("robot_id")) if blue_robots else []
-        self.__yellow_robots = sorted(yellow_robots, key=attrgetter("robot_id")) if yellow_robots else []
+        self.__blue_robots = sorted(blue_robots, key=attrgetter("confidence")) if blue_robots else []
+        self.__yellow_robots = sorted(yellow_robots, key=attrgetter("confidence")) if yellow_robots else []
 
     @property
     def num_of_cameras(self) -> int:

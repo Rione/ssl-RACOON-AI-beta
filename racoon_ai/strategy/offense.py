@@ -12,9 +12,8 @@ from typing import Any
 from racoon_ai.common import distance, move_point, radian, radian_normalize
 from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import RobotCommand
-from racoon_ai.networks import VisionReceiver
-from racoon_ai.observer.observer import Observer
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionRobot
+from racoon_ai.observer import Observer
+from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionRobot
 
 
 class Offense:
@@ -35,9 +34,6 @@ class Offense:
         self.__observer = observer
         self.__role: Any = role
         self.__send_cmds: list[RobotCommand]
-        self.__our_robots: list[SSL_DetectionRobot]
-        self.__ball: SSL_DetectionBall
-        # self.__their_robots: list[SSL_DetectionRobot]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
 
@@ -50,16 +46,6 @@ class Offense:
         """
         return self.__send_cmds
 
-    def vision_receive(self, vision: VisionReceiver) -> None:
-        """vision_receive
-
-        Returns:
-            None
-        """
-        self.__our_robots = vision.blue_robots
-        self.__ball = vision.get_ball()
-        # self.__their_robots = vision.yellow_robots
-
     def main(self) -> None:
         """main
 
@@ -70,7 +56,7 @@ class Offense:
         self.__send_cmds = []
 
         # 一番ボールに近いロボットがボールに向かって前進
-        self.__send_cmds.append(self._straight_move_ball(self.__our_robots[self.__role.get_pass()]))
+        self.__send_cmds.append(self._straight_move_ball(self.__observer.our_robots[self.__role.get_pass()]))
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
         target_position = Point(2000, 2000, 0)
