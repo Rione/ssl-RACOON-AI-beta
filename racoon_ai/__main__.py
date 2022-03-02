@@ -8,8 +8,8 @@ from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 from .models.robot import SimCommands
 from .networks import CommandSender, VisionReceiver
 from .observer import Observer
+from .strategy.offense import Offense
 
-# from .strategy.offense import Offense
 # from .strategy.role import Role
 
 
@@ -49,7 +49,7 @@ def main() -> None:
 
         # role = Role()
 
-        # offense = Offense(observer, role)
+        offense = Offense(observer)
 
         sender = CommandSender(is_real, online_ids)
 
@@ -63,9 +63,9 @@ def main() -> None:
 
             # role.decide_role()
 
-            # offense.main()
+            offense.main()
 
-            # sim_cmds.robot_commands += offense.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
     except KeyboardInterrupt:

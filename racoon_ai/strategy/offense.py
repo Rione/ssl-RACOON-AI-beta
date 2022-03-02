@@ -7,32 +7,26 @@
 
 import math
 from logging import getLogger
-from typing import Any
 
-from racoon_ai.common import distance, move_point, radian, radian_normalize
-from racoon_ai.models.coordinate import Point
-from racoon_ai.models.robot import RobotCommand
+from racoon_ai.common import distance, move2pose, radian, radian_normalize
+from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.observer import Observer
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionRobot
 
 
 class Offense:
     """Offense
     Args:
-        vision (VisionReceiver): VisionReceiver instance.
+        observer (Observer): Observer instance
 
     Attributes:
-        vision (VisionReceiver): VisionReceiver instance.
         send_cmds (list[RobotCommand]): RobotCommand list.
-        our_robots (list[SSL_DetectionRobot]): Our robots.
-        balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: Observer, role: Any):
+    def __init__(self, observer: Observer) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
-        self.__role: Any = role
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
@@ -47,56 +41,64 @@ class Offense:
         return self.__send_cmds
 
     def main(self) -> None:
-        """main
-
-        Returns:
-            None
-        """
+        """main"""
         # commandの情報を格納するリスト
         self.__send_cmds = []
+        bot: Robot
+        cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
-        self.__send_cmds.append(self._straight_move_ball(self.__observer.our_robots[self.__role.get_pass()]))
+        # self.__send_cmds.append(self._straight_move_ball(self.__observer.our_robots[self.__role.get_pass()]))
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
-        target_position = Point(2000, 2000, 0)
-        self.__send_cmds.append(move_point(self.__our_robots[1], self.__ball, target_position))
+        bot = self.__observer.our_robots[1]
+        target_position = Pose(2000, 2000, 0, radian(self.__observer.ball, bot))
+        cmd = move2pose(bot, target_position)
+        self.__logger.debug(cmd)
+        self.__send_cmds.append(cmd)
 
-    def _pass_receive(self, robot: SSL_DetectionRobot) -> RobotCommand:
-        command = RobotCommand(robot.robot_id)
-        target_position = Point(0, 0, 0)
-        distance_ball_robot = distance(self.__our_robots[robot.robot_id], self.__ball)
+        # ボールに向かって前進
+        bot = self.__observer.our_robots[2]
+        cmd = self.__straight2ball(bot)
+        self.__logger.debug(cmd)
+        self.__send_cmds.append(cmd)
 
-        if distance_ball_robot < 150:
-            self.__kick_flag = False
+    # def _pass_receive(self, robot: Robot) -> RobotCommand:
+    #     command = RobotCommand(robot.robot_id)
+    #     target_position = Point(0, 0, 0)
+    #     distance_ball_robot = distance(self.__observer.our_robots[robot.robot_id], self.__observer.ball)
 
-        if self.__kick_flag is True and self.__observer.get_ball_slope() != 0:
-            target_position.x = (
-                robot.y - self.__observer.get_ball_intercept() - (-1 / self.__observer.get_ball_slope()) * robot.x
-            ) / (self.__observer.get_ball_slope() - (-1 / self.__observer.get_ball_slope()))
-            target_position.y = (
-                self.__observer.get_ball_slope() * target_position.x + self.__observer.get_ball_intercept()
-            )
-        angular = radian_normalize(radian(self.__ball, robot) - robot.orientation)
+    #     if distance_ball_robot < 150:
+    #         self.__kick_flag = False
 
-        radian_target_robot = radian_normalize(radian(target_position, robot) - robot.orientation)
-        distance_target_robot = distance(target_position, robot)
-        speed = distance_target_robot / 1000
+    #     # if self.__kick_flag is True and self.__observer.get_ball_slope() != 0:
+    #     #     target_position.x = (
+    #     #         robot.y - self.__observer.get_ball_intercept() - (-1 / self.__observer.get_ball_slope()) * robot.x
+    #     #     ) / (self.__observer.get_ball_slope() - (-1 / self.__observer.get_ball_slope()))
+    #     #     target_position.y = (
+    #     #         self.__observer.get_ball_slope() * target_position.x + self.__observer.get_ball_intercept()
+    #     #     )
+    #     angular = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
 
-        fwd = math.cos(radian_target_robot) * speed
-        sway = math.sin(radian_target_robot) * speed
+    #     radian_target_robot = radian_normalize(radian(target_position, robot) - robot.theta)
+    #     distance_target_robot = distance(target_position, robot)
+    #     speed = distance_target_robot / 1000
 
-        command.vel_fwd = fwd
-        command.vel_sway = sway
-        command.vel_angular = angular
-        command.dribble_pow = 1
-        command.kickpow = 0
+    #     fwd = math.cos(radian_target_robot) * speed
+    #     sway = math.sin(radian_target_robot) * speed
 
-        return command
+    #     command.vel_fwd = fwd
+    #     command.vel_sway = sway
+    #     command.vel_angular = angular
+    #     command.dribble_pow = 1
+    #     command.kickpow = 0
 
-    def _straight_move_ball(self, robot: SSL_DetectionRobot) -> RobotCommand:
-        radian_ball_robot = radian_normalize(radian(self.__ball, robot) - robot.orientation)
-        distance_target_robot = distance(self.__ball, robot)
+    #     return command
+
+    def __straight2ball(self, robot: Robot) -> RobotCommand:
+        """straight2ball"""
+        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.ball, robot)
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0
