@@ -12,8 +12,8 @@ import time
 import pygame  # type: ignore
 from pygame.locals import JOYAXISMOTION, JOYBUTTONDOWN  # pylint: disable=no-name-in-module
 
-from racoon_ai.models.robot.commands import RobotCommand, SimCommands
-from racoon_ai.networks.command_sender import CommandSender
+from racoon_ai.models.robot import RobotCommand, SimCommands
+from racoon_ai.networks.sender import CommandSender
 
 
 def main() -> None:

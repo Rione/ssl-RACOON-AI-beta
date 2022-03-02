@@ -3,20 +3,13 @@
 """networks
 
     This module contains the network related classes.
-        - CommandSender
-        - RefReceiver
-        - VisionReceiver
-        - StatusReceiver
+        - receiver
+        - sender
 """
 
-from .command_sender import CommandSender
-from .ref_receiver import RefReceiver
-from .status_reciever import StatusReceiver
-from .vision_receiver import VisionReceiver
+from . import receiver, sender
 
 __all__ = [
-    "CommandSender",
-    "RefReceiver",
-    "StatusReceiver",
-    "VisionReceiver",
+    "receiver",
+    "sender",
 ]

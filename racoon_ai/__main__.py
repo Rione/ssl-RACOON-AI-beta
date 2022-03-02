@@ -6,10 +6,12 @@
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
 from .models.robot import SimCommands
-from .networks import CommandSender, VisionReceiver
-from .observer.observer import Observer
+from .networks.receiver import VisionReceiver
+from .networks.sender import CommandSender
+from .observer import Observer
 from .strategy.offense import Offense
-from .strategy.role import Role
+
+# from .strategy.role import Role
 
 
 def main() -> None:
@@ -30,51 +32,40 @@ def main() -> None:
     logger.addHandler(hdlr)
     logger.debug("Logger initialized")
 
-    # ここに通信可能なロボットIDを入力してください！
-    # 通信できないロボットがいるとOSErrorになります（継続可）
+    # List of online robot ids
     online_ids: list[int] = [1, 3]
 
-    # 実機環境で実行するときにはTrueにしてください
+    # Flag if run for a real robot
     is_real: bool = True
 
-    # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
+    # Flag if our team is yellow
+    is_team_yellow: bool = False
+
     try:
-        # VisionReceiverのインスタンス, receiveポートをportで変更可能
-        vision = VisionReceiver(port=10025)
 
-        # status = StatusReceiver()
+        observer = Observer(
+            VisionReceiver(),
+            is_team_yellow,
+        )
 
-        # RefereeReceiverのインスタンス
-        # ref = RefereeReceiver()
+        # role = Role()
 
-        observer = Observer()
-
-        role = Role()
-
-        offense = Offense(observer, role)
+        offense = Offense(observer)
 
         sender = CommandSender(is_real, online_ids)
 
         logger.info("Roop started")
 
         while True:
-            # 送信用のコマンドリストを初期化
-            sim_cmds = SimCommands(isteamyellow=False)
+            # Create a list of commands
+            sim_cmds = SimCommands(is_team_yellow)
 
-            vision.receive()
+            observer.main()
 
-            observer.vision_receiver(vision)
-            observer.ball_status()
+            # role.decide_role()
 
-            # Roleの処理
-            role.vision_receive(vision)
-            role.decide_role()
-
-            # offenseの処理
-            offense.vision_receive(vision)
             offense.main()
 
-            # Simulation又はRobotに送信
             sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
@@ -83,7 +74,6 @@ def main() -> None:
 
     finally:
         logger.info("Cleaning up...")
-        del vision
         del sender
         shutdown()
 

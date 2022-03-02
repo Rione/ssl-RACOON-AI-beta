@@ -8,13 +8,13 @@
 import socket
 from logging import getLogger
 
-from racoon_ai.models.network import Network
+from racoon_ai.models.network import IPNetAddr
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
 
 
-class CommandSender(Network):
+class CommandSender:
     """CommandSender
 
     Args:
@@ -24,6 +24,9 @@ class CommandSender(Network):
             Defaults to `224.5.23.2`.
         port (int, optional): Port number of the target.
             Defaults to `20011`.
+
+    TODO:
+        Implement a method to change the address and port on the fly.
     """
 
     def __init__(
@@ -35,19 +38,21 @@ class CommandSender(Network):
         port: int = 20011,
     ) -> None:
 
-        super().__init__(port, address=host)
-
         self.__logger = getLogger(__name__)
 
         self.__is_real: bool = is_real
 
         self.__online_ids: list[int] = online_ids
 
-        # 送信ソケット作成
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
-        # Set time-to-live
-        if not is_real:
+        self.__dists: list[IPNetAddr]
+
+        if is_real and online_ids:
+            host_ips: list[str] = [f"192.168.100.{robot_id:03d}" for robot_id in online_ids]
+            self.__dists = [IPNetAddr(host, port, mod_name=__name__) for host in host_ips]
+        else:
+            self.__dists = [IPNetAddr(host, port, mod_name=__name__)]
             self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
@@ -76,12 +81,20 @@ class CommandSender(Network):
         """
         return self.__online_ids
 
+    @property
+    def dists(self) -> list[IPNetAddr]:
+        """dists
+
+        Returns:
+            list[IPNetAddr]: distinations
+        """
+        return self.__dists
+
     def send(self, sim_cmds: SimCommands) -> None:
         """
         送信実行
         :return: None
         """
-        # TODO: 複数同じロボットがappendされてたらどうする？
         send_data = grSim_Commands(
             timestamp=sim_cmds.timestamp,
             isteamyellow=sim_cmds.isteamyellow,
@@ -91,23 +104,9 @@ class CommandSender(Network):
         send_packet = grSim_Packet(commands=send_data)
         packet: bytes = send_packet.SerializeToString()
 
-        # FOR REAL ENVIROMENT
-        # 実機環境
-        if self.is_real:
-            for i in sim_cmds.robot_commands:
-                if self.online_ids and (i.robot_id in self.online_ids):
-                    robotip: int = 100 + i.robot_id
-
-                    try:
-                        # 192.168.100.1xx: xxにはロボットIDが入る。
-                        # そのIPに送信している
-                        self.__sock.sendto(packet, ("192.168.100." + str(robotip), self.port))
-
-                    except OSError:
-                        # オンラインじゃないIPアドレスに送信するとOSエラーが返ってくるのでキャッチする
-                        print("OSError: Host " + "192.168.100." + str(robotip) + " is down!")
-        else:
-            self.__sock.sendto(packet, (self.address, self.port))
+        for dist in self.dists:
+            self.__logger.debug("Sending to %s:%d (%s)", dist.host, dist.port, ("real" if self.is_real else "sim"))
+            self.__sock.sendto(packet, (dist.host, dist.port))
 
     def __stop_robots(self) -> None:
         """stop_robots
