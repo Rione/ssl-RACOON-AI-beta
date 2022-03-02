@@ -127,8 +127,7 @@ class Robot(Pose):
         Returns:
             Vector3f: velocity in (x, y, theta) format
         """
-        # Greater than about 60[Hz] exeption
-        if span < 16e-3:
+        if span < 1e-5:
             return Vector3f(0, 0, 0)
 
         # Calculate velocity

@@ -5,7 +5,7 @@
         - Ball
 """
 
-from racoon_ai.models.coordinate import Point, Vector3f
+from racoon_ai.models.coordinate import Point, Pose, Vector3f
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
 
 
@@ -105,7 +105,7 @@ class Ball(Point):
             Vector3f: velocity in (x, y, z) format
         """
         # Greater than 60[Hz] exeption
-        if span < 16e-3:
+        if span < 1e-5:
             return Vector3f(0, 0, 0)
 
         # Calculate velocity
@@ -141,3 +141,13 @@ class Ball(Point):
         self.__confidence = dball.confidence
         self.__area = dball.area
         self.__pixel = Point(dball.pixel_x, dball.pixel_y)
+
+    def to_pose(self) -> Pose:
+        """to_pose
+
+        convert this object to pose
+
+        Returns:
+            Pose: pose
+        """
+        return Pose(self.x, self.y, theta=0, z=self.z)
