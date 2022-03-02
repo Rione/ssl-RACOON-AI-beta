@@ -52,18 +52,15 @@ class VisionReceiver(IPNetAddr):
 
         # コンストラクタでは、Visionを全カメラから受け取るまで待機
         while len(self.__geometries) <= (self.__num_of_cameras - 1):
-            self.recv()
+            self.main()
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
         self.__sock.close()
         self.__logger.info("Socket closed")
 
-    def recv(self) -> None:
-        """recv
-
-        Recieve a packet from the vision server.
-        """
+    def main(self) -> None:
+        """main"""
 
         # カメラの台数分ループさせる
         packets: list[bytes] = [self.__sock.recv(BUFFSIZE) for _ in range(self.__num_of_cameras)]

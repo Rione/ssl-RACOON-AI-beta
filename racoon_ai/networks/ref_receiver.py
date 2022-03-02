@@ -30,14 +30,8 @@ class RefReceiver(IPNetAddr):
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
 
-    def receive(self) -> None:
-        """receive
-
-        Recieve the refereee messages from the gc.
-
-        Return:
-            None
-        """
+    def main(self) -> None:
+        """main"""
         raise NotImplementedError
 
     def get_command(self) -> "Referee.Command":

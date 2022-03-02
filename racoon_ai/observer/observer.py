@@ -62,7 +62,7 @@ class Observer:
 
     def main(self) -> None:
         """main"""
-        self.__vision.recv()
+        self.__vision.main()
         curr: float = time()
         self.__update_ball_state(curr)
         self.__update_robot_state(curr)
@@ -88,3 +88,71 @@ class Observer:
             if timestamp - bot.timestamp < 1e-3:
                 continue
             bot.update(dbot, timestamp)
+
+    # def _update_ball(self) -> None:
+    #     """
+
+    #     calculate ball info
+
+    #     Return:
+    #         None
+    #     """
+    #     if not self.ball:
+    #         return
+
+    #     ball_delta_x = self.ball.x
+    #     ball_delta_y = self.ball.y
+
+    #     if self.prev_ball:
+    #         ball_delta_x -= self.prev_ball.x
+    #         ball_delta_y -= self.prev_ball.y
+
+    #     if ball_delta_x != 0 and ball_delta_y != 0:
+    #         self.__ball_slope = ball_delta_y / ball_delta_x
+    #         # self.__ball_slope_radian = math.atan2(ball_difference_y, ball_difference_x)
+    #         self.__ball_intercept = self.ball.y - (self.__ball_slope * self.ball.x)
+    #         # self.ball_speed = math.sqrt(math.pow(ball_difference_x, 2) + math.pow(ball_difference_y, 2)) / 0.016
+    #     self.__prev_ball = self.ball
+
+    # def _avoid_collision(
+    #   self,
+    #   robot: SSL_DetectionRobot,
+    #   command: RobotCommand,
+    #   target_radian: float,
+    # ) -> RobotCommand:
+    #     nearest_robot, min_distance, min_radian = self._detection_near_robot(robot)
+
+    #     if min_distance < 380 and ((min_radian > 0 and target_radian > 0) or (min_radian < 0 and target_radian < 0)):
+    #         for robot_their in range(4):
+    #             if self.__their_robots[robot_their].robot_id == nearest_robot:
+    #                 degree_invasion = common.radian(self.__their_robots[robot_their], robot) - robot.orientation
+    #                 if degree_invasion > 0:
+    #                     avoid_degree = degree_invasion + math.pi / 2
+    #                     command.vel_fwd = math.cos(avoid_degree) * 0.25
+    #                     command.vel_sway = math.sin(avoid_degree) * 0.25
+    #                 else:
+    #                     avoid_degree = degree_invasion - math.pi / 2
+    #                     command.vel_fwd = math.cos(avoid_degree - math.pi) * 0.25
+    #                     command.vel_sway = math.sin(avoid_degree - math.pi) * 0.25
+
+    #     return command
+
+    # def _detection_near_robot(self, robot: SSL_DetectionRobot) -> tuple[int, float, float]:
+    #     min_robot_id = -1
+    #     min_distance = 10000000.0
+    #     min_radian = 0.0
+    #     for robot_their in range(4):
+    #         if robot.robot_id == 0 and self.__their_robots[robot_their].robot_id == 3:
+    #             min_robot_id = 3
+    #             min_radian = common.radian_normalize(
+    #                 common.radian(self.__their_robots[robot_their], robot) - robot.orientation
+    #             )
+    #             min_distance = common.distance(self.__their_robots[robot_their], robot)
+    #         elif robot.robot_id == 1 and self.__their_robots[robot_their].robot_id == 4:
+    #             min_robot_id = 4
+    #             min_radian = common.radian_normalize(
+    #                 common.radian(self.__their_robots[robot_their], robot) - robot.orientation
+    #             )
+    #             min_distance = common.distance(self.__their_robots[robot_their], robot)
+
+    #     return min_robot_id, min_distance, min_radian
