@@ -10,8 +10,7 @@ from .networks.receiver import VisionReceiver
 from .networks.sender import CommandSender
 from .observer import Observer
 from .strategy.offense import Offense
-
-# from .strategy.role import Role
+from .strategy.role import Role
 
 
 def main() -> None:
@@ -36,7 +35,7 @@ def main() -> None:
     online_ids: list[int] = [1, 3]
 
     # Flag if run for a real robot
-    is_real: bool = True
+    is_real: bool = False
 
     # Flag if our team is yellow
     is_team_yellow: bool = False
@@ -48,11 +47,11 @@ def main() -> None:
             is_team_yellow,
         )
 
-        # role = Role()
+        role = Role(observer)
 
-        offense = Offense(observer)
+        offense = Offense(observer, role)
 
-        sender = CommandSender(is_real, online_ids)
+        sender = CommandSender(is_real, online_ids, host="localhost")
 
         logger.info("Roop started")
 
@@ -61,9 +60,7 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-
-            # role.decide_role()
-
+            role.main()
             offense.main()
 
             sim_cmds.robot_commands += offense.send_cmds
