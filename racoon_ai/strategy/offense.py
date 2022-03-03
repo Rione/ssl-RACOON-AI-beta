@@ -12,6 +12,7 @@ from racoon_ai.common import distance, move2pose, radian, radian_normalize
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.observer import Observer
+from racoon_ai.strategy.role import Role
 
 
 class Offense:
@@ -23,10 +24,11 @@ class Offense:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: Observer, role: Role) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
+        self.__role = role
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
@@ -40,6 +42,15 @@ class Offense:
         """
         return self.__send_cmds
 
+    @property
+    def kick_flag(self) -> bool:
+        """kick_flag
+
+        Returns:
+            bool: kick_flag
+        """
+        return self.__kick_flag
+
     def main(self) -> None:
         """main"""
         # commandの情報を格納するリスト
@@ -48,18 +59,14 @@ class Offense:
         cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
-        # self.__send_cmds.append(self._straight_move_ball(self.__observer.our_robots[self.__role.get_pass()]))
+        bot = self.__observer.our_robots[self.__role.offense_ids[0]]
+        cmd = self.__straight2ball(bot)
+        self.__send_cmds.append(cmd)
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
         bot = self.__observer.our_robots[1]
         target_position = Pose(2000, 2000, 0, radian(self.__observer.ball, bot))
         cmd = move2pose(bot, target_position)
-        self.__logger.debug(cmd)
-        self.__send_cmds.append(cmd)
-
-        # ボールに向かって前進
-        bot = self.__observer.our_robots[2]
-        cmd = self.__straight2ball(bot)
         self.__logger.debug(cmd)
         self.__send_cmds.append(cmd)
 
@@ -115,10 +122,3 @@ class Offense:
         command.dribble_pow = dribble_power
         command.kickpow = 0
         return command
-
-    def get_kick_flag(self) -> bool:
-        """
-        Returns:
-            bool: __kick_flag
-        """
-        return self.__kick_flag

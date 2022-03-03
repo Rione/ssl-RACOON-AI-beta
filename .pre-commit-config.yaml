@@ -14,6 +14,7 @@ repos:
         args:
           - "-b master"
           - "-b main"
+          - "-b dev"
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
