@@ -1,106 +1,277 @@
 # RACOON-AI
 
-Ri-one SSL Accurate Operation AI
+## Overview
 
-## 使い方 Usage
+**_NOTE: This instruction is for Ubuntu and MacOS. (Windows need some modification)_**
 
-### ランタイム要件
+This is our strategy software for [RoboCup Soccer SSL](https://ssl.robocup.org/)  
+`RACOON-AI` stands for Ri-one ssl Accurate Operation AI
 
-RACOON-AI は Windows でも動作しますが、grSim 等のインストール難易度が高いため、非推奨です。
+### Minimal Requirements
 
-- 64bit Ubuntu 21.04, macOS (M1 でも動作)
-- Python 3.10.X
-- [SSL-Vision](https://github.com/RoboCup-SSL/ssl-vision) (実機環境)
-- [grSim](https://github.com/RoboCup-SSL/grSim) (シミュレーション環境)
+- 64bit machienes (Tested on: x86_64, ARM64)
+- Python 3.10.X (We recommend using `pyenv`)
+- Poetry (Python's dependency manager)
+- GNU Make (`make` command)
+- Google Protobuffer Compiler (`protoc`) v3.19.1
 
-### 推奨依存ソフトウェア
+---
 
-このソフトウェアを開発するにあたり、最適な環境を設定するには以下のパッケージをインストールすることを推奨します。
+## Table of Contents
 
-- [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller)
-- [TIGERs-Autoref](https://github.com/TIGERs-Mannheim/AutoReferee)
+- **[Installation](#installation)**
+  - [Prerequisites](#prerequisites)
+    - [Setup ssh key](#set-up-ssh-key)
+    - [Setup GitHub Command Line Tool](#setup-github-command-line-tool)
+    - [Test SSH Connection](#test-ssh-connection)
+    - [Setup anyenv](#setup-anyenv)
+    - [Setup python 3.10.X](#setup-python-310X)
+    - [Setup poetry](#setup-poetry)
+  - [Getting Start With RACOON-AI](#getting-start-with-racoon-ai)
+    - [Clone RACOON-AI](#clone-racoon-ai)
+    - [Install dependencies](#install-dependencies)
+    - [Enable Pre-commit hooks](#enable-pre-commit-hooks)
+    - [Build RACOON-AI](#build-racoon-ai)
+- **[Usage](#usage)**
+- **[Related Tools](#related-tools)**
 
-|   OS/Platform    |     SSL-Vision     |       grSim        | ssl-game-controller |   TIGERs-Autoref   |
-| :--------------: | :----------------: | :----------------: | :-----------------: | :----------------: |
-|     Windows      |        :x:         | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
-|   Ubuntu/Linux   | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
-| macOS(M1, Intel) |        :x:         | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+---
 
-### 自分の環境にデプロイ
+# Installation
 
-下記のコマンドの上２行は、ワークスペース(ws)の作成をしています。必要に応じて名前を変更してください。
+We know Python version 3.10.X is still in development, isntalling with version management tool is recommended.
+Here, we use `pyenv` with `anyenv` since its simplicity.
+
+## Prerequisites
+
+NOTE: On windows, you can use `py` command instead of `pyenv` (with `anyenv`).
+
+- ssh
+- [GitHub command line tool](https://github.com/cli/cli) - For working with GitHub (`gh` command)
+- [anyenv](https://github.com/anyenv/anyenv) - For managing version management tools
+- [pyenv](https://github.com/pyenv/pyenv) - For managing python versions
+- [Poetry](https://github.com/python-poetry/poetry) - For managing python dependencies
+
+### Setup `ssh` key
+
+From the security perspective, we recommend to use SSH key.
+Please refer to [GitHub documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+1. Generate a Private/Public key
 
 ```bash
-mkdir ~/ws
-cd ~/ws
-git clone git@github.com:Rione-SSL/RACOON-AI
+ssh-keygen -t ed25519 -C "<Your GitHub Email>"
 ```
 
-SSH キーなどの設定は、Rione-SSL の Notion を確認してください。
+2. Add to ssh-agent
 
-### 環境構築
+On MacOS (10.12.2 or later), you can use Keychain Access to add the key to ssh-agent.
+Please add following to your `~/.ssh/config` file.
 
-Python のバージョンは 3.10 です。
+```text
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+```
 
-既に別の Python を使用している場合は、[pyenv](https://github.com/pyenv/pyenv) などを使用して別途インストールしてください。
-注意: Linux (Ubuntu) では python3-venv が必須です。 `sudo apt install -y python3-venv` でインストールできます。
+Add the key to ssh-agent.
+(Use `-K` option to use Keychain on MacOS.)
 
-なお、Windows では公式の Py ランチャーが使用できます。
-二つ目以降の Python をインストールする際に項目を選択し、同時にインストールしてください。
+```bash
+ssh-add ~/.ssh/<Your Key File>
+```
 
-依存関係管理とパッケージングには、[poetry](https://python-poetry.org) を使用します。
+**_NOTE:
+If you get an error, about the connection to the ssh-agent,
+please retry with the following command._**
 
-下記は ubuntu 環境でのコマンド例です。  
-以下、Python3.10 環境下の前提でのコマンド例です。
+```bash
+eval $(ssh-agent -s) && ssh-add ~/.ssh/<Your Key File>
+```
 
-```sh
+### Setup GitHub Command Line Tool
 
-# Uninstall old poetry
-$ curl -sSL https://install.python-poetry.org | python - --uninstall
+1. Install GitHub Command Line Tool
 
-# Install poetry
-$ curl -sSL https://install.python-poetry.org | python3.10
+Please follow the official [installation](https://github.com/cli/cli#installation).  
+On linux see: [Instructions for Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
 
-# Follow the description, add installed package to your PATH (Usually `~/.local/bin`)
-$ export $PATH="$PATH:<PATH_TO_POETRY_BIN>"
+2. Login with your GitHub account
 
-# Check if poetry is installed
+_NOTE: Select the `SSH` option, and add your SSH key._
+
+```bash
+gh auth login
+```
+
+### Test SSH connection
+
+```bash
+ssh -T git@github.com
+```
+
+### Setup `anyenv`
+
+Since the ease of installation, we recommend using with [anyenv](https://github.com/pyenv/pyenv).
+`anyenv` is a tool to manage multiple version management tools, include `pyenv`.
+The tool is provided in Homebrew.
+If you prefer to use Homebrew, please skip the following steps.
+
+1. Clone `anyenv` from GitHub
+
+```bash
+gh repo clone anyenv/anyenv ~/.tools/anyenv
+```
+
+2. Set environment variable
+
+Add following to your `~/.zshrc` or `~/.bashrc` file.
+
+```bash:
+if [ -d $HOME/.tools/anyenv ]; then
+  export PATH="$HOME/.tools/anyenv/bin:$PATH"
+  eval "$(anyenv init -)"
+fi
+```
+
+3. Install manifests
+
+```bash
+anyenv install --init git@github.com:anyenv/anyenv-install.git
+```
+
+Test the installation:
+
+```bash
+anyenv install -l
+```
+
+### Setup Python 3.10.X
+
+0. Install build dependencies
+
+Please follow the [Suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+
+1. Install `pyenv`
+
+```bash
+anyenv install pyenv
+```
+
+2. Search for the available versions
+
+```bash
+pyenv install -l | grep 3.10
+```
+
+3. Install Python
+
+```bash
+pyenv install <Your Selected Version>
+```
+
+### Setup Poetry
+
+1. Checkout to Python 3.10.x
+
+```bash
+pyenv shell <Your Selected Version>
+```
+
+2. Install Poetry
+
+```bash
+curl -sSL https://install.python-poetry.org | python3.10 -
+```
+
+Follow the installation guide, and add to your `$PATH`
+
+3. Check if Poetry is installed
+
+```bash
 $ poetry --version
-> Poetry version 1.1.12
-
-# Enable tab completion (optional)
-$ poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
-
-# Create a virtual environment (optional)
-$ python3.10 -m venv .venv
-
-# Install deps
-$ make install
-
-# Setup pre-commit hook
-$ pre-commit install
+> Poetry version X.X.X
 ```
 
-### 実行
+4. Enable Tab completion (optional)
 
-RACOON-AI を実行するには、以下のコマンドを実行してください。
+Guide: https://github.com/python-poetry/poetry#enable-tab-completion-for-bash-fish-or-zsh
+
+
+## Getting Start With RACOON-AI
+
+### Clone RACOON-AI
+
+Clone to your local workspace.
 
 ```bash
-# Only `make` is also available
-# You can see the usage by `make help
-$ make run
+gh repo clone Rione-SSL/RACOON-AI ~/ws/racoon-ai && cd $_
 ```
 
-## 使用フック
+### Install dependencies
 
-- check-yaml (YAML の構文チェック)
-- end-of-file-fixer (ファイルの最後に改行が一行になるように修正)
-- mixed-line-ending (改行コードを LF に統一)
-- no-commit-to-branch (master/main に commit するのを抑止)
-- isort (import の順番を整える)
-- flake8 (Python のコードを検証する)
-- pylint (Python のコードを検証する)
-- mypy (Python コードのデータ型を検証する)
-- black (Python のコードを整形)
+0. (Optional) Activate virtual environment
 
-(参照: [Supported hooks - pre-commit](https://pre-commit.com/hooks.html))
+If you are not in the python3.10 environment, please follow the following
+
+```bash
+pyenv shell <Your Selected Version>
+```
+
+1. Install dependencies
+
+```bash
+poetry install
+```
+
+NOTE: If you need extra dependencies, please specify with `-E` option.
+
+
+### Enable pre-commit hooks
+
+```bash
+pre-commit install
+```
+
+Used hooks:
+- check-yaml
+- end-of-file-fixer - Corrected line breaks to be on one line at the end of the file
+- mixed-line-ending - Unify line feed code to `LF`
+- no-commit-to-branch - Prohibit committing to branches `master`, `main` and `dev` 
+- isort - Ordering import
+- flake8 - Python code style checker
+- pylint - Python code linter
+- mypy - Python type checker
+- black - Python code formatter
+(See also: [Supported hooks - pre-commit](https://pre-commit.com/hooks.html))
+
+
+### Build RACOON-AI
+
+Compile proto files, and build python package to `dist` directory.
+
+```bash
+make
+```
+
+---
+
+# Usage
+
+## Execute
+
+```bash
+poetry run python -m racoon_ai
+```
+
+NOTE: If you are in the virtual environment, you can use `python` instead of `poetry run python`.
+
+---
+
+# Related Tools
+
+- [grSim](https://github.com/RoboCup-SSL/grSim) - Simulator 
+- [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller) - Game controller
+- [ssl-vision](https://github.com/RoboCup-SSL/ssl-vision/wiki) - Camera system (only support for Linux)
+- [ssl-vision-client](https://github.com/RoboCup-SSL/ssl-vision-client) - Visualizer for `ssl-vision`
+- [ssl-autorefs](https://github.com/RoboCup-SSL/ssl-autorefs) - Referee systems
