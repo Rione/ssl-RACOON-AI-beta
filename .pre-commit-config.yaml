@@ -11,10 +11,7 @@ repos:
         args:
           - "--fix=lf"
       - id: no-commit-to-branch
-        args:
-          - "-b master"
-          - "-b main"
-          - "-b dev"
+        args: [--branch, dev, --branch, master, --branch, main]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
