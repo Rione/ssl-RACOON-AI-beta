@@ -57,7 +57,7 @@ class Gui(QWidget, QPainter):
         """
         self.__our_robots = vision.blue_robots
         self.__their_robots = vision.yellow_robots
-        self.__ball = vision.ball
+        self.__ball = vision.get_ball()
         self.update()
 
         # print(self.__ball.x)
@@ -68,7 +68,7 @@ class Gui(QWidget, QPainter):
         self.setWindowTitle("RACOON-AI")
         label = QLabel(self)
         # label.setFixedSize(150, 150)
-        pixmap = QPixmap("game.jpg")
+        pixmap = QPixmap("game.png")
         label.setPixmap(pixmap.scaledToHeight(32))
         label.move(550, 10)
 
@@ -87,6 +87,7 @@ class Gui(QWidget, QPainter):
         self.__window_height = coat_height / self.__geometry_height
 
     def paintEvent(self, event) -> None:
+        print(self.__ball)
         self.__ui = QPainter(self)
         self.__ui.setPen(QColor(Qt.white))
 

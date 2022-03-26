@@ -70,10 +70,11 @@ class Offense:
         self.__send_cmds = []
 
         # 一番ボールに近いロボットがボールに向かって前進
-        self.__send_cmds.append(self._straight_move_ball(self.__our_robots[self.__role.get_pass()]))
+        self.__send_cmds.append(self._straight_move_ball(self.__our_robots[0]))
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
         target_position = Point(2000, 2000, 0)
+        print(self.__our_robots)
         self.__send_cmds.append(move_point(self.__our_robots[1], self.__ball, target_position))
 
     def _pass_receive(self, robot: SSL_DetectionRobot) -> RobotCommand:

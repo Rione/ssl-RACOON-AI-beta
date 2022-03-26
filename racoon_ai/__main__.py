@@ -50,7 +50,7 @@ def main() -> None:
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     try:
         # VisionReceiverのインスタンス, receiveポートをportで変更可能
-        vision = VisionReceiver(port=10025)
+        vision = VisionReceiver(port=10020)
 
         # status = StatusReceiver()
 

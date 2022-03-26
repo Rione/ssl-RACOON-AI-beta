@@ -69,9 +69,6 @@ class Role:
 
         self.decide_defense()
         self.decide_offense()
-        print(self.__keeper)
-        print(self.__offense)
-        print(self.__defense)
 
     def decide_defense(self) -> None:
         """decide_defense
