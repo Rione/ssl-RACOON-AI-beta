@@ -9,7 +9,9 @@ import socket
 from logging import getLogger
 from operator import attrgetter
 from struct import pack
+from typing import Tuple
 
+from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall, SSL_DetectionFrame, SSL_DetectionRobot
 from racoon_ai.proto.pb_gen.ssl_vision_geometry_pb2 import SSL_GeometryData, SSL_GeometryFieldSize
@@ -70,7 +72,8 @@ class VisionReceiver(IPNetAddr):
         _: list[int] = [wrappers[i].ParseFromString(packet) for i, packet in enumerate(packets)]
 
         # パケットをパースして、list[SSL_GeometryData]に格納
-        self.__geometries = [wrapper.geometry for wrapper in wrappers if wrapper.HasField("geometry")]
+        if self.__geometries == []:
+            self.__geometries = [wrapper.geometry for wrapper in wrappers if wrapper.HasField("geometry")]
 
         # パケットをパースして、list[SSL_DetectionFrame]に格納
         dframes: list[SSL_DetectionFrame] = [
@@ -143,3 +146,31 @@ class VisionReceiver(IPNetAddr):
             List[SSL_GeometryFieldSize]
         """
         return [geometry.field for geometry in self.__geometries]
+
+    @property
+    def geo_goal_position(self) -> Tuple[float, float]:
+        """field_size
+
+        Returns:
+            Tuple
+        """
+        leftgoaltopline: list[Pose] = [Pose(0.0, 0.0), Pose(0.0, 0.0)]
+        leftgoalbottomline: list[Pose] = [Pose(0.0, 0.0), Pose(0.0, 0.0)]
+        for geometry in self.__geometries:
+            for field_lines in geometry.field.field_lines:
+                if field_lines.name == "LeftGoalTopLine":
+                    leftgoaltopline = [
+                        Pose(field_lines.p1.x, field_lines.p1.y),
+                        Pose(field_lines.p2.x, field_lines.p2.y),
+                    ]
+
+                if field_lines.name == "LeftGoalBottomLine":
+                    leftgoalbottomline = [
+                        Pose(field_lines.p1.x, field_lines.p1.y),
+                        Pose(field_lines.p2.x, field_lines.p2.y),
+                    ]
+
+        leftgoal_x: float = (leftgoaltopline[0].x + leftgoaltopline[1].x) * 0.5
+        leftgoal_y: float = (leftgoaltopline[0].y + leftgoalbottomline[1].y) * 0.5
+
+        return (leftgoal_x, leftgoal_y)
