@@ -21,18 +21,34 @@ class Role:
         defense_ids (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: Observer, offe_cnt: int = 3, def_cnt: int = 3) -> None:
+    def __init__(self, observer: Observer) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-
         self.__observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = 0
         self.__offense: list[int] = []
         self.__defense: list[int] = []
-        self.__offense_quantity: int = offe_cnt
-        self.__defence_quantity: int = def_cnt
+        # self.__keeper_quantity: int = 0
+        self.__offense_quantity: int = 0
+        self.__defence_quantity: int = 0
+        # self.__midfielder_quantity: int = 0
+        self.__role_num: list[list[int]] = [
+            [0, 0, 0, 0],
+            [1, 0, 0, 0],
+            [1, 1, 0, 0],
+            [1, 1, 1, 0],
+            [1, 1, 2, 0],
+            [1, 2, 2, 0],
+            [1, 2, 3, 0],
+            [1, 3, 3, 0],
+            [1, 3, 3, 1],
+            [1, 3, 4, 1],
+            [1, 3, 5, 1],
+            [1, 4, 5, 1],
+            [1, 4, 5, 2],
+        ]
 
     @property
     def keeper_id(self) -> int:
@@ -51,12 +67,20 @@ class Role:
 
     def main(self) -> None:
         """main"""
+        self.__decide_quantity()
         self.__decide_keeper()
         self.__decide_defense()
         self.__decide_offense()
-        self.__logger.debug(self.keeper_id)
+        self.__logger.info(self.keeper_id)
         self.__logger.info(self.offense_ids)
-        self.__logger.debug(self.defense_ids)
+        self.__logger.info(self.defense_ids)
+
+    def __decide_quantity(self) -> None:
+        robot_quantity = len(self.__observer.our_robots)
+        # self.__keeper_quantity = self.__role_num[robot_quantity][0]
+        self.__offense_quantity = self.__role_num[robot_quantity][1]
+        self.__defence_quantity = self.__role_num[robot_quantity][2]
+        # self.__midfielder_quantity = self.__role_num[robot_quantity][3]
 
     def __decide_keeper(self) -> None:
         """decide_keeper"""
@@ -94,7 +118,7 @@ class Role:
         ]
 
         if offense:
-            offense.sort(reverse=False, key=lambda x: x[1])
+            offense.sort(reverse=True, key=lambda x: x[1])
             del offense[self.__offense_quantity :]
             offense.sort(reverse=True, key=lambda x: x[2])
         self.__offense = list(set(row[0] for row in offense))

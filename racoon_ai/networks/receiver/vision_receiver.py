@@ -24,7 +24,7 @@ class VisionReceiver(IPNetAddr):
         port (int): Port number of the vision server
     """
 
-    def __init__(self, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, host: str = "224.5.23.2", port: int = 10025) -> None:
 
         super().__init__(host, port)
 
