@@ -27,6 +27,7 @@ This is our strategy software for [RoboCup Soccer SSL](https://ssl.robocup.org/)
     - [Setup anyenv](#setup-anyenv)
     - [Setup python 3.10.X](#setup-python-310X)
     - [Setup poetry](#setup-poetry)
+    - [Setup Protobuf compiler](#setup-protoc)
   - [Getting Start With RACOON-AI](#getting-start-with-racoon-ai)
     - [Clone RACOON-AI](#clone-racoon-ai)
     - [Install dependencies](#install-dependencies)
@@ -51,6 +52,7 @@ NOTE: On windows, you can use `py` command instead of `pyenv` (with `anyenv`).
 - [anyenv](https://github.com/anyenv/anyenv) - For managing version management tools
 - [pyenv](https://github.com/pyenv/pyenv) - For managing python versions
 - [Poetry](https://github.com/python-poetry/poetry) - For managing python dependencies
+- [Protoc](https://github.com/protocolbuffers/protobuf) - For compiling `.proto` files
 
 ### Setup `ssh` key
 
@@ -120,7 +122,7 @@ If you prefer to use Homebrew, please skip the following steps.
 1. Clone `anyenv` from GitHub
 
 ```bash
-gh repo clone anyenv/anyenv ~/.tools/anyenv
+gh repo clone anyenv/anyenv ~/.local/opt/anyenv
 ```
 
 2. Set environment variable
@@ -128,9 +130,12 @@ gh repo clone anyenv/anyenv ~/.tools/anyenv
 Add following to your `~/.zshrc` or `~/.bashrc` file.
 
 ```bash:
-if [ -d $HOME/.tools/anyenv ]; then
-  export PATH="$HOME/.tools/anyenv/bin:$PATH"
+export ANYENV_ROOT="${HOME}/.local/opt/anyenv"
+
+if [ -d $ANYENV_ROOT ]; then
+  export PATH="${ANYENV_ROOT}/bin:${PATH}"
   eval "$(anyenv init -)"
+  test -e "${PYENV_ROOT}/plugins/pyenv-virtualenv" && eval "$(pyenv virtualenv-init -)"
 fi
 ```
 
@@ -193,9 +198,80 @@ $ poetry --version
 > Poetry version X.X.X
 ```
 
+If you get an error about the command not found, 
+please add following to your `~/.zshrc` or `~/.bashrc` file.
+
+```bash
+export PATH="${HOME}/.local/bin:${PATH}"
+```
+
 4. Enable Tab completion (optional)
 
 Guide: https://github.com/python-poetry/poetry#enable-tab-completion-for-bash-fish-or-zsh
+
+
+### Setup Protoc
+
+See also the [Official Guide](https://github.com/protocolbuffers/protobuf/blob/v3.19.1/src/README.md)
+
+**NOTE: Please modify the prefix path if you use another version of protoc.**
+
+0. Install build requirements (if not installed)
+
+- autoconf
+- automake
+- libtool
+- make
+- g++
+- unzip
+
+Note that GNU libtool is required here.
+
+1. Make a directory and chown it
+
+```bash
+sudo mkdir -p /usr/local/opt/protobuf && sudo chown -R $USER /usr/local/opt/protobuf
+```
+
+2. Clone and cd into into the repo
+
+```bash
+gh repo clone protocolbuffers/protobuf /usr/local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules && cd /usr/local/opt/protobuf 
+```
+
+3. Run setup script
+
+```bash
+./autogen.sh
+```
+
+4. Configure to your environment
+
+NOTE: If you use another version of protoc, some modification maight be required.
+
+```bash
+./configure --prefix=/usr/local
+```
+
+5. Build and test
+  
+```bash
+make && make check
+```
+
+6. Install
+
+```bash
+make install
+```
+
+7. Test
+
+```bash
+protoc --version
+```
+
+You will see `libprotoc 3.19.1`.
 
 
 ## Getting Start With RACOON-AI
