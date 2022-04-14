@@ -2,7 +2,7 @@
 
 ## Overview
 
-**_NOTE: This instruction is for Ubuntu and MacOS. (Windows need some modification)_**
+**_NOTE: This instruction is for Linux (Ubuntu) and MacOS. (Windows need some modification)_**
 
 This is our strategy software for [RoboCup Soccer SSL](https://ssl.robocup.org/)  
 `RACOON-AI` stands for Ri-one ssl Accurate Operation AI
@@ -19,328 +19,46 @@ This is our strategy software for [RoboCup Soccer SSL](https://ssl.robocup.org/)
 
 ## Table of Contents
 
-- **[Installation](#installation)**
-  - [Prerequisites](#prerequisites)
-    - [Setup ssh key](#set-up-ssh-key)
-    - [Setup GitHub Command Line Tool](#setup-github-command-line-tool)
-    - [Test SSH Connection](#test-ssh-connection)
-    - [Setup anyenv](#setup-anyenv)
-    - [Setup python 3.10.X](#setup-python-310X)
-    - [Setup poetry](#setup-poetry)
-    - [Setup Protobuf compiler](#setup-protoc)
-  - [Getting Start With RACOON-AI](#getting-start-with-racoon-ai)
-    - [Clone RACOON-AI](#clone-racoon-ai)
-    - [Install dependencies](#install-dependencies)
-    - [Enable Pre-commit hooks](#enable-pre-commit-hooks)
-    - [Build RACOON-AI](#build-racoon-ai)
+- **[Installation](/INSTALL.md)**
+  - [Prerequisites](/INSTALL.md#prerequisites)
+    - [Setup ssh key](/INSTALL.md#set-up-ssh-key)
+    - [Setup GitHub Command Line Tool](/INSTALL.md#setup-github-command-line-tool)
+    - [Test SSH Connection](/INSTALL.md#test-ssh-connection)
+    - [Setup anyenv](/INSTALL.md#setup-anyenv)
+    - [Setup python 3.10.X](/INSTALL.md#setup-python-310X)
+    - [Setup poetry](/INSTALL.md#setup-poetry)
+    - [Setup Protobuf compiler](/INSTALL.md#setup-protoc)
+  - [Getting Start With RACOON-AI](/INSTALL.md#getting-start-with-racoon-ai)
+    - [Clone RACOON-AI](/INSTALL.md#clone-racoon-ai)
+    - [Install dependencies](/INSTALL.md#install-dependencies)
+    - [Enable Pre-commit hooks](/INSTALL.md#enable-pre-commit-hooks)
+    - [Build RACOON-AI](/INSTALL.md#build-racoon-ai)
 - **[Usage](#usage)**
 - **[Related Tools](#related-tools)**
 
 ---
 
-# Installation
+# Usage
 
-We know Python version 3.10.X is still in development, isntalling with version management tool is recommended.
-Here, we use `pyenv` with `anyenv` since its simplicity.
-
-## Prerequisites
-
-NOTE: On windows, you can use `py` command instead of `pyenv` (with `anyenv`).
-
-- ssh
-- [GitHub command line tool](https://github.com/cli/cli) - For working with GitHub (`gh` command)
-- [anyenv](https://github.com/anyenv/anyenv) - For managing version management tools
-- [pyenv](https://github.com/pyenv/pyenv) - For managing python versions
-- [Poetry](https://github.com/python-poetry/poetry) - For managing python dependencies
-- [Protoc](https://github.com/protocolbuffers/protobuf) - For compiling `.proto` files
-
-### Setup `ssh` key
-
-From the security perspective, we recommend to use SSH key.
-Please refer to [GitHub documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-
-1. Generate a Private/Public key
-
-```bash
-ssh-keygen -t ed25519 -C "<Your GitHub Email>"
-```
-
-2. Add to ssh-agent
-
-On MacOS (10.12.2 or later), you can use Keychain Access to add the key to ssh-agent.
-Please add following to your `~/.ssh/config` file.
-
-```text
-Host *
-  AddKeysToAgent yes
-  UseKeychain yes
-```
-
-Add the key to ssh-agent.
-(Use `-K` option to use Keychain on MacOS.)
-
-```bash
-ssh-add ~/.ssh/<Your Key File>
-```
-
-**_NOTE:
-If you get an error, about the connection to the ssh-agent,
-please retry with the following command._**
-
-```bash
-eval $(ssh-agent -s) && ssh-add ~/.ssh/<Your Key File>
-```
-
-### Setup GitHub Command Line Tool
-
-1. Install GitHub Command Line Tool
-
-Please follow the official [installation](https://github.com/cli/cli#installation).  
-On linux see: [Instructions for Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
-
-2. Login with your GitHub account
-
-_NOTE: Select the `SSH` option, and add your SSH key._
-
-```bash
-gh auth login
-```
-
-### Test SSH connection
-
-```bash
-ssh -T git@github.com
-```
-
-### Setup `anyenv`
-
-Since the ease of installation, we recommend using with [anyenv](https://github.com/pyenv/pyenv).
-`anyenv` is a tool to manage multiple version management tools, include `pyenv`.
-The tool is provided in Homebrew.
-If you prefer to use Homebrew, please skip the following steps.
-
-1. Clone `anyenv` from GitHub
-
-```bash
-gh repo clone anyenv/anyenv ~/.local/opt/anyenv
-```
-
-2. Set environment variable
-
-Add following to your `~/.zshrc` or `~/.bashrc` file.
-
-```bash:
-export ANYENV_ROOT="${HOME}/.local/opt/anyenv"
-
-if [ -d $ANYENV_ROOT ]; then
-  export PATH="${ANYENV_ROOT}/bin:${PATH}"
-  eval "$(anyenv init -)"
-  test -e "${PYENV_ROOT}/plugins/pyenv-virtualenv" && eval "$(pyenv virtualenv-init -)"
-fi
-```
-
-3. Install manifests
-
-```bash
-anyenv install --init git@github.com:anyenv/anyenv-install.git
-```
-
-Test the installation:
-
-```bash
-anyenv install -l
-```
-
-### Setup Python 3.10.X
-
-0. Install build dependencies
-
-Please follow the [Suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
-
-1. Install `pyenv`
-
-```bash
-anyenv install pyenv
-```
-
-2. Search for the available versions
-
-```bash
-pyenv install -l | grep 3.10
-```
-
-3. Install Python
-
-```bash
-pyenv install <Your Selected Version>
-```
-
-### Setup Poetry
-
-1. Checkout to Python 3.10.x
-
-```bash
-pyenv shell <Your Selected Version>
-```
-
-2. Install Poetry
-
-```bash
-curl -sSL https://install.python-poetry.org | python3.10 -
-```
-
-Follow the installation guide, and add to your `$PATH`
-
-3. Check if Poetry is installed
-
-```bash
-$ poetry --version
-> Poetry version X.X.X
-```
-
-If you get an error about the command not found, 
-please add following to your `~/.zshrc` or `~/.bashrc` file.
-
-```bash
-export PATH="${HOME}/.local/bin:${PATH}"
-```
-
-4. Enable Tab completion (optional)
-
-Guide: https://github.com/python-poetry/poetry#enable-tab-completion-for-bash-fish-or-zsh
-
-
-### Setup Protoc
-
-See also the [Official Guide](https://github.com/protocolbuffers/protobuf/blob/v3.19.1/src/README.md)
-
-**NOTE: Please modify the prefix path if you use another version of protoc.**
-
-0. Install build requirements (if not installed)
-
-- autoconf
-- automake
-- libtool
-- make
-- g++
-- unzip
-
-Note that GNU libtool is required here.
-
-1. Make a directory and chown it
-
-```bash
-sudo mkdir -p /usr/local/opt/protobuf && sudo chown -R $USER /usr/local/opt/protobuf
-```
-
-2. Clone and cd into into the repo
-
-```bash
-gh repo clone protocolbuffers/protobuf /usr/local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules && cd /usr/local/opt/protobuf 
-```
-
-3. Run setup script
-
-```bash
-./autogen.sh
-```
-
-4. Configure to your environment
-
-NOTE: If you use another version of protoc, some modification maight be required.
-
-```bash
-./configure --prefix=/usr/local
-```
-
-5. Build and test
-  
-```bash
-make && make check
-```
-
-6. Install
-
-```bash
-make install
-```
-
-7. Test
-
-```bash
-protoc --version
-```
-
-You will see `libprotoc 3.19.1`.
-
-
-## Getting Start With RACOON-AI
-
-### Clone RACOON-AI
-
-Clone to your local workspace.
-
-```bash
-gh repo clone Rione-SSL/RACOON-AI ~/ws/racoon-ai && cd $_
-```
-
-### Install dependencies
-
-0. (Optional) Activate virtual environment
-
-If you are not in the python3.10 environment, please follow the following
-
-```bash
-pyenv shell <Your Selected Version>
-```
-
-1. Install dependencies
-
-```bash
-poetry install
-```
-
-NOTE: If you need extra dependencies, please specify with `-E` option.
-
-
-### Enable pre-commit hooks
-
-```bash
-pre-commit install
-```
-
-Used hooks:
-- check-yaml
-- end-of-file-fixer - Corrected line breaks to be on one line at the end of the file
-- mixed-line-ending - Unify line feed code to `LF`
-- no-commit-to-branch - Prohibit committing to branches `master`, `main` and `dev` 
-- isort - Ordering import
-- flake8 - Python code style checker
-- pylint - Python code linter
-- mypy - Python type checker
-- black - Python code formatter
-(See also: [Supported hooks - pre-commit](https://pre-commit.com/hooks.html))
-
-
-### Build RACOON-AI
-
-Compile proto files, and build python package to `dist` directory.
+## Compile and execute
 
 ```bash
 make
 ```
 
----
-
-# Usage
-
-## Execute
+Onece you have built with `make`, you can execute with:
 
 ```bash
 poetry run python -m racoon_ai
 ```
 
-NOTE: If you are in the virtual environment, you can use `python` instead of `poetry run python`.
+Or
+
+```bash
+python -m racoon_ai
+```
+
+You need to run with `poetry run` if you have not switched to `venv` yet.
 
 ---
 
