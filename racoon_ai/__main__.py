@@ -61,7 +61,7 @@ def main() -> None:
 
             observer.main()
             role.main()
-            offense.main()
+            # offense.main()
 
             sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)

@@ -5,8 +5,11 @@
     This module is for the Role class.
 """
 
+import math
 from logging import getLogger
 
+from racoon_ai.common import distance, radian, radian_normalize
+from racoon_ai.models.coordinate import Point
 from racoon_ai.observer import Observer
 
 
@@ -49,6 +52,8 @@ class Role:
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
+        # self.__their_goal: Point = Point(6000, 0)
+        self.__our_goal: Point = Point(-6000, 0)
 
     @property
     def keeper_id(self) -> int:
@@ -90,8 +95,9 @@ class Role:
         """decide_defense"""
 
         defense: list[tuple[int, float, float]]
+
         defense = [
-            (robot.robot_id, robot.x, robot.y)
+            (robot.robot_id, self.__defence_basis_dis(robot.robot_id), radian(robot, self.__our_goal))
             for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
         ]
@@ -100,7 +106,22 @@ class Role:
             defense.sort(reverse=False, key=lambda x: x[1])
             del defense[self.__defence_quantity :]
             defense.sort(reverse=True, key=lambda x: x[2])
-        self.__defense = list(set(row[0] for row in defense))
+        self.__defense = list(row[0] for row in defense)
+
+    # @staticmethod
+    def __defence_basis_dis(self, robot_id: int) -> float:
+        """defence_basis_dis"""
+
+        robot = self.__observer.our_robots[robot_id]
+        theta = radian_normalize(radian(robot, self.__our_goal))
+        robot_dis = distance(robot, self.__our_goal)
+
+        if abs(theta) < math.pi / 4:
+            basis_dis = robot_dis - 1200 / math.cos(theta)
+        else:
+            basis_dis = robot_dis - 1200 / math.sin(theta)
+
+        return basis_dis
 
     def __decide_offense(self) -> None:
         """decide_offense
@@ -121,4 +142,4 @@ class Role:
             offense.sort(reverse=True, key=lambda x: x[1])
             del offense[self.__offense_quantity :]
             offense.sort(reverse=True, key=lambda x: x[2])
-        self.__offense = list(set(row[0] for row in offense))
+        self.__offense = list(row[0] for row in offense)

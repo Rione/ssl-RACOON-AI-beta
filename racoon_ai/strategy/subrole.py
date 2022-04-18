@@ -6,6 +6,7 @@
 
 from racoon_ai.common import distance
 from racoon_ai.observer import Observer
+from racoon_ai.strategy.role import Role
 
 
 class SubRole:
@@ -19,10 +20,11 @@ class SubRole:
         balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: Observer, role: Role) -> None:
         self.__attacker: int = -1
         self.__receiver: int = -1
         self.__observer = observer
+        self.__role = role
 
     def decide_sub_role(self) -> None:
         """decide_sub_role
@@ -43,7 +45,7 @@ class SubRole:
         attacker = [
             (robot.robot_id, distance(self.__observer.ball, robot))
             for robot in self.__observer.our_robots
-            if robot.robot_id != 0
+            if robot.robot_id != self.__role.keeper_id
         ]
         if attacker:
             attacker.sort(reverse=False, key=lambda x: x[1])
@@ -58,8 +60,8 @@ class SubRole:
         receiver = [
             (robot.robot_id, distance(self.__observer.ball, self.__observer.our_robots[self.__attacker]))
             for robot in self.__observer.our_robots
-            if robot.robot_id != 0
+            if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
         ]
         if receiver:
             receiver.sort(reverse=False, key=lambda x: x[1])
-            self.__attacker = int(receiver[0][0])
+            self.__receiver = int(receiver[0][0])
