@@ -43,7 +43,7 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(),
+            VisionReceiver(port=10025),
             is_team_yellow,
         )
 
@@ -51,7 +51,7 @@ def main() -> None:
 
         offense = Offense(observer, role)
 
-        sender = CommandSender(is_real, online_ids, host="localhost")
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
 
         logger.info("Roop started")
 
@@ -61,7 +61,7 @@ def main() -> None:
 
             observer.main()
             role.main()
-            # offense.main()
+            offense.main()
 
             sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)

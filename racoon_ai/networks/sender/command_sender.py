@@ -35,7 +35,7 @@ class CommandSender:
         online_ids: list[int],
         *,
         host: str = "224.5.23.2",
-        port: int = 20025,
+        port: int = 20011,
     ) -> None:
 
         self.__logger = getLogger(__name__)
