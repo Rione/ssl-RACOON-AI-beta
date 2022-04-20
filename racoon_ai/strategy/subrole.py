@@ -1,69 +1,67 @@
 #!/usr/bin/env python3.10
 
 """role.py
-
     This module is for the Role class.
 """
 
 from racoon_ai.common import distance
 from racoon_ai.observer import Observer
-from racoon_ai.strategy.offense import Offense
+from racoon_ai.strategy.role import Role
 
 
 class SubRole:
     """SubRole
     Args:
-        observer (Observer): Observer instance.
-
+        vision (VisionReceiver): VisionReceiver instance.
     Attributes:
-        pass_provider_id (int): pass provider id.
-        pass_receiver_id (int): pass receiver id.
-
+        vision (VisionReceiver): VisionReceiver instance.
+        send_cmds (list[RobotCommand]): RobotCommand list.
+        our_robots (list[SSL_DetectionRobot]): Our robots.
+        balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: Observer) -> None:
-        self.__pass_provider: int = 0
-        self.__pass_receive: int = 0
-        self.__observer: Observer = observer
-        self.__offense: Offense
+    def __init__(self, observer: Observer, role: Role) -> None:
+        self.__attacker: int = -1
+        self.__receiver: int = -1
+        self.__observer = observer
+        self.__role = role
 
-    @property
-    def pass_provider_id(self) -> int:
-        """pass_provider_id
-
+    def decide_sub_role(self) -> None:
+        """decide_sub_role
         Returns:
-            int: pass provider id
+            None
         """
-        return self.__pass_provider
+        self.decide_attacker()
+        self.decide_receiver()
+        print(self.__attacker)
+        print(self.__receiver)
 
-    @property
-    def pass_reciever_id(self) -> int:
-        """pass_reciever_id
-
+    def decide_attacker(self) -> None:
+        """decide_attacker
         Returns:
-            int: pass reciever id
+           None
         """
-        return self.__pass_receive
+        attacker: list[tuple[int, float]]
+        attacker = [
+            (robot.robot_id, distance(self.__observer.ball, robot))
+            for robot in self.__observer.our_robots
+            if robot.robot_id != self.__role.keeper_id
+        ]
+        if attacker:
+            attacker.sort(reverse=False, key=lambda x: x[1])
+            self.__attacker = int(attacker[0][0])
 
-    def main(self) -> None:
-        """main"""
-        self.__decide_pass_provider()
-        self.__decide_pass_receive()
-
-    def __decide_pass_provider(self) -> None:
-        """decide_pass_provider"""
-        if self.__offense.kick_flag is False:
-            min_distance = 10000000.0
-            self.__pass_provider = -1
-            for robot in self.__observer.our_robots:
-                distance_robot_ball = distance(robot, self.__observer.ball)
-                if distance_robot_ball < min_distance:
-                    min_distance = distance_robot_ball
-                    self.__pass_provider = robot.robot_id
-
-    def __decide_pass_receive(self) -> None:
-        """decide_pass_receive"""
-        if self.pass_provider_id == 1:
-            self.__pass_receive = 0
-        else:
-            self.__pass_receive = 1
+    def decide_receiver(self) -> None:
+        """decide_receiver
+        Return:
+          None
+        """
+        receiver: list[tuple[int, float]]
+        receiver = [
+            (robot.robot_id, distance(self.__observer.ball, self.__observer.our_robots[self.__attacker]))
+            for robot in self.__observer.our_robots
+            if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
+        ]
+        if receiver:
+            receiver.sort(reverse=False, key=lambda x: x[1])
+            self.__receiver = int(receiver[0][0])
