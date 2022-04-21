@@ -43,15 +43,15 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(),
+            VisionReceiver(port=20025),
             is_team_yellow,
         )
 
         role = Role(observer)
 
-        offense = Offense(observer, role)
+        offense = Offense(observer)
 
-        sender = CommandSender(is_real, online_ids, host="localhost")
+        sender = CommandSender(is_real, online_ids, host="localhost", port=10025)
 
         logger.info("Roop started")
 
