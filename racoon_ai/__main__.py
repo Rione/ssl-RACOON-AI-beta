@@ -9,8 +9,10 @@ from .models.robot import SimCommands
 from .networks.receiver import VisionReceiver
 from .networks.sender import CommandSender
 from .observer import Observer
+from .strategy.goal_keeper import Keeper
 from .strategy.offense import Offense
-from .strategy.role import Role
+
+# from .strategy.role import Role
 
 
 def main() -> None:
@@ -43,15 +45,17 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(port=20025),
+            VisionReceiver(port=10025),
             is_team_yellow,
         )
 
-        role = Role(observer)
+        # role = Role(observer)
 
         offense = Offense(observer)
 
-        sender = CommandSender(is_real, online_ids, host="localhost", port=10025)
+        keeper = Keeper(observer)
+
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
 
         logger.info("Roop started")
 
@@ -60,10 +64,12 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            role.main()
+            # role.main()
             offense.main()
+            keeper.main()
 
             sim_cmds.robot_commands += offense.send_cmds
+            sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
     except KeyboardInterrupt:

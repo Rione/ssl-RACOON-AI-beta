@@ -9,6 +9,7 @@ import math
 from logging import getLogger
 
 from racoon_ai.common import distance, radian, radian_normalize
+from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.observer import Observer
 
@@ -30,6 +31,7 @@ class Offense:
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
+        self.__our_goal: Point = Point(-6000, 0)
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -58,12 +60,25 @@ class Offense:
 
         # 一番ボールに近いロボットがボールに向かって前進
         bot = self.__observer.our_robots[5]
-        cmd = self.__straight2ball(bot)
+        if (
+            distance(self.__observer.ball, bot) >= 150
+            or abs(radian_normalize(radian(self.__our_goal, bot)) - radian_normalize(radian(self.__observer.ball, bot)))
+            <= 0.1
+        ):
+            cmd = self.__straightball(bot)
+        elif distance(self.__observer.ball, bot) <= 105:
+            cmd = self.__straightgoal(bot)
+        else:
+            cmd = self.__ballaround(bot)
+        if abs(radian(self.__our_goal, bot) - bot.theta) < 0.1:
+            cmd.kickpow = 10
+        # print(distance(self.__observer.ball, bot))
         self.__send_cmds.append(cmd)
 
-    def __straight2ball(self, robot: Robot) -> RobotCommand:
+    def __straightball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
         radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        radian_goal_robot = radian_normalize(radian(self.__our_goal, robot) - robot.theta)
         distance_target_robot = distance(self.__observer.ball, robot)
         speed = distance_target_robot / 1000.0
 
@@ -73,7 +88,48 @@ class Offense:
         command = RobotCommand(5)
         command.vel_fwd = math.cos(radian_ball_robot) * speed
         command.vel_sway = math.sin(radian_ball_robot) * speed
-        command.vel_angular = radian_ball_robot
+        command.vel_angular = radian_goal_robot
         command.dribble_pow = 0
+        command.kickpow = 0
+        return command
+
+    def __straightgoal(self, robot: Robot) -> RobotCommand:
+        """straight2ball"""
+        radian_goal_robot = radian_normalize(radian(self.__our_goal, robot) - robot.theta)
+        # distance_target_robot = distance(self.__our_goal, robot)
+        speed = 0
+
+        # スピード制限
+        speed = min(speed, 1)
+
+        command = RobotCommand(5)
+        command.vel_fwd = math.cos(radian_goal_robot) * speed
+        command.vel_sway = math.sin(radian_goal_robot) * speed
+        command.vel_angular = radian_goal_robot
+        command.dribble_pow = 1
+        command.kickpow = 0
+        return command
+
+    def __ballaround(self, robot: Robot) -> RobotCommand:
+        """ballaround"""
+        radian_goal_robot = radian_normalize(radian(self.__our_goal, robot) - robot.theta)
+        radian_around = radian_normalize(radian(self.__observer.ball, robot))
+        discrimination = radian_normalize(
+            radian_normalize(radian(robot, self.__observer.ball))
+            - radian_normalize(radian(self.__our_goal, self.__observer.ball))
+        )
+        radian_around -= discrimination / abs(discrimination) * math.pi / 2
+        radian_around -= robot.theta
+        distance_target_robot = distance(self.__observer.ball, robot)
+        speed = distance_target_robot / 1000
+
+        # スピード制限
+        speed = min(speed, 1)
+
+        command = RobotCommand(5)
+        command.vel_fwd = math.cos(radian_around) * speed
+        command.vel_sway = math.sin(radian_around) * speed
+        command.vel_angular = radian_goal_robot
+        command.dribble_pow = 1
         command.kickpow = 0
         return command
