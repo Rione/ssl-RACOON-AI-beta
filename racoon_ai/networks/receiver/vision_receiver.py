@@ -32,7 +32,7 @@ class VisionReceiver(IPNetAddr):
 
         self.__logger = getLogger(__name__)
 
-        self.__num_of_cameras: int = 4
+        self.__num_of_cameras: int = 1
 
         self.__balls: list[SSL_DetectionBall] = []
 

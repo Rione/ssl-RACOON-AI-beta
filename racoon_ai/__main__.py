@@ -37,7 +37,7 @@ def main() -> None:
     online_ids: list[int] = [1, 3]
 
     # Flag if run for a real robot
-    is_real: bool = False
+    is_real: bool = True
 
     # Flag if our team is yellow
     is_team_yellow: bool = False
@@ -45,7 +45,7 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(port=10025),
+            VisionReceiver(port=10006),
             is_team_yellow,
         )
 

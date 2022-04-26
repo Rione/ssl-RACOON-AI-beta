@@ -60,17 +60,27 @@ class Offense:
 
         # 一番ボールに近いロボットがボールに向かって前進
         bot = self.__observer.our_robots[5]
-        if (
-            distance(self.__observer.ball, bot) >= 150
-            or abs(radian_normalize(radian(self.__our_goal, bot)) - radian_normalize(radian(self.__observer.ball, bot)))
-            <= 0.1
-        ):
-            cmd = self.__straightball(bot)
-        elif distance(self.__observer.ball, bot) <= 105:
-            cmd = self.__straightgoal(bot)
-        else:
-            cmd = self.__ballaround(bot)
-        if abs(radian(self.__our_goal, bot) - bot.theta) < 0.1:
+        #if (
+        #    distance(self.__observer.ball, bot) >= 150
+        #    or abs(radian_normalize(radian(self.__our_goal, bot)) - radian_normalize(radian(self.__observer.ball, bot)))
+        #    <= 0.1
+        #):
+        #    cmd = self.__straightball(bot)
+        #elif distance(self.__observer.ball, bot) <= 105:
+        #    cmd = self.__straightgoal(bot)
+        #else:
+        #    cmd = self.__ballaround(bot)
+
+        #if abs(radian_normalize(radian(self.__our_goal, bot)) - radian_normalize(radian(self.__observer.ball, bot))) >= 0.1:
+        #   cmd = self.__ballaround2(bot)
+        #elif distance(self.__observer.ball, bot) <= 105:
+        #    cmd = self.__straightgoal(bot)
+        #else:
+        #    cmd = self.__straightball(bot)
+
+        cmd = self.__ballaround2(bot)
+        print(bot.x)
+        if abs(radian(self.__our_goal, bot) - bot.theta) < 0.1 and distance(self.__observer.ball, bot) <= 105:
             cmd.kickpow = 10
         # print(distance(self.__observer.ball, bot))
         self.__send_cmds.append(cmd)
@@ -107,7 +117,7 @@ class Offense:
         command.vel_sway = math.sin(radian_goal_robot) * speed
         command.vel_angular = radian_goal_robot
         command.dribble_pow = 1
-        command.kickpow = 0
+        command.kickpow = 10
         return command
 
     def __ballaround(self, robot: Robot) -> RobotCommand:
@@ -121,7 +131,7 @@ class Offense:
         radian_around -= discrimination / abs(discrimination) * math.pi / 2
         radian_around -= robot.theta
         distance_target_robot = distance(self.__observer.ball, robot)
-        speed = distance_target_robot / 1000
+        speed = distance_target_robot / 2000
 
         # スピード制限
         speed = min(speed, 1)
@@ -131,5 +141,48 @@ class Offense:
         command.vel_sway = math.sin(radian_around) * speed
         command.vel_angular = radian_goal_robot
         command.dribble_pow = 1
+        command.kickpow = 0
+        return command
+
+    def __ballaround2(self, robot: Robot) -> RobotCommand:
+        """ballaround"""
+        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        radian_goal_robot = radian_normalize(radian(self.__our_goal, robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.ball, robot)
+        adjustment = distance_target_robot / 900
+
+        vel_fwd = math.cos(radian_ball_robot) * adjustment
+        vel_sway = math.sin(radian_ball_robot) * adjustment
+
+        radian_around = radian_normalize(radian(self.__observer.ball, robot))
+        discrimination = radian_normalize(
+          radian_normalize(radian(robot, self.__observer.ball))
+          - radian_normalize(radian(self.__our_goal, self.__observer.ball))
+        )
+        radian_around -= discrimination / abs(discrimination) * math.pi / 2
+        radian_around -= robot.theta
+        adjustment = 100 / distance_target_robot
+
+        vel_fwd += math.cos(radian_around) * adjustment
+        vel_sway += math.sin(radian_around) * adjustment
+
+        discrimination = radian_normalize(
+          radian_normalize(radian(self.__observer.ball, robot))
+          - radian_normalize(radian(self.__our_goal, robot))
+        )
+        adjustment = 0.1 / abs(discrimination)
+
+        vel_fwd += math.cos(radian_ball_robot) * adjustment
+        vel_sway += math.sin(radian_ball_robot) * adjustment
+
+        adjustment = math.sqrt(vel_fwd*vel_fwd + vel_sway*vel_sway)
+        speed = distance_target_robot / 1000.0
+        speed = min(speed, 0.3)
+
+        command = RobotCommand(5)
+        command.vel_fwd = vel_fwd / adjustment * speed
+        command.vel_sway = vel_sway / adjustment * speed
+        command.vel_angular = radian_goal_robot
+        command.dribble_pow = 0
         command.kickpow = 0
         return command
