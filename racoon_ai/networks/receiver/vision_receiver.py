@@ -26,13 +26,13 @@ class VisionReceiver(IPNetAddr):
         port (int): Port number of the vision server
     """
 
-    def __init__(self, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, num_cameras: int = 4, host: str = "224.5.23.2", port: int = 10020) -> None:
 
         super().__init__(host, port)
 
         self.__logger = getLogger(__name__)
 
-        self.__num_of_cameras: int = 4
+        self.__num_of_cameras: int = num_cameras
 
         self.__balls: list[SSL_DetectionBall] = []
 

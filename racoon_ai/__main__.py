@@ -43,7 +43,7 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(),
+            VisionReceiver(num_cameras=2),
             is_team_yellow,
         )
 
