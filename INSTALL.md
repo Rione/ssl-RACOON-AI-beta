@@ -4,10 +4,10 @@
   - [Setup ssh key](#set-up-ssh-key)
   - [Setup GitHub Command Line Tool](#setup-github-command-line-tool)
   - [Test SSH Connection](#test-ssh-connection)
+  - [Setup Protobuf compiler](#setup-protoc)
   - [Setup anyenv](#setup-anyenv)
   - [Setup python 3.10.X](#setup-python-310X)
   - [Setup poetry](#setup-poetry)
-  - [Setup Protobuf compiler](#setup-protoc)
 
 ---
 
@@ -53,7 +53,7 @@ Host github.com
   IdentityFile ~/.ssh/<Your Secret Key File>
 ```
 
-### Setup GitHub Command Line Tool
+#### Setup GitHub Command Line Tool
 
 0. Create a GitHub account
 
@@ -72,7 +72,7 @@ _NOTE: Select the `SSH` option, and upload your SSH key._
 gh auth login
 ```
 
-### Test SSH connection
+#### Test SSH connection
 
 ```bash
 ssh -T git@github.com
@@ -84,6 +84,85 @@ please retry with the following command._**
 
 ```bash
 eval $(ssh-agent -s) && ssh-add ~/.ssh/<Your Secet Key File>
+```
+
+### Setup Protoc
+
+See also the [Official Guide](https://github.com/protocolbuffers/protobuf/blob/v3.19.1/src/README.md)
+
+**NOTE: Please modify the prefix path if you want to.**
+
+0. Install build requirements (if not installed)
+
+NOTE: that GNU libtool is required here.
+
+- autoconf
+- automake
+- libtool
+- make
+- g++
+- unzip
+
+1. Clone the protobuf repository
+
+```bash
+gh repo clone protocolbuffers/protobuf $HOME/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
+```
+
+3. Cd into the repo & run setup script
+
+```bash
+cd ${HOME}/.local/opt/protoc && ./autogen.sh
+```
+
+4. Configure to your environment
+
+```bash
+./configure --prefix=${HOME}/.local/protobuf
+```
+
+5. Build and test
+
+NOTE: You can speed up by using make with `-j` option.
+
+```bash
+make && make check
+```
+
+6. Install
+
+```bash
+make install
+```
+
+7. Link protoc to your bin directory
+
+```bash
+ln -s ${HOME}/.local/opt/protobuf/bin/protoc ${HOME}/.local/bin/
+```
+
+8. Test
+
+```bash
+protoc --version
+```
+
+You would get `libprotoc 3.19.1`.
+
+If you get an error about the command not found, 
+please add following to your `~/.zshrc` or `~/.bashrc` file and reload.
+
+```bash
+export PATH="${HOME}/.local/bin:${PATH}"
+```
+
+9. (optional) Add to your `$PKG_CONFIG_PATH`
+
+If you plan to install RoboCup-SSL official packages, 
+please run the following command.
+
+```bash
+export PKG_CONFIG_PATH="${HOME}/.local/opt/protobuf/lib/pkgconfig:${PKG_CONFIG_PATH}"
 ```
 
 ### Setup `anyenv`
@@ -171,13 +250,6 @@ poetry --version
 ```
 You would get `Poetry version X.X.X`
 
-If you get an error about the command not found, 
-please add following to your `~/.zshrc` or `~/.bashrc` file.
-
-```bash
-export PATH="${HOME}/.local/bin:${PATH}"
-```
-
 4. Enable Tab completion (optional)
 
 Please follow the following guide.
@@ -187,62 +259,6 @@ NOTE: You can check your shell by `echo $SHELL`
 Guide: https://python-poetry.org/docs/master#enable-tab-completion-for-bash-fish-or-zsh
 
 
-### Setup Protoc
-
-See also the [Official Guide](https://github.com/protocolbuffers/protobuf/blob/v3.19.1/src/README.md)
-
-**NOTE: Please modify the prefix path if you use another version of protoc.**
-
-0. Install build requirements (if not installed)
-
-NOTE: that GNU libtool is required here.
-
-- autoconf
-- automake
-- libtool
-- make
-- g++
-- unzip
-
-1. Clone the protobuf repository
-
-```bash
-gh repo clone protocolbuffers/protobuf $HOME/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
-```
-
-3. Cd into the repo & run setup script
-
-```bash
-cd ${HOME}/.local/opt/protoc && ./autogen.sh
-```
-
-4. Configure to your environment
-
-```bash
-./configure --prefix=$HOME/.local
-```
-
-5. Build and test
-
-NOTE: You can speed up by using make with `-j` option.
-
-```bash
-make && make check
-```
-
-6. Install
-
-```bash
-make install
-```
-
-7. Test
-
-```bash
-protoc --version
-```
-
-You would get `libprotoc 3.19.1`.
 
 ## Getting Start With RACOON-AI
 
