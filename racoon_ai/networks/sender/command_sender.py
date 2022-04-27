@@ -49,7 +49,7 @@ class CommandSender:
         self.__dists: list[IPNetAddr]
 
         if is_real and online_ids:
-            host_ips: list[str] = [f"192.168.100.{robot_id:03d}" for robot_id in online_ids]
+            host_ips: list[str] = [f"192.168.100.1{robot_id:02d}" for robot_id in online_ids]
             self.__dists = [IPNetAddr(host, port, mod_name=__name__) for host in host_ips]
         else:
             self.__dists = [IPNetAddr(host, port, mod_name=__name__)]
