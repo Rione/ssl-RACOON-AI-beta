@@ -27,13 +27,13 @@ class VisionReceiver(Network):
             Defaults to `10020`.
     """
 
-    def __init__(self, *, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, *, host: str = "224.5.23.2", port: int = 10006) -> None:
 
         super().__init__(port, address=host)
 
         self.__logger = getLogger(__name__)
 
-        self.__num_of_cameras: int = 4
+        self.__num_of_cameras: int = 1
 
         self.__balls: list[SSL_DetectionBall] = []
 

@@ -27,7 +27,7 @@ class Gui(QWidget, QPainter):
 
     def __init__(self) -> None:
         super(Gui, self).__init__()
-        self.__geometry_width: int = 960
+        self.__geometry_width: int = 720
         self.__geometry_height: int = 850
         self.__window_width: float
         self.__window_height: float
@@ -36,16 +36,6 @@ class Gui(QWidget, QPainter):
         self.__role = QLabel("<h1><i>Role</i></h1>", self)
         self.__at = QLabel("<h3><i>AT</i></h3>", self)
         self.__ai = QLabel("<h3><i>RACOON-AI</i></h3>", self)
-        # self.__of0 = QLabel("<h3><i>OF0</i></h3>", self)
-        # self.__of1 = QLabel("<h3><i>OF1</i></h3>", self)
-        # self.__of2 = QLabel("<h3><i>OF2</i></h3>", self)
-        # self.__of3 = QLabel("<h3><i>OF3</i></h3>", self)
-        # self.__of4 = QLabel("<h3><i>OF3</i></h3>", self)
-        # self.__df0 = QLabel("<h3><i>DF0</i></h3>", self)
-        # self.__df1 = QLabel("<h3><i>DF1</i></h3>", self)
-        # self.__df2 = QLabel("<h3><i>DF2</i></h3>", self)
-        # self.__df3 = QLabel("<h3><i>DF2</i></h3>", self)
-        # self.__GK = QLabel("<h3><i>GK</i></h3>", self)
 
         self._initui()
 
@@ -67,10 +57,9 @@ class Gui(QWidget, QPainter):
         self.move(0, 0)
         self.setWindowTitle("RACOON-AI")
         label = QLabel(self)
-        # label.setFixedSize(150, 150)
-        pixmap = QPixmap("game.png")
+        pixmap = QPixmap("barger.png")
         label.setPixmap(pixmap.scaledToHeight(32))
-        label.move(550, 10)
+        label.move(800, 10)
 
         self.show()
 
@@ -87,7 +76,6 @@ class Gui(QWidget, QPainter):
         self.__window_height = coat_height / self.__geometry_height
 
     def paintEvent(self, event) -> None:
-        print(self.__ball)
         self.__ui = QPainter(self)
         self.__ui.setPen(QColor(Qt.white))
 

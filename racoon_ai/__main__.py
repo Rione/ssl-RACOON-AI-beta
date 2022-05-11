@@ -42,7 +42,7 @@ def main() -> None:
     online_ids: list[int] = [1, 3]
 
     # 実機環境で実行するときにはTrueにしてください
-    is_real: bool = True
+    is_real: bool = False
 
     sender = CommandSender(is_real, online_ids)
     app: Any = QApplication(sys.argv)
@@ -50,8 +50,8 @@ def main() -> None:
     # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
     try:
         # VisionReceiverのインスタンス, receiveポートをportで変更可能
-        vision = VisionReceiver(port=10020)
-
+        vision = VisionReceiver(port=10006)
+        logger.info("Roop started")
         # status = StatusReceiver()
 
         # RefereeReceiverのインスタンス
@@ -65,9 +65,7 @@ def main() -> None:
         gui = Gui()
         # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
 
-        sender = CommandSender(is_real, online_ids)
-
-        logger.info("Roop started")
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20015)
 
         while True:
             # 送信用のコマンドリストを初期化

@@ -48,6 +48,7 @@ class Offense:
         Returns:
             list[RobotCommand]: send_cmds
         """
+
         return self.__send_cmds
 
     def vision_receive(self, vision: VisionReceiver) -> None:
@@ -71,11 +72,6 @@ class Offense:
 
         # 一番ボールに近いロボットがボールに向かって前進
         self.__send_cmds.append(self._straight_move_ball(self.__our_robots[0]))
-
-        # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
-        target_position = Point(2000, 2000, 0)
-        print(self.__our_robots)
-        self.__send_cmds.append(move_point(self.__our_robots[1], self.__ball, target_position))
 
     def _pass_receive(self, robot: SSL_DetectionRobot) -> RobotCommand:
         command = RobotCommand(robot.robot_id)
@@ -121,12 +117,13 @@ class Offense:
         else:
             dribble_power = 1.0
 
-        command = RobotCommand(robot.robot_id)
+        command = RobotCommand(0)
         command.vel_fwd = math.cos(radian_ball_robot) * speed
         command.vel_sway = math.sin(radian_ball_robot) * speed
         command.vel_angular = radian_ball_robot
         command.dribble_pow = dribble_power
         command.kickpow = 0
+        print(command.vel_sway)
         return command
 
     def get_kick_flag(self) -> bool:
