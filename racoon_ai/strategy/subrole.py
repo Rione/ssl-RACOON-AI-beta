@@ -6,8 +6,8 @@
 
 from racoon_ai.common import distance
 from racoon_ai.models.coordinate import Point
+from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 from racoon_ai.strategy.role import Role
 
 
@@ -62,13 +62,11 @@ class SubRole:
           None
         """
         receiver: list[tuple[int, float]]
-        attacker: Robot_Infos = self.__observer.get_our_robot(self.__attacker)
+        attacker: Robot = self.__observer.get_our_robot(self.__attacker)
         receiver = [
             (
                 robot.robot_id,
-                distance(
-                    Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(attacker.x, attacker.y)
-                ),
+                distance(self.__observer.get_ball(), attacker),
             )
             for robot in self.__observer.get_our_robots()
             if robot.robot_id not in (self.__role.keeper_id, self.__attacker)

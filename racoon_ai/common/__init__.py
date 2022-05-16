@@ -4,7 +4,7 @@
 from math import atan2, cos, pi, sin, sqrt
 
 from racoon_ai.models.coordinate import Point, Pose
-from racoon_ai.models.robot import RobotCommand
+from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 
 MAX_SPEED = 1000.0
@@ -48,7 +48,7 @@ def distance(object1: Point, object2: Point) -> float:
     return sqrt(pow(object1.x - object2.x, 2) + pow(object1.y - object2.y, 2))
 
 
-def move2pose(robot: Robot_Infos, dist: Pose) -> RobotCommand:
+def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
     """move2pose
 
     Returns:
@@ -56,8 +56,8 @@ def move2pose(robot: Robot_Infos, dist: Pose) -> RobotCommand:
     """
     command = RobotCommand(robot.robot_id)
     rotation = radian_normalize(dist.theta - robot.theta)
-    radian_target_robot = radian_normalize(radian(dist, Point(robot.x, robot.y, robot.theta)) - robot.theta)
-    distance_target_robot = distance(dist, Point(robot.x, robot.y, robot.theta))
+    radian_target_robot = radian_normalize(radian(dist, robot) - robot.theta)
+    distance_target_robot = distance(dist, robot)
 
     speed = min(distance_target_robot / 100.0, MAX_SPEED)
     command.vel_fwd = cos(radian_target_robot) * speed

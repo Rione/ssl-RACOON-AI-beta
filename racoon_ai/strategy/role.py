@@ -100,7 +100,7 @@ class Role:
             (
                 robot.robot_id,
                 self.__defence_basis_dis(robot.robot_id),
-                radian(Point(robot.x, robot.y, robot.theta), self.__our_goal),
+                radian(robot, self.__our_goal),
             )
             for robot in self.__observer.get_our_robots()
             if robot.robot_id != self.keeper_id
@@ -117,8 +117,8 @@ class Role:
         """defence_basis_dis"""
 
         robot = self.__observer.get_our_robot(robot_id)
-        theta = radian_normalize(radian(Point(robot.x, robot.y, robot.theta), self.__our_goal))
-        robot_dis = distance(Point(robot.x, robot.y, robot.theta), self.__our_goal)
+        theta = radian_normalize(radian(robot, self.__our_goal))
+        robot_dis = distance(robot, self.__our_goal)
 
         if abs(theta) < math.pi / 4:
             basis_dis = robot_dis - 1200 / math.cos(theta)
