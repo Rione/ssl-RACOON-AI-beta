@@ -6,9 +6,8 @@
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
 from .models.robot import SimCommands
-from .networks.receiver import VisionReceiver
+from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
-from .observer import Observer
 from .strategy.offense import Offense
 from .strategy.role import Role
 
@@ -41,11 +40,7 @@ def main() -> None:
     is_team_yellow: bool = False
 
     try:
-
-        observer = Observer(
-            VisionReceiver(),
-            is_team_yellow,
-        )
+        observer = MWReceiver(host="127.0.0.1", port=30011)
 
         role = Role(observer)
 

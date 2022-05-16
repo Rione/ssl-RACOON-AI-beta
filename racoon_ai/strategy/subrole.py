@@ -5,7 +5,9 @@
 """
 
 from racoon_ai.common import distance
-from racoon_ai.observer import Observer
+from racoon_ai.models.coordinate import Point
+from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 from racoon_ai.strategy.role import Role
 
 
@@ -20,7 +22,7 @@ class SubRole:
         balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: Observer, role: Role) -> None:
+    def __init__(self, observer: MWReceiver, role: Role) -> None:
         self.__attacker: int = -1
         self.__receiver: int = -1
         self.__observer = observer
@@ -43,8 +45,11 @@ class SubRole:
         """
         attacker: list[tuple[int, float]]
         attacker = [
-            (robot.robot_id, distance(self.__observer.ball, robot))
-            for robot in self.__observer.our_robots
+            (
+                robot.robot_id,
+                distance(Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(robot.x, robot.y)),
+            )
+            for robot in self.__observer.get_our_robots()
             if robot.robot_id != self.__role.keeper_id
         ]
         if attacker:
@@ -57,9 +62,15 @@ class SubRole:
           None
         """
         receiver: list[tuple[int, float]]
+        attacker: Robot_Infos = self.__observer.get_our_robot(self.__attacker)
         receiver = [
-            (robot.robot_id, distance(self.__observer.ball, self.__observer.our_robots[self.__attacker]))
-            for robot in self.__observer.our_robots
+            (
+                robot.robot_id,
+                distance(
+                    Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(attacker.x, attacker.y)
+                ),
+            )
+            for robot in self.__observer.get_our_robots()
             if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
         ]
         if receiver:
