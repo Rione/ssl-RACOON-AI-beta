@@ -4,7 +4,7 @@
     This module is for the Role class.
 """
 
-from racoon_ai.common import distance
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
@@ -46,7 +46,7 @@ class SubRole:
         attacker = [
             (
                 robot.robot_id,
-                distance(self.__observer.ball, robot),
+                MU.distance(self.__observer.ball, robot),
             )
             for robot in self.__observer.our_robots
             if robot.robot_id != self.__role.keeper_id
@@ -65,7 +65,7 @@ class SubRole:
         receiver = [
             (
                 robot.robot_id,
-                distance(self.__observer.ball, attacker),
+                MU.distance(self.__observer.ball, attacker),
             )
             for robot in self.__observer.our_robots
             if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
