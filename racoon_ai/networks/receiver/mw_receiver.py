@@ -11,7 +11,7 @@ from logging import getLogger
 from racoon_ai.models.ball import Ball
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
-from racoon_ai.models.robot import Enemy, Robot
+from racoon_ai.models.robot import Robot
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Goal_Info, RacoonMW_Packet, Referee_Info
 
 
@@ -34,7 +34,7 @@ class MWReceiver(IPNetAddr):
         self.__ball: Ball = Ball()
 
         self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
-        self.__enemy_robots: list[Enemy] = [Enemy(i) for i in range(12)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -61,7 +61,7 @@ class MWReceiver(IPNetAddr):
         self.ball.update(self.__data.ball)
 
         bot: Robot
-        enemy: Enemy
+        enemy: Robot
         for dbot in self.__data.our_robots:
             if dbot.robot_id < 12:
                 bot = self.__our_robots[dbot.robot_id]
@@ -85,7 +85,7 @@ class MWReceiver(IPNetAddr):
         """
         return self.__our_robots
 
-    def get_enemy_robots(self) -> list[Enemy]:
+    def get_enemy_robots(self) -> list[Robot]:
         """get_our_robot
 
         Returns:
@@ -109,14 +109,14 @@ class MWReceiver(IPNetAddr):
 
         return our_robot
 
-    def get_enemy_robot(self, enemy_id: int) -> Enemy:
+    def get_enemy_robot(self, enemy_id: int) -> Robot:
         """get_enemy_robot
 
         Returns:
             Enemy
         """
-        enemy_robot: Enemy
-        enemy_robot = Enemy(
+        enemy_robot: Robot
+        enemy_robot = Robot(
             robot_id=99,
         )
         for enemy in self.__enemy_robots:

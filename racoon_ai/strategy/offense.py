@@ -10,9 +10,8 @@ from logging import getLogger
 
 from racoon_ai.common import distance, move2pose, radian, radian_normalize
 from racoon_ai.models.coordinate import Point, Pose
-from racoon_ai.models.robot import RobotCommand
+from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 from racoon_ai.strategy.role import Role
 
 
@@ -56,7 +55,7 @@ class Offense:
         """main"""
         # commandの情報を格納するリスト
         self.__send_cmds = []
-        bot: Robot_Infos
+        bot: Robot
         cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
@@ -111,17 +110,10 @@ class Offense:
 
     #     return command
 
-    def __straight2ball(self, robot: Robot_Infos) -> RobotCommand:
+    def __straight2ball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
-        radian_ball_robot = radian_normalize(
-            radian(
-                Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(robot.x, robot.y, robot.theta)
-            )
-            - robot.theta
-        )
-        distance_target_robot = distance(
-            Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(robot.x, robot.y)
-        )
+        radian_ball_robot = radian_normalize(radian(self.__observer.get_ball(), robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.get_ball(), robot)
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0
