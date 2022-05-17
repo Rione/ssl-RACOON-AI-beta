@@ -10,7 +10,7 @@ from logging import getLogger
 
 from racoon_ai.common import distance, radian, radian_normalize
 from racoon_ai.models.coordinate import Point
-from racoon_ai.observer import Observer
+from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 
 
 class Role:
@@ -24,7 +24,7 @@ class Role:
         defense_ids (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: MWReceiver) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
@@ -97,7 +97,11 @@ class Role:
         defense: list[tuple[int, float, float]]
 
         defense = [
-            (robot.robot_id, self.__defence_basis_dis(robot.robot_id), radian(robot, self.__our_goal))
+            (
+                robot.robot_id,
+                self.__defence_basis_dis(robot.robot_id),
+                radian(robot, self.__our_goal),
+            )
             for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
         ]
@@ -112,7 +116,7 @@ class Role:
     def __defence_basis_dis(self, robot_id: int) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.our_robots[robot_id]
+        robot = self.__observer.get_our_by_id(robot_id)
         theta = radian_normalize(radian(robot, self.__our_goal))
         robot_dis = distance(robot, self.__our_goal)
 
