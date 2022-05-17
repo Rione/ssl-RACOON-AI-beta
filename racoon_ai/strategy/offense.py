@@ -4,11 +4,11 @@
 
     This module is for the Offense class.
 """
-
-import math
 from logging import getLogger
+from math import cos, sin
 
-from racoon_ai.common import distance, move2pose, radian, radian_normalize
+from racoon_ai.common import move2pose
+from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.networks.receiver import MWReceiver
@@ -69,7 +69,7 @@ class Offense:
             2000,
             2000,
             0,
-            radian(
+            MU.radian(
                 Point(self.__observer.ball.filtered_x, self.__observer.ball.filtered_y),
                 bot,
             ),
@@ -112,8 +112,8 @@ class Offense:
 
     def __straight2ball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
-        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
-        distance_target_robot = distance(self.__observer.ball, robot)
+        radian_ball_robot = MU.radian_reduce(MU.radian(self.__observer.ball, robot), robot.theta)
+        distance_target_robot = MU.distance(self.__observer.ball, robot)
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0
@@ -124,8 +124,8 @@ class Offense:
             dribble_power = 1.0
 
         command = RobotCommand(robot.robot_id)
-        command.vel_fwd = math.cos(radian_ball_robot) * speed
-        command.vel_sway = math.sin(radian_ball_robot) * speed
+        command.vel_fwd = cos(radian_ball_robot) * speed
+        command.vel_sway = sin(radian_ball_robot) * speed
         command.vel_angular = radian_ball_robot
         command.dribble_pow = dribble_power
         command.kickpow = 0

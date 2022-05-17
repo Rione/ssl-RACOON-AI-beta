@@ -1,51 +1,17 @@
 #!/usr/bin/env python3.10
 # pylint: disable=C0114
 
-from math import atan2, cos, pi, sin, sqrt
+from math import cos, sin
+from typing import TypeAlias
 
-from racoon_ai.models.coordinate import Point, Pose
+from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 
-MAX_SPEED = 1000.0
-CLOSE_BALL = 150.0
+from .math_utils import MathUtils
 
-
-def radian(pt1: Point, pt2: Point) -> float:
-    """radian
-    Args:
-        pt1 Point: Calculatable object.
-        pt2 Point: Calculatable object.
-    Returns:
-        float: degree of two objects in radian
-    """
-    return atan2(pt1.y - pt2.y, pt1.x - pt2.x)
-
-
-def radian_normalize(rad: float) -> float:
-    """radian_normalize
-
-    Args:
-        rad (float): radian value
-
-    Returns:
-        float: normalized radian value
-    """
-    if rad > pi:
-        rad = rad - 2 * pi
-    if rad < -pi:
-        rad = rad + 2 * pi
-
-    return rad
-
-
-def distance(object1: Point, object2: Point) -> float:
-    """distance
-
-    Returns:
-        float: distance value
-    """
-    return sqrt(pow(object1.x - object2.x, 2) + pow(object1.y - object2.y, 2))
+MAX_SPEED: float = 1000.0
+CLOSE_BALL: float = 150.0
+MU: TypeAlias = MathUtils
 
 
 def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
@@ -55,9 +21,9 @@ def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
         RobotCommand: move motion value
     """
     command = RobotCommand(robot.robot_id)
-    rotation = radian_normalize(dist.theta - robot.theta)
-    radian_target_robot = radian_normalize(radian(dist, robot) - robot.theta)
-    distance_target_robot = distance(dist, robot)
+    rotation = MU.radian_reduce(dist.theta, robot.theta)
+    radian_target_robot = MU.radian_reduce(MU.radian(dist, robot), robot.theta)
+    distance_target_robot = MU.distance(dist, robot)
 
     speed = min(distance_target_robot / 100.0, MAX_SPEED)
     command.vel_fwd = cos(radian_target_robot) * speed
@@ -68,7 +34,7 @@ def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
     return command
 
 
-def halt(robot: Robot_Infos) -> RobotCommand:
+def halt(robot: Robot) -> RobotCommand:
     """halt
 
     Returns:
@@ -82,3 +48,12 @@ def halt(robot: Robot_Infos) -> RobotCommand:
     command.dribble_pow = 0.0
 
     return command
+
+
+__all__ = [
+    "MathUtils",
+    "CLOSE_BALL",
+    "MAX_SPEED",
+    "move2pose",
+    "halt",
+]
