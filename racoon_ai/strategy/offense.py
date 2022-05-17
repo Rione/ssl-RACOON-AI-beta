@@ -9,9 +9,9 @@ import math
 from logging import getLogger
 
 from racoon_ai.common import distance, move2pose, radian, radian_normalize
-from racoon_ai.models.coordinate import Point, Pose
+from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.strategy.role import Role
 
 
@@ -24,7 +24,7 @@ class Offense:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, role: Role) -> None:
+    def __init__(self, observer: Observer, role: Role) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
@@ -59,21 +59,13 @@ class Offense:
         cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
-        bot = self.__observer.get_our_robot(self.__role.offense_ids[0])
+        bot = self.__observer.our_robots[self.__role.offense_ids[0]]
         cmd = self.__straight2ball(bot)
         self.__send_cmds.append(cmd)
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
-        bot = self.__observer.get_our_robot(1)
-        target_position = Pose(
-            2000,
-            2000,
-            0,
-            radian(
-                Point(self.__observer.get_ball().filtered_x, self.__observer.get_ball().filtered_y),
-                Point(bot.x, bot.y, bot.theta),
-            ),
-        )
+        bot = self.__observer.our_robots[1]
+        target_position = Pose(2000, 2000, 0, radian(self.__observer.ball, bot))
         cmd = move2pose(bot, target_position)
         self.__logger.debug(cmd)
         self.__send_cmds.append(cmd)
@@ -112,8 +104,8 @@ class Offense:
 
     def __straight2ball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
-        radian_ball_robot = radian_normalize(radian(self.__observer.get_ball(), robot) - robot.theta)
-        distance_target_robot = distance(self.__observer.get_ball(), robot)
+        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.ball, robot)
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0

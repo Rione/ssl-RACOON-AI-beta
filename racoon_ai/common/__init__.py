@@ -5,7 +5,6 @@ from math import atan2, cos, pi, sin, sqrt
 
 from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 
 MAX_SPEED = 1000.0
 CLOSE_BALL = 150.0
@@ -68,7 +67,7 @@ def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
     return command
 
 
-def halt(robot: Robot_Infos) -> RobotCommand:
+def halt(robot: Robot) -> RobotCommand:
     """halt
 
     Returns:
