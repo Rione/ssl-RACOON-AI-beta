@@ -10,7 +10,7 @@ from logging import getLogger
 
 from racoon_ai.common import distance, radian, radian_normalize
 from racoon_ai.models.coordinate import Point
-from racoon_ai.networks.receiver.mw_receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 
 class Role:
@@ -24,7 +24,7 @@ class Role:
         defense_ids (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, observer: Observer) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
@@ -81,7 +81,7 @@ class Role:
         self.__logger.info(self.defense_ids)
 
     def __decide_quantity(self) -> None:
-        robot_quantity = len(self.__observer.get_our_robots())
+        robot_quantity = len(self.__observer.our_robots)
         # self.__keeper_quantity = self.__role_num[robot_quantity][0]
         self.__offense_quantity = self.__role_num[robot_quantity][1]
         self.__defence_quantity = self.__role_num[robot_quantity][2]
@@ -97,12 +97,8 @@ class Role:
         defense: list[tuple[int, float, float]]
 
         defense = [
-            (
-                robot.robot_id,
-                self.__defence_basis_dis(robot.robot_id),
-                radian(robot, self.__our_goal),
-            )
-            for robot in self.__observer.get_our_robots()
+            (robot.robot_id, self.__defence_basis_dis(robot.robot_id), radian(robot, self.__our_goal))
+            for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
         ]
 
@@ -116,7 +112,7 @@ class Role:
     def __defence_basis_dis(self, robot_id: int) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.get_our_robot(robot_id)
+        robot = self.__observer.our_robots[robot_id]
         theta = radian_normalize(radian(robot, self.__our_goal))
         robot_dis = distance(robot, self.__our_goal)
 
@@ -138,7 +134,7 @@ class Role:
         offense: list[tuple[int, float, float]]
         offense = [
             (robot.robot_id, robot.x, robot.y)
-            for robot in self.__observer.get_our_robots()
+            for robot in self.__observer.our_robots
             if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
         ]
 
