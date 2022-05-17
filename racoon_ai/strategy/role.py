@@ -81,7 +81,7 @@ class Role:
         self.__logger.info(self.defense_ids)
 
     def __decide_quantity(self) -> None:
-        robot_quantity = len(self.__observer.get_our_robots())
+        robot_quantity = len(self.__observer.our_robots)
         # self.__keeper_quantity = self.__role_num[robot_quantity][0]
         self.__offense_quantity = self.__role_num[robot_quantity][1]
         self.__defence_quantity = self.__role_num[robot_quantity][2]
@@ -102,7 +102,7 @@ class Role:
                 self.__defence_basis_dis(robot.robot_id),
                 radian(robot, self.__our_goal),
             )
-            for robot in self.__observer.get_our_robots()
+            for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
         ]
 
@@ -116,7 +116,7 @@ class Role:
     def __defence_basis_dis(self, robot_id: int) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.get_our_robot(robot_id)
+        robot = self.__observer.get_our_by_id(robot_id)
         theta = radian_normalize(radian(robot, self.__our_goal))
         robot_dis = distance(robot, self.__our_goal)
 
@@ -138,7 +138,7 @@ class Role:
         offense: list[tuple[int, float, float]]
         offense = [
             (robot.robot_id, robot.x, robot.y)
-            for robot in self.__observer.get_our_robots()
+            for robot in self.__observer.our_robots
             if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
         ]
 

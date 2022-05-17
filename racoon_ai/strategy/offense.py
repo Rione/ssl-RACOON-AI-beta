@@ -59,19 +59,19 @@ class Offense:
         cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
-        bot = self.__observer.get_our_robot(self.__role.offense_ids[0])
+        bot = self.__observer.get_our_by_id(self.__role.offense_ids[0])
         cmd = self.__straight2ball(bot)
         self.__send_cmds.append(cmd)
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
-        bot = self.__observer.get_our_robot(1)
+        bot = self.__observer.get_our_by_id(1)
         target_position = Pose(
             2000,
             2000,
             0,
             radian(
-                Point(self.__observer.get_ball().filtered_x, self.__observer.get_ball().filtered_y),
-                Point(bot.x, bot.y, bot.theta),
+                Point(self.__observer.ball.filtered_x, self.__observer.ball.filtered_y),
+                bot,
             ),
         )
         cmd = move2pose(bot, target_position)
@@ -112,8 +112,8 @@ class Offense:
 
     def __straight2ball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
-        radian_ball_robot = radian_normalize(radian(self.__observer.get_ball(), robot) - robot.theta)
-        distance_target_robot = distance(self.__observer.get_ball(), robot)
+        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.ball, robot)
         speed = distance_target_robot / 1000.0
 
         dribble_power = 0.0

@@ -77,7 +77,8 @@ class MWReceiver(IPNetAddr):
         """ball"""
         return self.__ball
 
-    def get_our_robots(self) -> list[Robot]:
+    @property
+    def our_robots(self) -> list[Robot]:
         """get_our_robot
 
         Returns:
@@ -85,7 +86,8 @@ class MWReceiver(IPNetAddr):
         """
         return self.__our_robots
 
-    def get_enemy_robots(self) -> list[Robot]:
+    @property
+    def enemy_robots(self) -> list[Robot]:
         """get_our_robot
 
         Returns:
@@ -93,8 +95,8 @@ class MWReceiver(IPNetAddr):
         """
         return self.__enemy_robots
 
-    def get_our_robot(self, robot_id: int) -> Robot:
-        """get_our_robot
+    def get_our_by_id(self, robot_id: int) -> Robot:
+        """get_our_by_id
 
         Returns:
             Robot
@@ -109,8 +111,8 @@ class MWReceiver(IPNetAddr):
 
         return our_robot
 
-    def get_enemy_robot(self, enemy_id: int) -> Robot:
-        """get_enemy_robot
+    def get_enemy_by_id(self, enemy_id: int) -> Robot:
+        """get_enemy_by_id
 
         Returns:
             Enemy
@@ -125,17 +127,9 @@ class MWReceiver(IPNetAddr):
 
         return enemy_robot
 
-    def get_ball(self) -> Ball:
-        """get_ball
-
-        Returns:
-            Ball_Info
-        """
-
-        return self.__ball
-
-    def get_goal(self) -> Pose:
-        """get_goal
+    @property
+    def goal(self) -> Pose:
+        """goal
 
         Returns:
             Goal_Info
@@ -144,8 +138,9 @@ class MWReceiver(IPNetAddr):
 
         return Pose(goal.x, goal.y)
 
-    def get_referee(self) -> Referee_Info:
-        """get_referee
+    @property
+    def referee(self) -> Referee_Info:
+        """referee
 
         Returns:
             Referee_Info
@@ -154,8 +149,9 @@ class MWReceiver(IPNetAddr):
 
         return referee
 
-    def get_sec_per_frame(self) -> float:
-        """get_sec_per_frame
+    @property
+    def sec_per_frame(self) -> float:
+        """sec_per_frame
 
         Returns:
             float
@@ -164,8 +160,9 @@ class MWReceiver(IPNetAddr):
 
         return secperframe
 
-    def get_num_of_cameras(self) -> int:
-        """get_num_of_cameras
+    @property
+    def num_of_cameras(self) -> int:
+        """num_of_cameras
 
         Returns:
             int
@@ -174,6 +171,7 @@ class MWReceiver(IPNetAddr):
 
         return numofcameras
 
+    @property
     def is_vision_recv(self) -> bool:
         """is_vision_recv
 
@@ -184,8 +182,9 @@ class MWReceiver(IPNetAddr):
 
         return isvisionrecv
 
-    def get_attack_direction(self) -> int:
-        """get_attack_direction
+    @property
+    def attack_direction(self) -> int:
+        """attack_direction
 
         Returns:
             int

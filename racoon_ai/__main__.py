@@ -31,7 +31,7 @@ def main() -> None:
     logger.debug("Logger initialized")
 
     # List of online robot ids
-    online_ids: list[int] = [1, 3]
+    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     # Flag if run for a real robot
     is_real: bool = False

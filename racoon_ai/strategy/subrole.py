@@ -5,7 +5,6 @@
 """
 
 from racoon_ai.common import distance
-from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
@@ -47,9 +46,9 @@ class SubRole:
         attacker = [
             (
                 robot.robot_id,
-                distance(Point(self.__observer.get_ball().x, self.__observer.get_ball().y), Point(robot.x, robot.y)),
+                distance(self.__observer.ball, robot),
             )
-            for robot in self.__observer.get_our_robots()
+            for robot in self.__observer.our_robots
             if robot.robot_id != self.__role.keeper_id
         ]
         if attacker:
@@ -62,13 +61,13 @@ class SubRole:
           None
         """
         receiver: list[tuple[int, float]]
-        attacker: Robot = self.__observer.get_our_robot(self.__attacker)
+        attacker: Robot = self.__observer.get_our_by_id(self.__attacker)
         receiver = [
             (
                 robot.robot_id,
-                distance(self.__observer.get_ball(), attacker),
+                distance(self.__observer.ball, attacker),
             )
-            for robot in self.__observer.get_our_robots()
+            for robot in self.__observer.our_robots
             if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
         ]
         if receiver:
