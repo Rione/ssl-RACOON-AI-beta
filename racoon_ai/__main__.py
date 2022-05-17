@@ -10,7 +10,8 @@ from .networks.receiver import VisionReceiver
 from .networks.sender import CommandSender
 from .observer import Observer
 from .strategy.goal_keeper import Keeper
-from .strategy.offense import Offense
+
+# from .strategy.offense import Offense
 
 # from .strategy.role import Role
 
@@ -37,7 +38,7 @@ def main() -> None:
     online_ids: list[int] = [1, 3]
 
     # Flag if run for a real robot
-    is_real: bool = True
+    is_real: bool = False
 
     # Flag if our team is yellow
     is_team_yellow: bool = False
@@ -45,13 +46,13 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(port=10006),
+            VisionReceiver(port=10025),
             is_team_yellow,
         )
 
         # role = Role(observer)
 
-        offense = Offense(observer)
+        # offense = Offense(observer)
 
         keeper = Keeper(observer)
 
@@ -65,10 +66,10 @@ def main() -> None:
 
             observer.main()
             # role.main()
-            offense.main()
+            # offense.main()
             keeper.main()
 
-            sim_cmds.robot_commands += offense.send_cmds
+            # sim_cmds.robot_commands += offense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
