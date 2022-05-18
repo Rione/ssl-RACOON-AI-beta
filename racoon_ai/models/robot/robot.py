@@ -169,3 +169,13 @@ class Robot(Pose):
         self.__is_ball_catch = dbot.ball_catch
         self.__is_online = dbot.online
         self.__battery_voltage = dbot.battery_voltage
+
+    def to_pose(self) -> Pose:
+        """to_pose
+
+        convert this object to pose
+
+        Returns:
+            Pose: pose of robot
+        """
+        return Pose(self.x, self.y, self.theta)
