@@ -68,31 +68,26 @@ class Keeper:
         """keep_goal"""
         radian_ball_goal = radian_normalize(radian(self.__observer.ball, self.__our_goal))
         radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot))
+
         if abs(radian_ball_goal) >= math.pi / 2:
             radian_ball_goal = radian_ball_goal / abs(radian_ball_goal) * math.pi / 2
         self.__target_point = Point(
             self.__our_goal.x + self.__radius * math.cos(radian_ball_goal),
             self.__our_goal.y + self.__radius * math.sin(radian_ball_goal),
         )
-
         self.__target_theta = radian_ball_robot
-        vel_angular = self.__pid_radian(robot)
-        self.__pre_robot_position = robot
-        self.__pre_target_point = self.__target_point
-        self.__pre_target_theta = self.__target_theta
-        self.__pre_robot_theta = robot.theta
 
         command = self.__pid_point(robot)
-        command.vel_angular = vel_angular
+        command.vel_angular = self.__pid_radian(robot)
         command.dribble_pow = 0
         command.kickpow = 0
         return command
 
     def __pid_radian(self, robot: Robot) -> float:
         """pid_radian"""
-        kp = 3
-        kd = 0.5
-        ki = 5
+        kp = 5
+        kd = 1
+        ki = 10
         e_robot = robot.theta - self.__pre_robot_theta
         e_target = self.__target_theta - self.__pre_target_theta
         self.__accumulation[3] += e_robot * 0.016
@@ -104,6 +99,9 @@ class Keeper:
             + ki * (self.__accumulation[6] - self.__accumulation[3])
         )
         angular = min(angular, math.pi)
+
+        self.__pre_target_theta = self.__target_theta
+        self.__pre_robot_theta = robot.theta
         return angular
 
     def __pid_point(self, robot: Robot) -> RobotCommand:
@@ -113,7 +111,7 @@ class Keeper:
         bvel: list[list[float]]
         cmd = RobotCommand(robot.robot_id)
         kp = 10 / 1000
-        kd = 8 / 1000
+        kd = 1 / 1000
         ki = 20 / 1000
         e_robot = robot - self.__pre_robot_position
         e_target = self.__target_point - self.__pre_target_point
@@ -139,7 +137,12 @@ class Keeper:
             [-math.sin(robot.theta), math.cos(robot.theta)],
         ]
         vel = np.dot(transformation, bvel)
+        if vel[0, 0] * vel[0, 0] + vel[1, 0] * vel[1, 0] > 1:
+            vel /= math.sqrt(vel[0, 0] * vel[0, 0] + vel[1, 0] * vel[1, 0])
         cmd.vel_fwd = vel[0, 0]
         cmd.vel_sway = vel[1, 0]
+
+        self.__pre_robot_position = Point(robot.x, robot.y)
+        self.__pre_target_point = Point(self.__target_point.x, self.__target_point.y)
 
         return cmd
