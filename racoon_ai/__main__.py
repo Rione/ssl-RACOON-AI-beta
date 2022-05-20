@@ -6,14 +6,12 @@
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
 from .models.robot import SimCommands
-from .networks.receiver import VisionReceiver
+from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
-from .observer import Observer
-from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
-
 # from .strategy.role import Role
+from .strategy.goal_keeper import Keeper
 
 
 def main() -> None:
@@ -35,7 +33,7 @@ def main() -> None:
     logger.debug("Logger initialized")
 
     # List of online robot ids
-    online_ids: list[int] = [1, 3]
+    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     # Flag if run for a real robot
     is_real: bool = False
@@ -44,11 +42,7 @@ def main() -> None:
     is_team_yellow: bool = False
 
     try:
-
-        observer = Observer(
-            VisionReceiver(port=10025),
-            is_team_yellow,
-        )
+        observer = MWReceiver(host="127.0.0.1", port=30011)
 
         # role = Role(observer)
 

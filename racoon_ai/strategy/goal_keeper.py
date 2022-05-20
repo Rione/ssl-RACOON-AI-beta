@@ -10,10 +10,10 @@ from logging import getLogger
 
 import numpy as np
 
-from racoon_ai.common import radian, radian_normalize
+from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.observer import Observer
+from racoon_ai.networks.receiver import MWReceiver
 
 
 class Keeper:
@@ -25,14 +25,12 @@ class Keeper:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: MWReceiver) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
-        # self.__arrive_flag: bool = False
-        self.__our_goal: Point = Point(-6000, 0)
         self.__radius: float = 750
         self.__pre_target_point: Point = Point(0, 0)
         self.__pre_robot_position: Point = Point(0, 0)
@@ -66,14 +64,14 @@ class Keeper:
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
-        radian_ball_goal = radian_normalize(radian(self.__observer.ball, self.__our_goal))
-        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot))
+        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.goal)
+        radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
         if abs(radian_ball_goal) >= math.pi / 2:
             radian_ball_goal = radian_ball_goal / abs(radian_ball_goal) * math.pi / 2
         self.__target_point = Point(
-            self.__our_goal.x + self.__radius * math.cos(radian_ball_goal),
-            self.__our_goal.y + self.__radius * math.sin(radian_ball_goal),
+            self.__observer.goal.x + self.__radius * math.cos(radian_ball_goal),
+            self.__observer.goal.y + self.__radius * math.sin(radian_ball_goal),
         )
         self.__target_theta = radian_ball_robot
 

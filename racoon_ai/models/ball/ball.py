@@ -5,8 +5,11 @@
         - Ball
 """
 
-from racoon_ai.models.coordinate import Point, Pose, Vector3f
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
+
+from dataclasses import field
+
+from racoon_ai.models.coordinate import Point, Pose
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Ball_Info
 
 
 class Ball(Point):
@@ -17,102 +20,87 @@ class Ball(Point):
 
         y (float): y coordinate
 
-        z (float): z coordinate
+        filtered_x (float) : Kalman Filtered X
 
-        confidence (float): confidence
+        filtered_y (float) : Kalman Filtered Y
 
-        area (float): area
+        slipe_degree (float) : slope degree
 
-        pixel_point (Point): pixel point
+        intercept (float) : ball intercept
 
-        velocity (Vector3f): velocity
+        speed (float) : ball speed
 
-        timestamp (float): timestamp
+        slope (float) : ball slope
     """
 
     def __init__(self) -> None:
         super().__init__(0, 0)
-        self.__confidence: float = 0
-        self.__area: float = 0
-        self.__pixel: Point = Point(0, 0)
-        self.__velocity: Vector3f = Vector3f(0, 0, 0)
-        self.__timestamp: float = 0
+        self.__filtered_x: float = field(default=0, init=False)
+        self.__filtered_y: float = field(default=0, init=False)
+        self.__speed: float = field(default=0, init=False)
+        self.__slope: float = field(default=0, init=False)
+        self.__intercept: float = field(default=0, init=False)
+        self.__slope_degree: float = field(default=0, init=False)
 
     def __str__(self) -> str:
         return (
             "Ball("
             f"x={self.x:.1f}, "
             f"y={self.y:.1f}, "
-            f"z={self.z:.1f}, "
-            f"confidence={self.confidence:3.0%}, "
-            f"area={self.area:.1f}, "
-            f"pixel={self.pixel}, "
-            f"velocity={self.velocity}, "
+            f"filtered_x={self.filtered_x:.1f}, "
+            f"filtered_y={self.filtered_y:.1f}, "
+            f"speed={self.speed:.1f}, "
+            f"slope={self.slope:.1f}, "
+            f"intercept={self.intercept:.1f}, "
+            f"slope_degree={self.slope_degree:.1f}, "
             ")"
         )
 
     def __repr__(self) -> str:
         return (
             "Ball("
-            f"x={self.x}, "
-            f"y={self.y}, "
-            f"z={self.z}, "
-            f"confidence={self.confidence}, "
-            f"area={self.area}, "
-            f"pixel={self.pixel}, "
-            f"velocity={self.velocity}, "
-            f"timestamp={self.timestamp}"
+            f"x={self.x:.1f}, "
+            f"y={self.y:.1f}, "
+            f"filtered_x={self.filtered_x:.1f}, "
+            f"filtered_y={self.filtered_y:.1f}, "
+            f"speed={self.speed:.1f}, "
+            f"slope={self.slope:.1f}, "
+            f"intercept={self.intercept:.1f}, "
+            f"slope_degree={self.slope_degree:.1f}, "
             ")"
         )
 
     @property
-    def confidence(self) -> float:
+    def filtered_x(self) -> float:
         """confidence"""
-        return self.__confidence
+        return self.__filtered_x
 
     @property
-    def area(self) -> float:
-        """area"""
-        return self.__area
+    def filtered_y(self) -> float:
+        """confidence"""
+        return self.__filtered_y
 
     @property
-    def pixel(self) -> Point:
-        """pixel"""
-        return self.__pixel
+    def slope_degree(self) -> float:
+        """confidence"""
+        return self.__slope_degree
 
     @property
-    def velocity(self) -> Vector3f:
-        """velocity"""
-        return self.__velocity
+    def intercept(self) -> float:
+        """confidence"""
+        return self.__intercept
 
     @property
-    def timestamp(self) -> float:
-        """timestamp"""
-        return self.__timestamp
+    def speed(self) -> float:
+        """confidence"""
+        return self.__speed
 
-    @classmethod
-    def calc_velocity(cls, curr_ball: "Ball", prev_ball: "Ball", span: float) -> Vector3f:
-        """calc_velocity
+    @property
+    def slope(self) -> float:
+        """confidence"""
+        return self.__slope
 
-        calculate velocity
-
-        Args:
-            curr_ball (Ball): current ball state
-            prev_ball (Ball): previous ball state
-            span (int): time interval between current and previous ball state
-
-        Returns:
-            Vector3f: velocity in (x, y, z) format
-        """
-        # Greater than 60[Hz] exeption
-        if span < 1e-5:
-            return Vector3f(0, 0, 0)
-
-        # Calculate velocity
-        delta = curr_ball - prev_ball
-        return Vector3f((delta.x ** 2) / span, (delta.y ** 2) / span, (delta.z ** 2) / span)
-
-    def update(self, dball: SSL_DetectionBall, timestamp: float) -> None:
+    def update(self, dball: Ball_Info) -> None:
         """update
 
         update this object with data from protobuf
@@ -120,14 +108,9 @@ class Ball(Point):
         Args:
             ball (SSL_DetectionBall): ball proto message
         """
-        prev_ball: Ball = self
         self.__from_proto(dball)
-        self.__timestamp = timestamp
-        span: float = self.timestamp - prev_ball.timestamp
-        vel: Vector3f = self.calc_velocity(self, prev_ball, span)
-        self.__velocity = vel
 
-    def __from_proto(self, dball: SSL_DetectionBall) -> None:
+    def __from_proto(self, dball: Ball_Info) -> None:
         """from_proto
 
         fill this object with data from protobuf
@@ -137,10 +120,12 @@ class Ball(Point):
         """
         self.x = dball.x
         self.y = dball.y
-        self.z = dball.z
-        self.__confidence = dball.confidence
-        self.__area = dball.area
-        self.__pixel = Point(dball.pixel_x, dball.pixel_y)
+        self.__filtered_x = dball.filtered_x
+        self.__filtered_y = dball.filtered_y
+        self.__slope_degree = dball.slope_degree
+        self.__intercept = dball.intercept
+        self.__speed = dball.speed
+        self.__slope = dball.slope
 
     def to_pose(self) -> Pose:
         """to_pose
