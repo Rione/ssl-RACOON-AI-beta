@@ -10,9 +10,10 @@ from logging import getLogger
 
 from racoon_ai.models.ball import Ball
 from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.geometry import Geometry
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
 from racoon_ai.models.robot import Robot
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Goal_Info, RacoonMW_Packet, Referee_Info
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Geometry_Info, RacoonMW_Packet, Referee_Info
 
 
 class MWReceiver(IPNetAddr):
@@ -32,7 +33,7 @@ class MWReceiver(IPNetAddr):
         self.__data: RacoonMW_Packet
 
         self.__ball: Ball = Ball()
-
+        self.__geometry: Geometry = Geometry()
         self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
 
@@ -60,6 +61,8 @@ class MWReceiver(IPNetAddr):
 
         self.ball.update(self.__data.ball)
 
+        self.geometry.update(self.__data.geometry)
+
         bot: Robot
         enemy: Robot
         for dbot in self.__data.our_robots:
@@ -72,10 +75,17 @@ class MWReceiver(IPNetAddr):
                 enemy = self.__enemy_robots[debot.robot_id]
                 enemy.update(debot)
 
+        print(self.geometry)
+
     @property
     def ball(self) -> Ball:
         """ball"""
         return self.__ball
+
+    @property
+    def geometry(self) -> Geometry:
+        """geometry"""
+        return self.__geometry
 
     @property
     def our_robots(self) -> list[Robot]:
@@ -134,12 +144,12 @@ class MWReceiver(IPNetAddr):
         Returns:
             Goal_Info
         """
-        goal: Goal_Info = self.__data.goal
+        goal: Geometry_Info = self.__data.geometry
 
-        return Pose(goal.x, goal.y)
+        return Pose(goal.goal_x, goal.goal_y)
 
     @property
-    def referee(self) -> Referee_Info:
+    def ref_command_int(self) -> int:
         """referee
 
         Returns:
@@ -147,11 +157,67 @@ class MWReceiver(IPNetAddr):
         """
         referee: Referee_Info = self.__data.referee
 
-        return referee
+        return int(referee.command)
+
+    @property
+    def ref_pre_command(self) -> int:
+        """referee
+
+        Returns:
+            Referee_Info
+        """
+        referee: Referee_Info = self.__data.referee
+
+        return int(referee.pre_command)
+
+    @property
+    def ref_red_cards(self) -> int:
+        """referee
+
+        Returns:
+            Referee_Info
+        """
+        referee: Referee_Info = self.__data.referee
+
+        return int(referee.red_cards)
+
+    @property
+    def ref_yellow_cards(self) -> int:
+        """referee
+
+        Returns:
+            Referee_Info
+        """
+        referee: Referee_Info = self.__data.referee
+
+        return int(referee.yellow_cards)
+
+    @staticmethod
+    def get_ref_command_str_by_int(command_id: int) -> str:
+        """referee
+
+        Returns:
+            Referee_Info
+        """
+        commands: list[str] = Referee_Info.Command.keys()
+        return commands[command_id]
+
+    @property
+    def ref_command_str(self) -> str:
+        """referee
+
+        Returns:
+            Referee_Info
+        """
+
+        referee: Referee_Info = self.__data.referee
+
+        commands: list[str] = Referee_Info.Command.keys()
+        return commands[referee.command]
 
     @property
     def sec_per_frame(self) -> float:
-        """sec_per_frame
+        """sec_per_framed
 
         Returns:
             float
