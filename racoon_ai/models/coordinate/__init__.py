@@ -34,7 +34,7 @@ class Point:
         return (self.x == obj.x) and (self.y == obj.y) and (self.z == obj.z)
 
     def __abs__(self) -> float:
-        return float((self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5)
+        return float((self.x**2 + self.y**2 + self.z**2) ** 0.5)
 
     def __add__(self, other: "Point") -> "Point":
         return Point(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -138,7 +138,7 @@ class Vector3f:
         return f"Vector3f({self.x}, {self.y}, {self.z})"
 
     def __abs__(self) -> float:
-        return float((self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5)
+        return float((self.x**2 + self.y**2 + self.z**2) ** 0.5)
 
     def __add__(self, other: "Vector3f") -> "Vector3f":
         return Vector3f(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -185,6 +185,25 @@ class Vector3f:
     def z(self, z: float) -> None:
         self.__z = z
 
+    @staticmethod
+    def from_point(point: Point) -> "Vector3f":
+        """from_point
+
+        Args:
+            point (Point): The point to convert into a vector.
+
+        Returns:
+            Vector3f: The vector of (x, y, z).
+
+        Examples:
+            >>> Vector3f.from_point(Pose(1, 2, 3, 4)).dot_prod(Vector3f(1, 2, 3)) == 1 + 4 + 12
+            True
+
+            >>> Vector3f.from_point(Pose(1, 2, 3, 4)).cross_prod(Vector3f(1, 2, 3))
+            Vector3f(-2, 1, 0)
+        """
+        return Vector3f(point.x, point.y, point.z)
+
     def dot_prod(self, other: "Vector3f") -> float:
         """dot_prod
 
@@ -214,3 +233,9 @@ class Vector3f:
             -self.x * other.z + self.z * other.x,
             self.x * other.y - self.y * other.x,
         )
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
