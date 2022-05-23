@@ -336,6 +336,13 @@ NOTE: If you need extra dependencies, please specify with `-E` option.
 
 Ex) `poetry install -E pygame`
 
+---
+
+### Setup Git commit template
+
+```bash
+cd $(git rev-parse --show-toplevel) && git config commit.template .gitmessage.txt
+```
 
 ## Enable pre-commit hooks
 
