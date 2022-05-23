@@ -1,16 +1,16 @@
 
 # ==== Emojis ====
-# ✨ :sparkles: 新機能追加
-# ✅ :white_check_mark: 既存機能の修正
-# 🔥 :fire: 不要なファイル・機能の削除
-# 📝 :memo: ドキュメント追加
-# ⚠️ :warning: エラー修正
-# 🚀 :rocket: パフォーマンス改善
-# ♻️ :recycle: Dependencies の修正
-# 🐧 :penguin: Linux用の何かしらを改善
-# 🍎 :apple: Mac OS用の何かしらを改善
-# 🔖 :bookmark: バージョンアップ
-# 🎉 :tada: Initial commit
+# ✨ :sparkles: New featur / 新機能追加
+# ✅ :white_check_mark: Fix a feaure (not a bug) / 既存機能の修正
+# 🔥 :fire: Remove a file or feature / 不要なファイル・機能の削除
+# 📝 :memo: Add (Fix) Document / ドキュメント追加・修正
+# ⚠️ :warning: Fix error or bug / エラー・バグの修正
+# 🚀 :rocket: Improve performance / パフォーマンス改善
+# ♻️ :recycle: Fix dependencies or libraries / Dependencies・ライブラリ関連の修正
+# 🐧 :penguin: Linux related improvement / Linux用の何かしらを改善
+# 🍎 :apple: MacOS related improvement / MacOS用の何かしらを改善
+# 🔖 :bookmark: Versioning / バージョンアップ
+# 🎉 :tada: Initial commit / 初回コミット
 
 # ==== Format ====
 # :emoji: Subject
@@ -18,7 +18,7 @@
 # Commit body...
 
 # ==== Messages ====
-# 新規ファイル・機能追加: Add ...
-# バグ修正: Fix ...
-# 既存機能修正 (バグではない): Update ...
-# 削除など: Remove ...
+# Add a file or feature / 新規ファイル・機能追加: Add ...
+# Fix a bug / バグ修正: Fix ...
+# Fix a feature (not bug) / 既存機能修正 (バグではない): Update ...
+# Remove file or something / 削除など: Remove ...
