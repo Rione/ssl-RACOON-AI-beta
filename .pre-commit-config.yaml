@@ -33,6 +33,8 @@ repos:
       - id: pylint
         args:
           - "--rcfile=pyproject.toml"
+        additional_dependencies:
+          - "numpy==1.22.3"
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.942
@@ -42,6 +44,7 @@ repos:
           - "--config-file=pyproject.toml"
         additional_dependencies:
           - "types-protobuf==3.18.2"
+          - "numpy==1.22.3"
 
   - repo: https://github.com/psf/black
     rev: 22.3.0
