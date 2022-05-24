@@ -7,6 +7,9 @@
         - Vector3f
 """
 
+from numpy import array, float32
+from numpy.typing import NDArray
+
 
 class Point:
     """Point
@@ -14,13 +17,22 @@ class Point:
     Attributes:
         x (float): The x coordinate
         y (float): The y coordinate
-        z (float): The z coordinate
+        z (float, optional): The z coordinate
+
+    Examples:
+        Specifying the 2D point (x, and y):
+        >>> Point(1, 2)
+        Point(1.0, 2.0, 0.0)
+
+        Specifying the 3D point (x, y, and z):
+        >>> Point(1, 2, 3)
+        Point(1.0, 2.0, 3.0)
     """
 
     def __init__(self, x: float, y: float, z: float = 0) -> None:
-        self.__x: float = x
-        self.__y: float = y
-        self.__z: float = z
+        self.__x: float = float(x)
+        self.__y: float = float(y)
+        self.__z: float = float(z)
 
     def __str__(self) -> str:
         return f"(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f})"
@@ -81,6 +93,22 @@ class Point:
     def z(self, z: float) -> None:
         self.__z = z
 
+    @staticmethod
+    def from_vector3f(obj: "Vector3f") -> "Point":
+        """from_vector3f
+
+        Args:
+            obj (Vector3f): The vector3f to convert
+
+        Returns:
+            Point: The converted point
+
+        Examples:
+            >>> Point.from_vector3f(Vector3f(1, 2, 3))
+            Point(1.0, 2.0, 3.0)
+        """
+        return Point(obj.x, obj.y, z=obj.z)
+
 
 class Pose(Point):
     """Pose
@@ -88,13 +116,26 @@ class Pose(Point):
     Attributes:
         x (float): The x-coordinate of the pose in millimeters.
         y (float): The y-coordinate of the pose in millimeters.
-        theta (float): The orientation of the pose in radians.
-        z (float): The z-coordinate of the pose in millimeters.
+        theta (float, optional): The orientation of the pose in radians.
+        z (float, optional): The z-coordinate of the pose in millimeters.
+
+    Examples:
+        Specifying the 2D Point:
+        >>> Pose(1, 2)
+        Pose(1.0, 2.0, 0.0, 0.0)
+
+        Specifying the orientation:
+        >>> Pose(1, 2, 3)
+        Pose(1.0, 2.0, 3.0, 0.0)
+
+        Specifying the 3D Pose:
+        >>> Pose(1, 2, 3, 4)
+        Pose(1.0, 2.0, 3.0, 4.0)
     """
 
     def __init__(self, x: float, y: float, theta: float = 0, z: float = 0) -> None:
         super().__init__(x, y, z)
-        self.__theta: float = theta
+        self.__theta: float = float(theta)
 
     def __str__(self) -> str:
         return f"(x={self.x:.1f}, y={self.y:.1f}, theta={self.theta:.1f}, z={self.z:.1f})"
@@ -116,6 +157,22 @@ class Pose(Point):
     def theta(self, theta: float) -> None:
         self.__theta = theta
 
+    @staticmethod
+    def from_vector3f(obj: "Vector3f") -> "Pose":
+        """from_vector3f
+
+        Args:
+            obj (Vector3f): The vector3f to convert
+
+        Returns:
+            Pose: The converted pose
+
+        Examples:
+            >>> Pose.from_vector3f(Vector3f(1, 2, 3))
+            Pose(1.0, 2.0, 0.0, 3.0)
+        """
+        return Pose(obj.x, obj.y, z=obj.z)
+
 
 class Vector3f:
     """Vector3f
@@ -127,9 +184,9 @@ class Vector3f:
     """
 
     def __init__(self, x: float, y: float, z: float) -> None:
-        self.__x: float = x
-        self.__y: float = y
-        self.__z: float = z
+        self.__x: float = float(x)
+        self.__y: float = float(y)
+        self.__z: float = float(z)
 
     def __str__(self) -> str:
         return f"({self.x:.1f}, {self.y:.1f}, {self.z:.1f})"
@@ -186,23 +243,48 @@ class Vector3f:
         self.__z = z
 
     @staticmethod
-    def from_point(point: Point) -> "Vector3f":
+    def from_point(obj: "Point") -> "Vector3f":
         """from_point
 
         Args:
-            point (Point): The point to convert into a vector.
+            obj (Point): The point to convert
 
         Returns:
-            Vector3f: The vector of (x, y, z).
+            Vector3f: The converted vector3f
 
         Examples:
-            >>> Vector3f.from_point(Pose(1, 2, 3, 4)).dot_prod(Vector3f(1, 2, 3)) == 1 + 4 + 12
-            True
-
-            >>> Vector3f.from_point(Pose(1, 2, 3, 4)).cross_prod(Vector3f(1, 2, 3))
-            Vector3f(-2, 1, 0)
+            >>> Vector3f.from_point(Point(1, 2, 3))
+            Vector3f(1.0, 2.0, 3.0)
         """
-        return Vector3f(point.x, point.y, point.z)
+        return Vector3f(obj.x, obj.y, obj.z)
+
+    @staticmethod
+    def from_pose(obj: "Pose") -> "Vector3f":
+        """from_pose
+
+        Args:
+            obj (Pose): The pose to convert
+
+        Returns:
+            Vector3f: The converted vector3f
+
+        Examples:
+            >>> Vector3f.from_pose(Pose(1, 2, 3))  # NOTE: Pose is in order of (x, y, theta, z)
+            Vector3f(1.0, 2.0, 0.0)
+        """
+        return Vector3f(obj.x, obj.y, obj.z)
+
+    def to_np_array(self) -> NDArray[float32]:
+        """to_np_array
+
+        Returns:
+            np.ndarray: The converted numpy array
+
+        Examples:
+            >>> Vector3f.from_pose(Pose(1, 2, 3)).to_np_array()
+            array([1., 2., 0.], dtype=float32)
+        """
+        return array([self.x, self.y, self.z], dtype=float32)
 
     def dot_prod(self, other: "Vector3f") -> float:
         """dot_prod
