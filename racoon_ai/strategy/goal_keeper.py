@@ -7,11 +7,13 @@
 
 import math
 from logging import getLogger
+from math import cos, sin
 
-import numpy as np
+from numpy import array, dot, float64
+from numpy.typing import NDArray
 
+# from numpy import linalg as LA
 from racoon_ai.common.math_utils import MathUtils as MU
-from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.networks.receiver import MWReceiver
 
@@ -32,13 +34,12 @@ class Keeper:
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
         self.__radius: float = 750
-        self.__pre_target_point: Point = Point(0, 0)
-        self.__pre_robot_position: Point = Point(0, 0)
-        self.__accumulation: list[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.__target_theta: float = 0
-        self.__target_point: Point = Point(0, 0)
-        self.__pre_robot_theta: float = 0
-        self.__pre_target_theta: float = 0
+        self.__pre_target_pose: NDArray[float64] = array([0, 0, 0], dtype="float64")
+        self.__pre_robot_pose: NDArray[float64] = array([0, 0, 0], dtype="float64")
+        self.__target_pose: NDArray[float64] = array([0, 0, 0], dtype="float64")
+        self.__accumulation: NDArray[float64] = array([0, 0, 0], dtype="float64")
+        self.__dtaime: float = observer.sec_per_frame
+        self.__k_gain: NDArray[float64] = array([8, 0.5, 1], dtype="float64")
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -69,78 +70,50 @@ class Keeper:
 
         if abs(radian_ball_goal) >= math.pi / 2:
             radian_ball_goal = radian_ball_goal / abs(radian_ball_goal) * math.pi / 2
-        self.__target_point = Point(
-            self.__observer.goal.x + self.__radius * math.cos(radian_ball_goal),
-            self.__observer.goal.y + self.__radius * math.sin(radian_ball_goal),
+        self.__target_pose = array(
+            [
+                (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)) / 1000,
+                (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)) / 1000,
+                radian_ball_robot,
+            ]
         )
-        self.__target_theta = radian_ball_robot
 
-        command = self.__pid_point(robot)
-        command.vel_angular = self.__pid_radian(robot)
+        command = self.__pid(robot)
         command.dribble_pow = 0
         command.kickpow = 0
         return command
 
-    def __pid_radian(self, robot: Robot) -> float:
-        """pid_radian"""
-        kp = 5
-        kd = 1
-        ki = 10
-        e_robot = robot.theta - self.__pre_robot_theta
-        e_target = self.__target_theta - self.__pre_target_theta
-        self.__accumulation[3] += e_robot * 0.016
-        self.__accumulation[6] += e_target * 0.016
-        # print(round((self.__target_theta - robot.theta), 0))
-        angular = (
-            kp * (self.__target_theta - robot.theta)
-            + kd * (e_target / 0.016 - e_robot / 0.016)
-            + ki * (self.__accumulation[6] - self.__accumulation[3])
-        )
-        angular = min(angular, math.pi)
-
-        self.__pre_target_theta = self.__target_theta
-        self.__pre_robot_theta = robot.theta
-        return angular
-
-    def __pid_point(self, robot: Robot) -> RobotCommand:
-        """pid_point"""
-        e_robot: Point
-        e_target: Point
-        bvel: list[list[float]]
+    def __pid(self, robot: Robot) -> RobotCommand:
+        """pid"""
         cmd = RobotCommand(robot.robot_id)
-        kp = 10 / 1000
-        kd = 1 / 1000
-        ki = 20 / 1000
-        e_robot = robot - self.__pre_robot_position
-        e_target = self.__target_point - self.__pre_target_point
-        self.__accumulation[1] += e_robot.x * 0.016
-        self.__accumulation[2] += e_robot.y * 0.016
-        self.__accumulation[4] += e_target.x * 0.016
-        self.__accumulation[5] += e_target.y * 0.016
 
-        bvel = [
-            [
-                kp * (self.__target_point.x - robot.x)
-                + kd * (e_target.x / 0.016 - e_robot.x / 0.016)
-                + ki * (self.__accumulation[4] - self.__accumulation[1])
-            ],
-            [
-                kp * (self.__target_point.y - robot.y)
-                + kd * (e_target.y / 0.016 - e_robot.y / 0.016)
-                + ki * (self.__accumulation[5] - self.__accumulation[2])
-            ],
-        ]
-        transformation = [
-            [math.cos(robot.theta), math.sin(robot.theta)],
-            [-math.sin(robot.theta), math.cos(robot.theta)],
-        ]
-        vel = np.dot(transformation, bvel)
-        if vel[0, 0] * vel[0, 0] + vel[1, 0] * vel[1, 0] > 1:
-            vel /= math.sqrt(vel[0, 0] * vel[0, 0] + vel[1, 0] * vel[1, 0])
-        cmd.vel_fwd = vel[0, 0]
-        cmd.vel_sway = vel[1, 0]
+        rbt: NDArray[float64] = array([robot.x / 1000, robot.y / 1000, robot.theta])
+        robot_speed = (rbt - self.__pre_robot_pose) / self.__dtaime
+        target_speed = (self.__target_pose - self.__pre_target_pose) / self.__dtaime
+        self.__accumulation += (self.__target_pose - rbt) * self.__dtaime
+        print(rbt - self.__pre_robot_pose)
 
-        self.__pre_robot_position = Point(robot.x, robot.y)
-        self.__pre_target_point = Point(self.__target_point.x, self.__target_point.y)
+        bbvel: NDArray[float64] = array([self.__target_pose - rbt, target_speed - robot_speed, self.__accumulation])
+
+        bvel = dot(self.__k_gain, bbvel)
+
+        transformation: NDArray[float64] = array(
+            [
+                [cos(robot.theta), -sin(robot.theta), 0],
+                [sin(robot.theta), cos(robot.theta), 0],
+                [0, 0, 1],
+            ]
+        )
+
+        vel = dot(bvel, transformation)
+
+        cmd.vel_angular = vel[2]
+        if vel[0] * vel[0] + vel[1] * vel[1] > 1:
+            vel /= math.sqrt(vel[0] * vel[0] + vel[1] * vel[1])
+        cmd.vel_fwd = vel[0]
+        cmd.vel_sway = vel[1]
+
+        self.__pre_robot_pose = rbt
+        self.__pre_target_pose = self.__target_pose
 
         return cmd
