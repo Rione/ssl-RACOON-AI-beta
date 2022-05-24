@@ -24,7 +24,7 @@ class Ball(Point):
 
         filtered_y (float) : Kalman Filtered Y
 
-        slipe_degree (float) : slope degree
+        slope_radian (float) : slope radian
 
         intercept (float) : ball intercept
 
@@ -37,10 +37,10 @@ class Ball(Point):
         super().__init__(0, 0)
         self.__filtered_x: float = field(default=0, init=False)
         self.__filtered_y: float = field(default=0, init=False)
-        self.__speed: float = field(default=0, init=False)
-        self.__slope: float = field(default=0, init=False)
+        self.__ball_speed: float = field(default=0, init=False)
+        self.__ball_slope: float = field(default=0, init=False)
         self.__intercept: float = field(default=0, init=False)
-        self.__slope_degree: float = field(default=0, init=False)
+        self.__slope_radian: float = field(default=0, init=False)
 
     def __str__(self) -> str:
         return (
@@ -52,7 +52,7 @@ class Ball(Point):
             f"speed={self.speed:.1f}, "
             f"slope={self.slope:.1f}, "
             f"intercept={self.intercept:.1f}, "
-            f"slope_degree={self.slope_degree:.1f}, "
+            f"slope_degree={self.slope_radian:.1f}, "
             ")"
         )
 
@@ -66,39 +66,45 @@ class Ball(Point):
             f"speed={self.speed:.1f}, "
             f"slope={self.slope:.1f}, "
             f"intercept={self.intercept:.1f}, "
-            f"slope_degree={self.slope_degree:.1f}, "
+            f"slope_degree={self.slope_radian:.1f}, "
             ")"
         )
 
     @property
     def filtered_x(self) -> float:
-        """confidence"""
+        """filtered_x"""
         return self.__filtered_x
 
     @property
     def filtered_y(self) -> float:
-        """confidence"""
+        """filtered_y"""
         return self.__filtered_y
 
     @property
-    def slope_degree(self) -> float:
-        """confidence"""
-        return self.__slope_degree
+    def slope_radian(self) -> float:
+        """slope_radian"""
+        return self.__slope_radian
 
     @property
     def intercept(self) -> float:
-        """confidence"""
+        """intercept"""
         return self.__intercept
 
     @property
     def speed(self) -> float:
-        """confidence"""
-        return self.__speed
+        """speed
+
+        speed of ball
+        """
+        return self.__ball_speed
 
     @property
     def slope(self) -> float:
-        """confidence"""
-        return self.__slope
+        """slope
+
+        slope of ball
+        """
+        return self.__ball_slope
 
     def update(self, dball: Ball_Info) -> None:
         """update
@@ -106,7 +112,7 @@ class Ball(Point):
         update this object with data from protobuf
 
         Args:
-            ball (SSL_DetectionBall): ball proto message
+            dball (Ball_Info): Ball_Info
         """
         self.__from_proto(dball)
 
@@ -122,10 +128,10 @@ class Ball(Point):
         self.y = dball.y
         self.__filtered_x = dball.filtered_x
         self.__filtered_y = dball.filtered_y
-        self.__slope_degree = dball.slope_degree
+        self.__slope_radian = dball.slope_radian
         self.__intercept = dball.intercept
-        self.__speed = dball.speed
-        self.__slope = dball.slope
+        self.__ball_speed = dball.speed
+        self.__ball_slope = dball.slope
 
     def to_pose(self) -> Pose:
         """to_pose

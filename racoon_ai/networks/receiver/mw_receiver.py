@@ -24,7 +24,7 @@ class MWReceiver(IPNetAddr):
         port (int): Port number of the vision server
     """
 
-    def __init__(self, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, host: str = "127.0.0.1", port: int = 30011) -> None:
 
         super().__init__(host, port)
 
@@ -52,7 +52,7 @@ class MWReceiver(IPNetAddr):
     def main(self) -> None:
         """main"""
 
-        # カメラの台数分ループさせる
+        # Receive data from RACOON-MW
         packet: bytes = self.__sock.recv(BUFFSIZE)
 
         self.__data = RacoonMW_Packet()
@@ -79,29 +79,37 @@ class MWReceiver(IPNetAddr):
 
     @property
     def ball(self) -> Ball:
-        """ball"""
+        """ball
+
+        Returns:
+            Ball
+        """
         return self.__ball
 
     @property
     def geometry(self) -> Geometry:
-        """geometry"""
+        """geometry
+
+        Returns:
+            Geometry
+        """
         return self.__geometry
 
     @property
     def our_robots(self) -> list[Robot]:
-        """get_our_robot
+        """our_robot
 
         Returns:
-            Robot_Infos
+            list[Robot]
         """
         return self.__our_robots
 
     @property
     def enemy_robots(self) -> list[Robot]:
-        """get_our_robot
+        """enemy_robots
 
         Returns:
-            Robot_Infos
+            list[Robot]
         """
         return self.__enemy_robots
 
@@ -125,7 +133,7 @@ class MWReceiver(IPNetAddr):
         """get_enemy_by_id
 
         Returns:
-            Enemy
+            Robot
         """
         enemy_robot: Robot
         enemy_robot = Robot(
@@ -141,8 +149,10 @@ class MWReceiver(IPNetAddr):
     def goal(self) -> Pose:
         """goal
 
+        Give goal pose
+
         Returns:
-            Goal_Info
+            Pose
         """
         goal: Geometry_Info = self.__data.geometry
 
@@ -150,10 +160,12 @@ class MWReceiver(IPNetAddr):
 
     @property
     def ref_command_int(self) -> int:
-        """referee
+        """ref_command_int
+
+        Referee command
 
         Returns:
-            Referee_Info
+            int
         """
         referee: Referee_Info = self.__data.referee
 
@@ -161,10 +173,12 @@ class MWReceiver(IPNetAddr):
 
     @property
     def ref_pre_command(self) -> int:
-        """referee
+        """ref_pre_command
+
+        1 time old referee command
 
         Returns:
-            Referee_Info
+            int
         """
         referee: Referee_Info = self.__data.referee
 
@@ -172,10 +186,12 @@ class MWReceiver(IPNetAddr):
 
     @property
     def ref_red_cards(self) -> int:
-        """referee
+        """ref_red_cards
+
+        How many red cards received
 
         Returns:
-            Referee_Info
+            int
         """
         referee: Referee_Info = self.__data.referee
 
@@ -183,10 +199,12 @@ class MWReceiver(IPNetAddr):
 
     @property
     def ref_yellow_cards(self) -> int:
-        """referee
+        """ref_yellow_cards
+
+        How many yellow cards received
 
         Returns:
-            Referee_Info
+            int
         """
         referee: Referee_Info = self.__data.referee
 
@@ -194,20 +212,24 @@ class MWReceiver(IPNetAddr):
 
     @staticmethod
     def get_ref_command_str_by_int(command_id: int) -> str:
-        """referee
+        """get_ref_command_str_by_int
+
+        Return string from referee command id
 
         Returns:
-            Referee_Info
+            int
         """
         commands: list[str] = Referee_Info.Command.keys()
         return commands[command_id]
 
     @property
     def ref_command_str(self) -> str:
-        """referee
+        """ref_command_str
+
+        Retrun referee command in string
 
         Returns:
-            Referee_Info
+            str
         """
 
         referee: Referee_Info = self.__data.referee
@@ -217,7 +239,10 @@ class MWReceiver(IPNetAddr):
 
     @property
     def sec_per_frame(self) -> float:
-        """sec_per_framed
+        """sec_per_frame
+
+        Seconds Per Frame
+        NOT FPS
 
         Returns:
             float
@@ -229,6 +254,8 @@ class MWReceiver(IPNetAddr):
     @property
     def num_of_cameras(self) -> int:
         """num_of_cameras
+
+        How many cameras used
 
         Returns:
             int
