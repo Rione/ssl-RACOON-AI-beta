@@ -17,18 +17,30 @@ class Geometry:
 
     Attributes:
         field_length (int): length of field
+
         field_width (int): width of field
+
         goal_width (int): width of goal
+
         goal_depth (int): depth of goal
+
         boundary_width (int): width of boundary
+
         penalty_area_depth (int): depth of penalty
+
         penalty_area_width (int): width of penalty
+
         center_circle_radius (int): radius of center circle
+
         line_thickness (int): thickness of line
+
         goal_center_to_penalty_mark (int): distance between goal center to penalty
+
         goal_height (int) : height of goal
-        ball_radius (int): radius of ball
-        max_robot_radius (int): max robot radius
+
+        ball_radius (float): radius of ball
+
+        max_robot_radius (float): max robot radius
     """
 
     def __init__(self) -> None:
