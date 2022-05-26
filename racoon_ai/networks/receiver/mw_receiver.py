@@ -7,6 +7,7 @@
 
 import socket
 from logging import getLogger
+from typing import Optional
 
 from racoon_ai.models.ball import Ball
 from racoon_ai.models.coordinate import Point
@@ -126,37 +127,27 @@ class MWReceiver(IPNetAddr):
         """
         return self.__enemy_robots
 
-    def get_our_by_id(self, robot_id: int) -> Robot:
+    def get_our_by_id(self, robot_id: int) -> Optional[Robot]:
         """get_our_by_id
 
         Returns:
-            Robot
+            Optional[Robot]
         """
-        our_robot: Robot
-        our_robot = Robot(
-            robot_id=99,
-        )
         for robot in self.__our_robots:
             if robot_id == robot.robot_id:
-                our_robot = robot
+                return robot
+        return None
 
-        return our_robot
-
-    def get_enemy_by_id(self, enemy_id: int) -> Robot:
+    def get_enemy_by_id(self, enemy_id: int) -> Optional[Robot]:
         """get_enemy_by_id
 
         Returns:
             Robot
         """
-        enemy_robot: Robot
-        enemy_robot = Robot(
-            robot_id=99,
-        )
         for enemy in self.__enemy_robots:
             if enemy_id == enemy.robot_id:
-                enemy_robot = enemy
-
-        return enemy_robot
+                return enemy
+        return None
 
     @property
     def goal(self) -> Point:
