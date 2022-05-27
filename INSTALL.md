@@ -34,21 +34,14 @@ Here, we use `pyenv` with `anyenv` since its simplicity.
 ### (optional) Generate `ssh` key
 
 > **Note**  
-> This step is for those who want to specify the path of the key file.
+> This step is for those who want to costomize SSH key.  
+> (GitHub CLI can generate `id_ed25519` automatically)
 
 From the security perspective, we recommend to use SSH key.
 Please refer to [GitHub documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
-0. Generate a Private/Public key
-
 ```bash
 ssh-keygen -t ed25519 -C "<Your GitHub Email>"
-```
-
-1. Add to ssh-agent
-
-```bash
-ssh-add ~/.ssh/<Your Secret Key File>
 ```
 
 ---
@@ -84,8 +77,12 @@ Please add following to your `~/.ssh/config` file.
 ```text
 Host *
   AddKeysToAgent yes
-  UseKeychain yes            # Only for MacOS (10.12.2 or later)
-  PasswordAuthentication no  # Recommended for the security reason
+  
+  # Only for MacOS (10.12.2 or later)
+  UseKeychain yes
+  
+  # Recommended for the security reason
+  PasswordAuthentication no  
 
 # For GitHub
 Host github.com
@@ -137,25 +134,25 @@ brew install autoconf automake libtool
 If you use ubuntu (Debian):
 
 ```bash
-sudo apt install -y build-essential automake autoconf libtool unzip
+sudo apt update && sudo apt install -y build-essential automake autoconf libtool unzip
 ```
 
 1. Clone the protobuf repository
 
 ```bash
-gh repo clone protocolbuffers/protobuf $HOME/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
+gh repo clone protocolbuffers/protobuf ${HOME}/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
 ```
 
 3. Cd into the repo & run setup script
 
 ```bash
-cd ${HOME}/.local/opt/protoc && ./autogen.sh
+cd ${HOME}/.local/opt/protobuf && ./autogen.sh
 ```
 
 4. Configure to your environment
 
 ```bash
-./configure --prefix=${HOME}/.local/protobuf
+./configure --prefix=${HOME}/.local/opt/protobuf
 ```
 
 5. Build the code
@@ -182,7 +179,7 @@ make install
 8. Link protoc to your bin directory
 
 ```bash
-mkdir -p ${HOME}/.local/bin && ln -s ${HOME}/.local/opt/protobuf/bin/protoc ${HOME}/.local/bin/
+mkdir -p ${HOME}/.local/bin && ln -s ${HOME}/.local/opt/protobuf/bin/* ${HOME}/.local/bin/
 ```
 
 9. Test the installation
@@ -197,26 +194,30 @@ You would get `libprotoc 3.19.1`.
 > If you get an error about the command not found, 
 > please add following to your `~/.zshrc` or `~/.bashrc` file, and retry after source it.
 
+Example (bash):
+
 ```bash
-export PATH="${HOME}/.local/bin:${PATH}"
+echo 'export PATH="${HOME}/.local/bin:${PATH}"' >> ~/.bashrc && . ~/.bashrc
 ```
 
 10. Add to your `$PKG_CONFIG_PATH`
 
 Please add the following to your `~/.zshrc` or `~/.bashrc`, and source it.
 
+Example (bash):
+
 ```bash
-export PKG_CONFIG_PATH="${HOME}/.local/opt/protobuf/lib/pkgconfig:${PKG_CONFIG_PATH}"
+echo 'export PKG_CONFIG_PATH="${HOME}/.local/opt/protobuf/lib/pkgconfig:${PKG_CONFIG_PATH}"' >> ~/.bashrc && . ~/.bashrc
 ```
 
 ## Prepare Python environment
 
 ### Setup anyenv
 
-Since the ease of installation, we recommend using with [anyenv](https://github.com/pyenv/pyenv).
-`anyenv` is a tool to manage multiple version management tools, include `pyenv`.
-The tool is provided in Homebrew.
-If you prefer to use Homebrew, please skip the following steps.
+Since the ease of installation, we recommend using with [anyenv](https://github.com/anyenv/anyenv). 
+`anyenv` is a tool to manage multiple version management tools, include `pyenv`. 
+The tool is provided in Homebrew (`brew install anyenv`). 
+If you prefer to use Homebrew, please skip the following steps. 
 
 1. Clone `anyenv` from GitHub
 
@@ -240,7 +241,7 @@ fi
 3. Install manifests
 
 ```bash
-anyenv install --init git@github.com:anyenv/anyenv-install.git
+anyenv install --init https://github.com/anyenv/anyenv-install.git
 ```
 
 Test the installation:
@@ -253,7 +254,7 @@ anyenv install -l
 
 ### Setup Python 3.10.X with Pyenv
 
-0. Install build dependencies
+0. Install Python build dependencies
 
 See also [Suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
 
@@ -263,11 +264,19 @@ On MacOS native (with Homebrew):
 brew install openssl@1.1 readline
 ```
 
+On Ubuntu:
+
+```bash
+sudo apt update && sudo apt install -y libbz2-dev libssl-dev  libreadline-dev libsqlite3-dev llvm tk-dev libxmlsec1-dev
+```
+
 1. Install `pyenv`
 
 ```bash
 anyenv install pyenv
 ```
+> **Note**  
+> Restart terminal is recommended after installing `pyenv`
 
 2. Search for the available versions
 
@@ -278,12 +287,20 @@ pyenv install -l | grep 3.10
 3. Install Python
 
 ```bash
-pyenv install <Your Selected Version>
+pyenv install <Your Selected Version> && pyenv rehash
 ```
 
 ---
 
 ### Setup Poetry
+
+0. Install build dependencies
+
+On Ubuntu:
+
+```bash
+sudo apt update && sudo apt install -y python3-dev python3-pip python3-venv
+```
 
 1. Checkout to Python 3.10.x
 
@@ -310,7 +327,7 @@ You would get `Poetry version X.X.X`
 
 Please follow the following guide.
 
-NOTE: You can check your shell by `echo $SHELL`
+NOTE: You can check your shell by `echo $SHELL` or `echo $0` (current shell)
  
 Guide: https://python-poetry.org/docs/master#enable-tab-completion-for-bash-fish-or-zsh
 
@@ -340,11 +357,15 @@ Ex) `poetry install -E pygame`
 
 ### Setup Git commit template
 
+
 ```bash
 cd $(git rev-parse --show-toplevel) && git config commit.template .gitmessage.txt
 ```
 
 ## Enable pre-commit hooks
+
+> **Note**  
+> After `poetry install`, you need to checkout to the .venv with `pyenv shell --unset && poetry shell`.
 
 ```bash
 pre-commit install
