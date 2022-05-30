@@ -52,7 +52,7 @@ cache_dir = ".cache/mypy"
 
 [tool.pylint]
   [tool.pylint.basic]
-  good-names = ["i", "j", "k", "x", "y", "z", "kp", "kd", "ki"]
+  good-names = ["i", "j", "k", "x", "y", "z"]
 
   [tool.pylint.master]
   ignore-paths = [
