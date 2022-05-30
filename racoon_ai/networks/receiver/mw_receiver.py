@@ -7,13 +7,15 @@
 
 import socket
 from logging import getLogger
+from typing import Optional
 
 from racoon_ai.models.ball import Ball
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point
 from racoon_ai.models.geometry import Geometry
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
+from racoon_ai.models.referee import Referee
 from racoon_ai.models.robot import Robot
-from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Geometry_Info, RacoonMW_Packet, Referee_Info
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Geometry_Info, RacoonMW_Packet
 
 
 class MWReceiver(IPNetAddr):
@@ -24,7 +26,7 @@ class MWReceiver(IPNetAddr):
         port (int): Port number of the vision server
     """
 
-    def __init__(self, host: str = "224.5.23.2", port: int = 10020) -> None:
+    def __init__(self, host: str = "127.0.0.1", port: int = 30011) -> None:
 
         super().__init__(host, port)
 
@@ -34,6 +36,7 @@ class MWReceiver(IPNetAddr):
 
         self.__ball: Ball = Ball()
         self.__geometry: Geometry = Geometry()
+        self.__referee: Referee = Referee()
         self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
 
@@ -52,7 +55,7 @@ class MWReceiver(IPNetAddr):
     def main(self) -> None:
         """main"""
 
-        # カメラの台数分ループさせる
+        # Receive data from RACOON-MW
         packet: bytes = self.__sock.recv(BUFFSIZE)
 
         self.__data = RacoonMW_Packet()
@@ -62,6 +65,8 @@ class MWReceiver(IPNetAddr):
         self.ball.update(self.__data.ball)
 
         self.geometry.update(self.__data.geometry)
+
+        self.referee.update(self.__data.referee)
 
         bot: Robot
         enemy: Robot
@@ -75,149 +80,94 @@ class MWReceiver(IPNetAddr):
                 enemy = self.__enemy_robots[debot.robot_id]
                 enemy.update(debot)
 
-        print(self.geometry)
+        print(self.referee)
 
     @property
     def ball(self) -> Ball:
-        """ball"""
+        """ball
+
+        Returns:
+            Ball
+        """
         return self.__ball
 
     @property
     def geometry(self) -> Geometry:
-        """geometry"""
+        """geometry
+
+        Returns:
+            Geometry
+        """
         return self.__geometry
 
     @property
-    def our_robots(self) -> list[Robot]:
-        """get_our_robot
+    def referee(self) -> Referee:
+        """referee
 
         Returns:
-            Robot_Infos
+            Referee
+        """
+        return self.__referee
+
+    @property
+    def our_robots(self) -> list[Robot]:
+        """our_robot
+
+        Returns:
+            list[Robot]
         """
         return self.__our_robots
 
     @property
     def enemy_robots(self) -> list[Robot]:
-        """get_our_robot
+        """enemy_robots
 
         Returns:
-            Robot_Infos
+            list[Robot]
         """
         return self.__enemy_robots
 
-    def get_our_by_id(self, robot_id: int) -> Robot:
+    def get_our_by_id(self, robot_id: int) -> Optional[Robot]:
         """get_our_by_id
+
+        Returns:
+            Optional[Robot]
+        """
+        for robot in self.__our_robots:
+            if robot_id == robot.robot_id:
+                return robot
+        return None
+
+    def get_enemy_by_id(self, enemy_id: int) -> Optional[Robot]:
+        """get_enemy_by_id
 
         Returns:
             Robot
         """
-        our_robot: Robot
-        our_robot = Robot(
-            robot_id=99,
-        )
-        for robot in self.__our_robots:
-            if robot_id == robot.robot_id:
-                our_robot = robot
-
-        return our_robot
-
-    def get_enemy_by_id(self, enemy_id: int) -> Robot:
-        """get_enemy_by_id
-
-        Returns:
-            Enemy
-        """
-        enemy_robot: Robot
-        enemy_robot = Robot(
-            robot_id=99,
-        )
         for enemy in self.__enemy_robots:
             if enemy_id == enemy.robot_id:
-                enemy_robot = enemy
-
-        return enemy_robot
+                return enemy
+        return None
 
     @property
-    def goal(self) -> Pose:
+    def goal(self) -> Point:
         """goal
 
+        Give goal point
+
         Returns:
-            Goal_Info
+            Point
         """
         goal: Geometry_Info = self.__data.geometry
 
-        return Pose(goal.goal_x, goal.goal_y)
-
-    @property
-    def ref_command_int(self) -> int:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-        referee: Referee_Info = self.__data.referee
-
-        return int(referee.command)
-
-    @property
-    def ref_pre_command(self) -> int:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-        referee: Referee_Info = self.__data.referee
-
-        return int(referee.pre_command)
-
-    @property
-    def ref_red_cards(self) -> int:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-        referee: Referee_Info = self.__data.referee
-
-        return int(referee.red_cards)
-
-    @property
-    def ref_yellow_cards(self) -> int:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-        referee: Referee_Info = self.__data.referee
-
-        return int(referee.yellow_cards)
-
-    @staticmethod
-    def get_ref_command_str_by_int(command_id: int) -> str:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-        commands: list[str] = Referee_Info.Command.keys()
-        return commands[command_id]
-
-    @property
-    def ref_command_str(self) -> str:
-        """referee
-
-        Returns:
-            Referee_Info
-        """
-
-        referee: Referee_Info = self.__data.referee
-
-        commands: list[str] = Referee_Info.Command.keys()
-        return commands[referee.command]
+        return Point(goal.goal_x, goal.goal_y)
 
     @property
     def sec_per_frame(self) -> float:
-        """sec_per_framed
+        """sec_per_frame
+
+        Seconds Per Frame
+        NOT FPS
 
         Returns:
             float
@@ -229,6 +179,8 @@ class MWReceiver(IPNetAddr):
     @property
     def num_of_cameras(self) -> int:
         """num_of_cameras
+
+        How many cameras used
 
         Returns:
             int

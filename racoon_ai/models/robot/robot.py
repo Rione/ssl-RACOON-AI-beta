@@ -30,6 +30,8 @@ class Robot(Pose):
 
         distance_ball_robot (float): distance between ball and robot
 
+        radian_ball_robot (float): radian between ball and robot
+
         speed (float) : speed
 
         slope (float) : slope of velocity
@@ -49,9 +51,9 @@ class Robot(Pose):
         super().__init__(0, 0)
         self.__robot_id: int = robot_id
         self.__distance_ball_robot: float = field(default=0, init=False)
-        self.__degree_ball_robot: float = field(default=0, init=False)
-        self.__speed: float = field(default=0, init=False)
-        self.__slope: float = field(default=0, init=False)
+        self.__radian_ball_robot: float = field(default=0, init=False)
+        self.__robot_speed: float = field(default=0, init=False)
+        self.__robot_slope: float = field(default=0, init=False)
         self.__intercept: float = field(default=0, init=False)
         self.__angular_velocity: float = field(default=0, init=False)
         self.__is_ball_catch: bool = field(default=False, init=False)
@@ -65,6 +67,7 @@ class Robot(Pose):
             f"x={self.x:.1f}, "
             f"y={self.y:.1f}, "
             f"theta={self.theta:.1f}, "
+            f"radian_ball_robot={self.radian_ball_robot:.1f}"
             f"distance_ball_robot={self.distance_ball_robot:.1f}, "
             f"speed={self.speed:.1f}, "
             f"slope={self.slope:.1f}, "
@@ -97,9 +100,9 @@ class Robot(Pose):
         return self.__distance_ball_robot
 
     @property
-    def degree_ball_robot(self) -> float:
-        """degree_ball_robot"""
-        return self.__degree_ball_robot
+    def radian_ball_robot(self) -> float:
+        """radian_ball_robot"""
+        return self.__radian_ball_robot
 
     @property
     def robot_id(self) -> int:
@@ -108,13 +111,19 @@ class Robot(Pose):
 
     @property
     def speed(self) -> float:
-        """speed"""
-        return self.__speed
+        """speed
+
+        speed of robot
+        """
+        return self.__robot_speed
 
     @property
     def slope(self) -> float:
-        """slope"""
-        return self.__slope
+        """slope
+
+        slope of robot
+        """
+        return self.__robot_slope
 
     @property
     def intercept(self) -> float:
@@ -146,7 +155,7 @@ class Robot(Pose):
         Update robot
 
         Args:
-            drobot (SSL_DetectionRobot): SSL_DetectionRobot
+            drobot (Robot_Infos): Robot_Infos
         """
         self.__from_proto(drobot)
 
@@ -154,16 +163,15 @@ class Robot(Pose):
         """from_proto
 
         Args:
-            drobot (SSL_DetectionRobot): SSL_DetectionRobot
-            recv_time (int): receive time
+            drobot (Robot_Infos): Robot_Infos
         """
         self.x = dbot.x
         self.y = dbot.y
         self.theta = dbot.theta
         self.__distance_ball_robot = dbot.distance_ball_robot
-        self.__degree_ball_robot = dbot.degree_ball_robot
-        self.__speed = dbot.speed
-        self.__slope = dbot.slope
+        self.__radian_ball_robot = dbot.radian_ball_robot
+        self.__robot_speed = dbot.speed
+        self.__robot_slope = dbot.slope
         self.__intercept = dbot.intercept
         self.__angular_velocity = dbot.angular_velocity
         self.__is_ball_catch = dbot.ball_catch
