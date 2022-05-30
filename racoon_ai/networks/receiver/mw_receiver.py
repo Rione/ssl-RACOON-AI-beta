@@ -80,8 +80,6 @@ class MWReceiver(IPNetAddr):
                 enemy = self.__enemy_robots[debot.robot_id]
                 enemy.update(debot)
 
-        print(self.referee)
-
     @property
     def ball(self) -> Ball:
         """ball

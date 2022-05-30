@@ -5,6 +5,7 @@
 """
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
+from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
@@ -42,13 +43,15 @@ def main() -> None:
     is_team_yellow: bool = False
 
     try:
-        observer = MWReceiver(host="127.0.0.1", port=30011)
 
+        observer = MWReceiver(host="127.0.0.1", port=30011)
         # role = Role(observer)
+
+        controls = Controls(observer)
 
         # offense = Offense(observer)
 
-        keeper = Keeper(observer)
+        keeper = Keeper(observer, controls)
 
         sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
 
