@@ -5,14 +5,11 @@
 """
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
-from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
-
-# from .strategy.offense import Offense
-# from .strategy.role import Role
-from .strategy.goal_keeper import Keeper
+from .strategy.offense import Offense
+from .strategy.role import Role
 
 
 def main() -> None:
@@ -43,17 +40,13 @@ def main() -> None:
     is_team_yellow: bool = False
 
     try:
-
         observer = MWReceiver(host="127.0.0.1", port=30011)
-        # role = Role(observer)
 
-        controls = Controls(observer)
+        role = Role(observer)
 
-        # offense = Offense(observer)
+        offense = Offense(observer, role)
 
-        keeper = Keeper(observer, controls)
-
-        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
+        sender = CommandSender(is_real, online_ids, host="localhost")
 
         logger.info("Roop started")
 
@@ -62,12 +55,10 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            # role.main()
-            # offense.main()
-            keeper.main()
+            role.main()
+            offense.main()
 
-            # sim_cmds.robot_commands += offense.send_cmds
-            sim_cmds.robot_commands += keeper.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
     except KeyboardInterrupt:
