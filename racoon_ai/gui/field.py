@@ -34,23 +34,24 @@ class Field(QWidget, QPainter):
 
     def paintEvent(self, event) -> None:
         self.__ui = QPainter(self)
+
         self.__ui.setPen(QColor(Qt.white))
         self.__ui.setBrush(QColor(Qt.gray))
 
         # Feild全体
-        self._drawRect(20, 30, 520, 680)
+        self.__ui.drawRect(25, 20, 520, 730)
         # Feild line
-        self._drawRect(60, 70, 440, 600)
+        self.__ui.drawRect(65, 60, 440, 650)
         # Center line
-        self._drawEllipse(280, 370, 30, 30)
+        self.__ui.drawEllipse(260, 340, 30, 30)
         # Down Goal line
-        self._drawRect(220, 610, 120, 60)
+        self.__ui.drawRect(220, 650, 120, 60)
         # Up Goal line
-        self._drawRect(220, 70, 120, 60)
+        self.__ui.drawRect(220, 60, 120, 60)
         # Down Goal
-        self._drawRect(250, 669, 60, 10)
+        self.__ui.drawRect(250, 709, 60, 10)
         # Up Goal
-        self._drawRect(250, 60, 60, 10)
+        self.__ui.drawRect(250, 50, 60, 10)
 
         self.__ui.setPen(QColor(Qt.black))
         self.__ui.setBrush(QColor(Qt.white))

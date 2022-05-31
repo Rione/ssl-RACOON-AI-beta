@@ -59,7 +59,6 @@ def main() -> None:
 
         offense = Offense(observer, role)
         gui = Gui(observer)
-        # gui.vision_receive(observer)
 
         # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
 
