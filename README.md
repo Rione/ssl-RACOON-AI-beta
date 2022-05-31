@@ -30,22 +30,14 @@ make
 
 ---
 
-Onece you have built with `make`, you can execute with:
+Onece you have built with `make` or `make build`, you can execute with:
 
 ```bash
-poetry run python -m racoon_ai
+make run
 ```
-
-Or
-
-```bash
-python -m racoon_ai
-```
-
-You need to run with `poetry run` if you have not switched to `venv` yet.
 
 > **Warning**  
-> Above two way perhaps cause some problems.
+> You need to run with `poetry run` if you have not switched to `venv` yet.
 
 ---
 
