@@ -45,7 +45,7 @@ $(TGZ):
 
 $(RACOON_MW):
 	@echo ""
-	$(error [ERROR] Please download RACOON_MW from https://github.com/Rione/ssl-RACOON-MW/releases/latest and place it in $(BIN_DIR))
+	@[ ! -f $@ ] && echo '[WARN] Please download RACOON_MW from https://github.com/Rione/ssl-RACOON-MW/releases/latest and place it in $(BIN_DIR)/'
 
 $(WHEEL): $(PROJECT_DIR) $(PROTO_GENDIR)/%.pyi
 	@echo "Creating $(PKG)@$(VERSION) distribution..."
@@ -93,7 +93,7 @@ install:
 	@poetry install
 
 .PHONY: run
-run: doctor $(TGZ)
+run: doctor $(TGZ) $(RACOON_MW)
 	@echo ""
 	poetry run python -m $(PKG)
 
