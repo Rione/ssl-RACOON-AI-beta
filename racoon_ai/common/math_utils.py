@@ -58,7 +58,7 @@ class MathUtils:
             >>> MathUtils.radian(Point(0, 0), Point(0, 1)) == MathUtils.PI / 2
             True
         """
-        return cls.radian_normalize(atan2(obj2.y - obj1.y, obj2.x - obj1.x), center)
+        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x), center)
 
     @staticmethod
     def radian_normalize(angle: float, center: float = 0) -> float:
@@ -85,6 +85,7 @@ class MathUtils:
         See Also:
             https://commons.apache.org/proper/commons-math/javadocs/api-3.1/org/apache/commons/math3/util/MathUtils.html#normalizeAngle(double,%20double)
         """
+
         return angle - (MathUtils.TWO_PI * floor((angle + MathUtils.PI - center) / MathUtils.TWO_PI))
 
     @staticmethod
@@ -160,6 +161,19 @@ class MathUtils:
         val3 = cls.__substitution_fn(pt3, pt4, pt1)
         val4 = cls.__substitution_fn(pt3, pt4, pt2)
         return (val1 * val2 < 0) and (val3 * val4 < 0)
+
+    @classmethod
+    def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
+        """radian
+
+        Args:
+            obj1 Point: object at least has x and y
+            obj2 Point: object at least has x and y
+
+        Returns:
+            float: radian value
+        """
+        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x) - center)
 
 
 if __name__ == "__main__":

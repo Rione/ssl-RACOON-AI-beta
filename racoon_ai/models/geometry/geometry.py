@@ -41,6 +41,9 @@ class Geometry:
         ball_radius (float): radius of ball
 
         max_robot_radius (float): max robot radius
+
+        goal_x (int): goal pose x
+        goal_y (int): goal pose y
     """
 
     def __init__(self) -> None:
@@ -57,6 +60,8 @@ class Geometry:
         self.__goal_height: int = field(default=0, init=False)
         self.__ball_radius: float = field(default=0, init=False)
         self.__max_robot_radius: float = field(default=0, init=False)
+        self.__goal_x: float = field(default=0, init=False)
+        self.__goal_y: float = field(default=0, init=False)
 
     def __str__(self) -> str:
         return (
@@ -74,6 +79,8 @@ class Geometry:
             f"goal_height={self.goal_height:1d},"
             f"ball_radius={self.ball_radius:.1f},"
             f"max_robot_radius={self.max_robot_radius:.1f},"
+            f"goal_x={self.goal_x},"
+            f"goal_y={self.goal_y},"
             ")"
         )
 
@@ -93,6 +100,8 @@ class Geometry:
             f"goal_height={self.goal_height:1d},"
             f"ball_radius={self.ball_radius:.1f},"
             f"max_robot_radius={self.max_robot_radius:.1f},"
+            f"goal_x={self.goal_x},"
+            f"goal_y={self.goal_y},"
             ")"
         )
 
@@ -161,6 +170,16 @@ class Geometry:
         """max_robot_radius"""
         return self.__max_robot_radius
 
+    @property
+    def goal_x(self) -> float:
+        """goal_x"""
+        return self.__goal_x
+
+    @property
+    def goal_y(self) -> float:
+        """goal_y"""
+        return self.__goal_y
+
     def update(self, geometry: Geometry_Info) -> None:
         """
         Update robot
@@ -189,3 +208,5 @@ class Geometry:
         self.__goal_height = geometry.goal_height
         self.__ball_radius = geometry.ball_radius
         self.__max_robot_radius = geometry.max_robot_radius
+        self.__goal_x = geometry.goal_x
+        self.__goal_y = geometry.goal_y

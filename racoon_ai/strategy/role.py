@@ -9,7 +9,8 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.models.coordinate import Point
+
+# from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 
 
@@ -53,7 +54,6 @@ class Role:
             [1, 4, 5, 2],
         ]
         # self.__their_goal: Point = Point(6000, 0)
-        self.__our_goal: Point = Point(-6000, 0)
 
     @property
     def keeper_id(self) -> int:
@@ -100,7 +100,7 @@ class Role:
             (
                 robot.robot_id,
                 self.__defence_basis_dis(robot.robot_id),
-                MU.radian(robot, self.__our_goal),
+                MU.radian(robot, self.__observer.goal),
             )
             for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
@@ -117,8 +117,11 @@ class Role:
         """defence_basis_dis"""
 
         robot = self.__observer.get_our_by_id(robot_id)
-        theta = MU.radian(robot, self.__our_goal)
-        robot_dis = MU.distance(robot, self.__our_goal)
+        if robot is None:
+            return float(1e6)
+
+        theta = MU.radian(robot, self.__observer.goal)
+        robot_dis = MU.distance(robot, self.__observer.goal)
 
         if abs(theta) < MU.PI / 4:
             basis_dis = robot_dis - 1200 / cos(theta)
