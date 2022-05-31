@@ -117,6 +117,9 @@ class Role:
         """defence_basis_dis"""
 
         robot = self.__observer.get_our_by_id(robot_id)
+        if robot is None:
+            return float(1e6)
+
         theta = MU.radian(robot, self.__observer.goal)
         robot_dis = MU.distance(robot, self.__observer.goal)
 
