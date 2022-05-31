@@ -1,113 +1,118 @@
-ROOT      := .
+ROOT     = $(shell git rev-parse --show-toplevel)
+PKG      = $(shell sed -n 's/^ *name.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
+VERSION  = $(shell sed -n 's/^ *version.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
 
-PROJECT   := racoon_ai
-PROTO     := $(ROOT)/$(PROJECT)/proto
-SRC       := $(ROOT)/$(PROJECT) $(ROOT)/cmd
-VENV      := $(ROOT)/.venv
+DIST_DIR		    = $(ROOT)/dist
+VENV_DIR        = $(ROOT)/.venv
+BIN_DIR         = $(ROOT)/bin
+PROJECT_DIR     = $(ROOT)/$(PKG)
+PROTO_SRCDIR    = $(ROOT)/$(PKG)/proto/pb_src
+PROTO_GENDIR    = $(ROOT)/$(PKG)/proto/pb_gen
+
+PKG_FILENAME    = $(PKG)-$(VERSION)
+WHEEL           = $(DIST_DIR)/$(PKG_FILENAME)-py3-none-any.whl
+TGZ             = $(DIST_DIR)/$(PKG_FILENAME).tar.gz
+TARGETS         = $(WHEEL) $(TGZ)
+PROTO_SRCS      = $(wildcard $(PROTO_SRCDIR)/*.proto)
+
+PROTO_PYS       = $(PROTO_SRCS:$(PROTO_SRCDIR)/%.proto=$(PROTO_GENDIR)/%_pb2.py)
+PROTO_STUBS     = $(PROTO_SRCS:$(PROTO_SRCDIR)/%.proto=$(PROTO_GENDIR)/%_pb2.pyi)
+
+PY_SRCS         = $(ROOT)/$(PKG) $(ROOT)/cmd
+PY_LOCKFILE     = $(ROOT)/$(PKG)/poetry.lock
+
+PROTOC          = protoc
+RACOON_MW       = $(BIN_DIR)/RACOON_MW
+VERCHEW         = $(BIN_DIR)/verchew
+
+
+PROTOC_GEN_MYPY = $(VENV_DIR)/bin/protoc-gen-mypy
+PROTOL          = $(VENV_DIR)/bin/protol
+BLACK           = $(VENV_DIR)/bin/black
+ISORT           = $(VENV_DIR)/bin/isort
+
+# *************************************************************************** #
 
 .PHONY: all
-all: run
+all: clean build run
+
+.PHONY: build
+build: $(WHEEL)
+
+$(TGZ):
+	@echo ""
+	$(error [ERROR] Please compile with `make build`, or use just `make` (compile and run at the same time))
+
+$(RACOON_MW):
+	@echo ""
+	@[ ! -f $@ ] && echo '[WARN] Please download RACOON_MW from https://github.com/Rione/ssl-RACOON-MW/releases/latest and place it in $(BIN_DIR)/'
+
+$(WHEEL): $(PROJECT_DIR) $(PROTO_GENDIR)/%.pyi
+	@echo "Creating $(PKG)@$(VERSION) distribution..."
+	@poetry build -vv
+
+$(PROTO_GENDIR)/%.pyi: $(PROTO_GENDIR)/%.py $(PROTOL)
+	@echo ""
+	$(info Editing stub files)
+	@poetry run protol \
+		--in-place \
+		--python-out $(PROTO_GENDIR) \
+		$(PROTOC) --proto-path=$(PROTO_SRCDIR)	$(PROTO_SRCS)
+
+$(PROTO_GENDIR)/%.py: $(PROTO_SRCS) $(PROTOC_GEN_MYPY)
+	@echo ""
+	$(info Compiling protobuf files)
+	@$(PROTOC) \
+		--proto_path=$(PROTO_SRCDIR) \
+		--plugin=protoc-gen-mypy=$(PROTOC_GEN_MYPY) \
+		--python_out=$(PROTO_GENDIR) \
+	  --mypy_out=$(PROTO_GENDIR) \
+		$(PROTO_SRCS)
+
+$(PROTOL): $(VENV_DIR)
+	@echo ""
+	@poetry install
+
+$(PROTOC_GEN_MYPY): $(VENV_DIR)
+	@echo ""
+	@poetry install
+
+$(VENV_DIR): doctor poetry.lock clean-deps
+
+# *************************************************************************** #
 
 .PHONY: doctor
 doctor:
-	$(ROOT)/bin/verchew --exit-code
-
-
-# help ########################################################################
-
-.PHONY: help
-help:
-	@echo "Usage: make <target>"
 	@echo ""
-	@echo "  run:        run the runner script"
-	@echo "  install:    install dependencies"
-	@echo "  build:      build this project"
-	@echo "  clean:      clean this project"
-	@echo "  lint:       run the all linters"
-	@echo "  format:     run the all formatters"
-	@echo "  help:       show more verbose help"
-
-.PHONY: help-long
-help-long:
-	@echo "Usage: make <target>"
-	@echo ""
-	@echo "[help]"
-	@echo "  help:       show help"
-	@echo "  help-long:  show more verbose help"
-	@echo ""
-	@echo "[main]"
-	@echo "  run:        run the runner script"
-	@echo "  install:    install dependencies"
-	@echo "  build:      build this project"
-	@echo ""
-	@echo "[cleanup]"
-	@echo "  clean:      clean this project"
-	@echo "  clean-deps: auto-remove unlisted packages"
-	@echo "  clean-pyc:  remove python chache files"
-	@echo ""
-	@echo "[lint]"
-	@echo "  lint:       run the all linters"
-	@echo "  pylint:     lint code with pylint"
-	@echo "  flake8:     lint code with flake8"
-	@echo ""
-	@echo "[format]"
-	@echo "  format:     run the all formatters"
-	@echo "  black:      format code with black"
-	@echo "  isort:      format code with isort"
-
-
-# Main ########################################################################
-
-.PHONY: run
-run: build install
-	poetry run python -m $(PROJECT)
+	$(info Checking dependencies versions for $(PKG)@$(VERSION))
+	@$(VERCHEW) --exit-code
 
 .PHONY: install
-install: $(VENV) poetry.lock
-	poetry install
+install:
+	@echo ""
+	@poetry install
 
-.PHONY: build
-build: build-proto build-src
-
-.PHONY: build-proto
-build-proto: $(PROTO) clean-deps
-	@protoc \
-		--proto_path=$(PROTO)/pb_src \
-		--plugin=protoc-gen-mypy=$(VENV)/bin/protoc-gen-mypy \
-		--python_out=$(PROTO)/pb_gen \
-		--mypy_out=$(PROTO)/pb_gen \
-			$(PROTO)/pb_src/*.proto
-
-	@poetry run protol \
-		--in-place \
-		--python-out $(PROTO)/pb_gen \
-		protoc --proto-path=$(PROTO)/pb_src \
-			$(PROTO)/pb_src/*.proto
-
-.PHONY: build-src
-build-src: $(SRC) clean-deps
-	poetry build -vv
-
-
-
-# Cleanup #####################################################################
+.PHONY: run
+run: doctor $(TGZ) $(RACOON_MW)
+	@echo ""
+	poetry run python -m $(PKG)
 
 .PHONY: clean
-clean: clean-deps clean-pyc
+clean: clean-dirs clean-deps
+
+clean-dirs:
+	@echo ""
+	$(info Cleaning up...)
+	@rm -f $(TARGETS) $(PROTO_PYS) $(PROTO_STUBS)
+	@find . -name '*~' -exec rm -f {} +
+	@find . -name '__pycache__' -exec rm -fr {} +
 
 .PHONY: clean-deps
-clean-deps: doctor
-	poetry install --remove-untracked --no-root
+clean-deps:
+	@echo ""
+	@poetry install --remove-untracked --no-root
 
-.PHONY: clean-pyc
-clean-pyc:
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
-
-
-# Lint ########################################################################
+# *************************************************************************** #
 
 .PHONY: lint
 lint: flake8 pylint mypy black-check isort-check
@@ -122,7 +127,7 @@ flake8:
 pylint:
 	@echo ""
 	@echo "Running pylint..."
-	@poetry run pylint --exit-zero --rcfile=$(ROOT)/pyproject.toml --output-format=colorized --reports=y $(SRC)
+	@poetry run pylint --exit-zero --rcfile=$(ROOT)/pyproject.toml --output-format=colorized --reports=y $(PKG)
 
 .PHONY: mypy
 mypy:
@@ -142,8 +147,7 @@ isort-check:
 	@echo "Checking code formatting with isort..."
 	@poetry run isort --verbose --check-only --settings-file $(ROOT)/pyproject.toml --color $(ROOT)
 
-
-# Format ######################################################################
+# *************************************************************************** #
 
 .PHONY: format
 format: black isort
@@ -154,4 +158,46 @@ black:
 
 .PHONY: isort
 isort:
-	poetry run isort --verbose --setting-file $(ROOT)/pyproject.toml --color $(ROOT)
+	poetry run isort --verbose --settings-file $(ROOT)/pyproject.toml --color $(ROOT)
+
+# *************************************************************************** #
+
+.PHONY: help
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "  run:        just run the runner script (withoud building)"
+	@echo "  install:    install dependencies"
+	@echo "  build:      build this project"
+	@echo "  clean:      clean this project"
+	@echo "  lint:       run the all linters"
+	@echo "  format:     run the all formatters"
+	@echo "  help:       show more verbose help"
+
+.PHONY: help-long
+help-long:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "[help]"
+	@echo "  help:       show help"
+	@echo "  help-long:  show more verbose help (this one)"
+	@echo ""
+	@echo "[main]"
+	@echo "  run:        run the runner script (withoud building)"
+	@echo "  install:    install dependencies"
+	@echo "  build:      build this project"
+	@echo ""
+	@echo "[cleanup]"
+	@echo "  clean:      clean this project"
+	@echo "  clean-deps: auto-remove unlisted packages"
+	@echo "  clean-dirs: remove chaches and compiled files"
+	@echo ""
+	@echo "[lint]"
+	@echo "  lint:       run the all linters"
+	@echo "  pylint:     lint code with pylint"
+	@echo "  flake8:     lint code with flake8"
+	@echo ""
+	@echo "[format]"
+	@echo "  format:     run the all formatters"
+	@echo "  black:      format code with black"
+	@echo "  isort:      format code with isort"

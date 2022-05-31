@@ -11,13 +11,16 @@ from typing import Any
 
 from PyQt5.QtWidgets import QApplication  # type: ignore
 
-from .gui.main import Gui  # type: ignore
+
+from .common.controls import Controls
+from . import __version__
 from .models.robot import SimCommands
-from .networks.receiver import VisionReceiver
+from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
-from .observer import Observer
-from .strategy.offense import Offense
-from .strategy.role import Role
+
+# from .strategy.offense import Offense
+# from .strategy.role import Role
+from .strategy.goal_keeper import Keeper
 
 
 def main() -> None:
@@ -38,8 +41,10 @@ def main() -> None:
     logger.addHandler(hdlr)
     logger.debug("Logger initialized")
 
+    logger.info("Racoon AI v%s", __version__)
+
     # List of online robot ids
-    online_ids: list[int] = [1, 3]
+    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     # Flag if run for a real robot
     is_real: bool = False
@@ -50,19 +55,16 @@ def main() -> None:
     app: Any = QApplication(sys.argv)
     try:
 
-        observer = Observer(
-            VisionReceiver(),
-            is_team_yellow,
-        )
+        observer = MWReceiver(host="localhost")
+  
+        controls = Controls(observer)
 
-        role = Role(observer)
 
-        offense = Offense(observer, role)
-        gui = Gui(observer)
+        # offense = Offense(observer)
 
-        # TODO: 同期型処理。VisionのFPSに依存するから、VisionのFPS下がったら処理やばいかも？
+        keeper = Keeper(observer, controls)
 
-        sender = CommandSender(is_real, online_ids, host="localhost")
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
 
         logger.info("Roop started")
 
@@ -71,11 +73,12 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            role.main()
-            offense.main()
-            gui.active()
+            # role.main()
+            # offense.main()
+            keeper.main()
 
-            sim_cmds.robot_commands += offense.send_cmds
+            # sim_cmds.robot_commands += offense.send_cmds
+            sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
             app.processEvents()

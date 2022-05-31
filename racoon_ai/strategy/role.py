@@ -5,12 +5,13 @@
     This module is for the Role class.
 """
 
-import math
 from logging import getLogger
+from math import cos, sin
 
-from racoon_ai.common import distance, radian, radian_normalize
-from racoon_ai.models.coordinate import Point
-from racoon_ai.observer import Observer
+from racoon_ai.common import MathUtils as MU
+
+# from racoon_ai.models.coordinate import Point
+from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 
 
 class Role:
@@ -24,7 +25,7 @@ class Role:
         defense_ids (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: MWReceiver) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
@@ -53,7 +54,6 @@ class Role:
             [1, 4, 5, 2],
         ]
         # self.__their_goal: Point = Point(6000, 0)
-        self.__our_goal: Point = Point(-6000, 0)
 
     @property
     def keeper_id(self) -> int:
@@ -97,7 +97,11 @@ class Role:
         defense: list[tuple[int, float, float]]
 
         defense = [
-            (robot.robot_id, self.__defence_basis_dis(robot.robot_id), radian(robot, self.__our_goal))
+            (
+                robot.robot_id,
+                self.__defence_basis_dis(robot.robot_id),
+                MU.radian(robot, self.__observer.goal),
+            )
             for robot in self.__observer.our_robots
             if robot.robot_id != self.keeper_id
         ]
@@ -112,14 +116,17 @@ class Role:
     def __defence_basis_dis(self, robot_id: int) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.our_robots[robot_id]
-        theta = radian_normalize(radian(robot, self.__our_goal))
-        robot_dis = distance(robot, self.__our_goal)
+        robot = self.__observer.get_our_by_id(robot_id)
+        if robot is None:
+            return float(1e6)
 
-        if abs(theta) < math.pi / 4:
-            basis_dis = robot_dis - 1200 / math.cos(theta)
+        theta = MU.radian(robot, self.__observer.goal)
+        robot_dis = MU.distance(robot, self.__observer.goal)
+
+        if abs(theta) < MU.PI / 4:
+            basis_dis = robot_dis - 1200 / cos(theta)
         else:
-            basis_dis = robot_dis - 1200 / math.sin(theta)
+            basis_dis = robot_dis - 1200 / sin(theta)
 
         return basis_dis
 

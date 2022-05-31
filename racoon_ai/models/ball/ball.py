@@ -5,8 +5,8 @@
         - Ball
 """
 
-from racoon_ai.models.coordinate import Point, Pose, Vector3f
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
+from racoon_ai.models.coordinate import Point
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Ball_Info
 
 
 class Ball(Point):
@@ -19,115 +19,95 @@ class Ball(Point):
 
         z (float): z coordinate
 
-        confidence (float): confidence
+        filtered_x (float) : Kalman Filtered X
 
-        area (float): area
+        filtered_y (float) : Kalman Filtered Y
 
-        pixel_point (Point): pixel point
+        speed (float) : ball speed (absolute value)
 
-        velocity (Vector3f): velocity
+        speed_slope (float) : ball slope
 
-        timestamp (float): timestamp
+        speed_slope_radian (float) : speed slope angle in radian
+
+        speed_intercept (float) : ball intercept
     """
 
     def __init__(self) -> None:
-        super().__init__(0, 0)
-        self.__confidence: float = 0
-        self.__area: float = 0
-        self.__pixel: Point = Point(0, 0)
-        self.__velocity: Vector3f = Vector3f(0, 0, 0)
-        self.__timestamp: float = 0
+        super().__init__(0, 0)  # x, y, z
+        self.__filtered_x: float = float(0)
+        self.__filtered_y: float = float(0)
+        self.__speed: float = float(0)
+        self.__speed_slope: float = float(0)
+        self.__speed_slope_radian: float = float(0)
+        self.__speed_intercept: float = float(0)
 
     def __str__(self) -> str:
         return (
-            "Ball("
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
-            f"z={self.z:.1f}, "
-            f"confidence={self.confidence:3.0%}, "
-            f"area={self.area:.1f}, "
-            f"pixel={self.pixel}, "
-            f"velocity={self.velocity}, "
+            "("
+            f"pt=Point(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f}), "
+            f"filtered_x={self.filtered_x:.1f}, "
+            f"filtered_y={self.filtered_y:.1f}, "
+            f"speed={self.speed:.1f}, "
+            f"speed_slope={self.speed_slope:.1f}, "
+            f"speed_slope_radian={self.speed_slope_radian:.1f}, "
+            f"speed_intercept={self.speed_intercept:.1f}, "
             ")"
         )
 
     def __repr__(self) -> str:
-        return (
-            "Ball("
-            f"x={self.x}, "
-            f"y={self.y}, "
-            f"z={self.z}, "
-            f"confidence={self.confidence}, "
-            f"area={self.area}, "
-            f"pixel={self.pixel}, "
-            f"velocity={self.velocity}, "
-            f"timestamp={self.timestamp}"
-            ")"
-        )
+        raise NotImplementedError
 
     @property
-    def confidence(self) -> float:
-        """confidence"""
-        return self.__confidence
+    def filtered_x(self) -> float:
+        """filtered_x"""
+        return self.__filtered_x
 
     @property
-    def area(self) -> float:
-        """area"""
-        return self.__area
+    def filtered_y(self) -> float:
+        """filtered_y"""
+        return self.__filtered_y
 
+    # pylint: disable=R0801
     @property
-    def pixel(self) -> Point:
-        """pixel"""
-        return self.__pixel
+    def speed(self) -> float:
+        """speed
 
-    @property
-    def velocity(self) -> Vector3f:
-        """velocity"""
-        return self.__velocity
-
-    @property
-    def timestamp(self) -> float:
-        """timestamp"""
-        return self.__timestamp
-
-    @classmethod
-    def calc_velocity(cls, curr_ball: "Ball", prev_ball: "Ball", span: float) -> Vector3f:
-        """calc_velocity
-
-        calculate velocity
-
-        Args:
-            curr_ball (Ball): current ball state
-            prev_ball (Ball): previous ball state
-            span (int): time interval between current and previous ball state
-
-        Returns:
-            Vector3f: velocity in (x, y, z) format
+        speed of ball
         """
-        # Greater than 60[Hz] exeption
-        if span < 1e-5:
-            return Vector3f(0, 0, 0)
+        return self.__speed
 
-        # Calculate velocity
-        delta = curr_ball - prev_ball
-        return Vector3f((delta.x ** 2) / span, (delta.y ** 2) / span, (delta.z ** 2) / span)
+    # pylint: disable=R0801
+    @property
+    def speed_slope(self) -> float:
+        """slope
 
-    def update(self, dball: SSL_DetectionBall, timestamp: float) -> None:
+        slope of ball speed
+        """
+        return self.__speed_slope
+
+    # pylint: disable=R0801
+    @property
+    def speed_slope_radian(self) -> float:
+        """speed_slope_radian"""
+        return self.__speed_slope_radian
+
+    # pylint: disable=R0801
+    @property
+    def speed_intercept(self) -> float:
+        """speed_intercept"""
+        return self.__speed_intercept
+
+    def update(self, dball: Ball_Info) -> None:
         """update
 
         update this object with data from protobuf
 
         Args:
-            ball (SSL_DetectionBall): ball proto message
+            dball (Ball_Info): Ball_Info
         """
-        prev_ball: Ball = self
         self.__from_proto(dball)
-        self.__timestamp = timestamp
-        span: float = self.timestamp - prev_ball.timestamp
-        vel: Vector3f = self.calc_velocity(self, prev_ball, span)
-        self.__velocity = vel
 
-    def __from_proto(self, dball: SSL_DetectionBall) -> None:
+    def __from_proto(self, dball: Ball_Info) -> None:
         """from_proto
 
         fill this object with data from protobuf
@@ -137,12 +117,14 @@ class Ball(Point):
         """
         self.x = dball.x
         self.y = dball.y
-        self.z = dball.z
-        self.__confidence = dball.confidence
-        self.__area = dball.area
-        self.__pixel = Point(dball.pixel_x, dball.pixel_y)
+        self.__filtered_x = dball.filtered_x
+        self.__filtered_y = dball.filtered_y
+        self.__speed = dball.speed
+        self.__speed_slope = dball.slope
+        self.__speed_slope_radian = dball.slope_radian
+        self.__speed_intercept = dball.intercept
 
-    def to_pose(self) -> Pose:
+    def to_point(self) -> Point:
         """to_pose
 
         convert this object to pose
@@ -150,4 +132,4 @@ class Ball(Point):
         Returns:
             Pose: pose
         """
-        return Pose(self.x, self.y, theta=0, z=self.z)
+        return Point(self.x, self.y, z=self.z)

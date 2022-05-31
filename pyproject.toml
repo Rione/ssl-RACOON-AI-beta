@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "racoon_ai"
-version = "0.0.1"
+version = "0.2.2"
 description = "Ri-one Accurate Operation AI"
 authors = ["Ri-one-SSL <rionesslq@gmail.com>"]
 license = "MIT"
@@ -12,10 +12,14 @@ protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
 PyQt5 = {version = "^5.15.6", optional = true, extras = ["Qt"]}
 pygame = {version = "^2.1.2", optional = true, extras = ["pygame"]}
+<<<<<<< HEAD
 PySide2 = "^5.15.2"
 PyQtChart = "^5.15.5"
 brainflow = "^4.9.3"
 pyqtgraph = "0.12.1"
+=======
+numpy = "^1.22.3"
+>>>>>>> 1ee641690a511e5679a90215743783d03bd78022
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
@@ -55,7 +59,7 @@ cache_dir = ".cache/mypy"
 
 [tool.pylint]
   [tool.pylint.basic]
-  good-names = ["i", "j", "k", "x", "y", "z"]
+  good-names = ["i", "j", "k", "x", "y", "z", "kp", "kd", "ki"]
 
   [tool.pylint.master]
   ignore-paths = [

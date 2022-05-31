@@ -1,59 +1,52 @@
+> **Warning**  
+> On windows, please use Ubuntu 20.04 with Windows Subsystem for Linux (WSL) to run. (Windows native is not tested yet)
+
 # Installation
 
-- [Prerequisites](#prerequisites)
-  - [Setup ssh key](#set-up-ssh-key)
+- [Prepare GitHub](#prepare-github)
+  - [(Optional) Generate SSH key manually](#optional-generate-ssh-key)
   - [Setup GitHub Command Line Tool](#setup-github-command-line-tool)
-  - [Test SSH Connection](#test-ssh-connection)
-  - [Setup Protobuf compiler](#setup-protoc)
+    - [Test SSH Connection](#test-ssh-connection)
+- [Clone RACOON-AI](#clone-racoon-ai)
+- [Setup Protobuf compiler](#setup-protoc)
+- [Prepare Python environment](#prepare-python-environment)
   - [Setup anyenv](#setup-anyenv)
-  - [Setup python 3.10.X](#setup-python-310X)
+  - [Setup python 3.10.X with Pyenv](#setup-python-310x-with-pyenv)
   - [Setup poetry](#setup-poetry)
+- [Enable pre-commit hooks](#enable-pre-commit-hooks)
+- [Build RACOON-AI](#build-racoon-ai)
 
----
-
-We know Python version 3.10.X is still in development, isntalling with version management tool is recommended.
-Here, we use `pyenv` with `anyenv` since its simplicity.
 
 ## Prerequisites
 
-NOTE: On windows, you can use `py` command instead of `pyenv` (with `anyenv`).
-
-- ssh
+- [OpenSSH client](https://www.openssh.com) - For SSH connection
 - [GitHub command line tool](https://github.com/cli/cli) - For working with GitHub (`gh` command)
 - [anyenv](https://github.com/anyenv/anyenv) - For managing version management tools
 - [pyenv](https://github.com/pyenv/pyenv) - For managing python versions
 - [Poetry](https://github.com/python-poetry/poetry) - For managing python dependencies
 - [Protoc](https://github.com/protocolbuffers/protobuf) - For compiling `.proto` files
 
-### Setup `ssh` key
+We know Python version 3.10.X is still in development, isntalling with version management tool is recommended.
+Here, we use `pyenv` with `anyenv` since its simplicity.
+
+## Prepare GitHub
+
+### (optional) Generate `ssh` key
+
+> **Note**  
+> This step is for those who want to costomize SSH key.  
+> (GitHub CLI can generate `id_ed25519` automatically)
 
 From the security perspective, we recommend to use SSH key.
 Please refer to [GitHub documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-
-1. Generate a Private/Public key
 
 ```bash
 ssh-keygen -t ed25519 -C "<Your GitHub Email>"
 ```
 
-2. Add to ssh-agent
+---
 
-Please add following to your `~/.ssh/config` file.
-
-```text
-Host *
-  AddKeysToAgent yes
-  UseKeychain yes            # Only for MacOS (10.12.2 or later)
-  PasswordAuthentication no  # Recommended for the security reason
-
-# For GitHub
-Host github.com
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/<Your Secret Key File>
-```
-
-#### Setup GitHub Command Line Tool
+### Setup GitHub Command Line Tool
 
 0. Create a GitHub account
 
@@ -62,86 +55,134 @@ Please register from this page: [GitHub](https://github.com/signup)
 1. Install GitHub Command Line Tool
 
 Please follow the official [installation](https://github.com/cli/cli#installation).  
-For linux users: [Instructions for Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
+For ubuntu (Linux) users: [Instructions for Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
 
 2. Login with your GitHub account
 
-_NOTE: Select the `SSH` option, and upload your SSH key._
+> **Note**  
+> Select the `SSH` option, and upload your SSH key
 
 ```bash
 gh auth login
 ```
 
-#### Test SSH connection
+---
+
+### Test SSH connection
+
+0. Write configuration file
+
+Please add following to your `~/.ssh/config` file.
+
+```text
+Host *
+  AddKeysToAgent yes
+  
+  # Only for MacOS (10.12.2 or later)
+  UseKeychain yes
+  
+  # Recommended for the security reason
+  PasswordAuthentication no  
+
+# For GitHub
+Host github.com
+  HostName github.com
+  IdentityFile ~/.ssh/<Your Secret Key File>
+```
+
+1. Connect to GitHub
 
 ```bash
 ssh -T git@github.com
 ```
 
-**_NOTE:
-If you get an error, about the connection to the ssh-agent,
-please retry with the following command._**
+> **Note**  
+> If you get an error about the connection to the ssh-agent, please retry after the following command
 
 ```bash
-eval $(ssh-agent -s) && ssh-add ~/.ssh/<Your Secet Key File>
+eval $(ssh-agent -s)
 ```
 
-### Setup Protoc
+## Clone RACOON-AI
+
+Clone to your local workspace.
+
+```bash
+gh repo clone Rione/ssl-RACOON-AI ~/ws/ssl-racoon-ai && cd $_
+```
+
+## Setup Protoc
 
 See also the [Official Guide](https://github.com/protocolbuffers/protobuf/blob/v3.19.1/src/README.md)
 
-**NOTE: Please modify the prefix path if you want to.**
-
 0. Install build requirements (if not installed)
-
-NOTE: that GNU libtool is required here.
 
 - autoconf
 - automake
-- libtool
+- libtool (GNU libtool)
 - make
 - g++
 - unzip
 
+
+On MacOS native, install with [Homebrew](https://brew.sh/) is recommended:
+
+```bash
+brew install autoconf automake libtool
+```
+
+If you use ubuntu (Debian):
+
+```bash
+sudo apt update && sudo apt install -y build-essential automake autoconf libtool unzip
+```
+
 1. Clone the protobuf repository
 
 ```bash
-gh repo clone protocolbuffers/protobuf $HOME/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
+gh repo clone protocolbuffers/protobuf ${HOME}/.local/opt/protobuf -- -b v3.19.1 --depth=1 --recurse-submodules --shallow-submodules
 ```
 
 3. Cd into the repo & run setup script
 
 ```bash
-cd ${HOME}/.local/opt/protoc && ./autogen.sh
+cd ${HOME}/.local/opt/protobuf && ./autogen.sh
 ```
 
 4. Configure to your environment
 
 ```bash
-./configure --prefix=${HOME}/.local/protobuf
+./configure --prefix=${HOME}/.local/opt/protobuf
 ```
 
-5. Build and test
+5. Build the code
 
-NOTE: You can speed up by using make with `-j` option.
+> **Note**  
+> You can speed up by using make with `-j` option.
 
 ```bash
-make && make check
+make
 ```
 
-6. Install
+6. Test the compilation
+
+```bash
+make check
+```
+
+7. Install
 
 ```bash
 make install
 ```
 
-7. Link protoc to your bin directory
+8. Link protoc to your bin directory
 
 ```bash
-ln -s ${HOME}/.local/opt/protobuf/bin/protoc ${HOME}/.local/bin/
+mkdir -p ${HOME}/.local/bin && ln -s ${HOME}/.local/opt/protobuf/bin/* ${HOME}/.local/bin/
 ```
 
-8. Test
+9. Test the installation
 
 ```bash
 protoc --version
@@ -149,28 +190,34 @@ protoc --version
 
 You would get `libprotoc 3.19.1`.
 
-If you get an error about the command not found, 
-please add following to your `~/.zshrc` or `~/.bashrc` file and reload.
+> **Note**  
+> If you get an error about the command not found, 
+> please add following to your `~/.zshrc` or `~/.bashrc` file, and retry after source it.
+
+Example (bash):
 
 ```bash
-export PATH="${HOME}/.local/bin:${PATH}"
+echo 'export PATH="${HOME}/.local/bin:${PATH}"' >> ~/.bashrc && . ~/.bashrc
 ```
 
-9. (optional) Add to your `$PKG_CONFIG_PATH`
+10. Add to your `$PKG_CONFIG_PATH`
 
-If you plan to install RoboCup-SSL official packages, 
-please run the following command.
+Please add the following to your `~/.zshrc` or `~/.bashrc`, and source it.
+
+Example (bash):
 
 ```bash
-export PKG_CONFIG_PATH="${HOME}/.local/opt/protobuf/lib/pkgconfig:${PKG_CONFIG_PATH}"
+echo 'export PKG_CONFIG_PATH="${HOME}/.local/opt/protobuf/lib/pkgconfig:${PKG_CONFIG_PATH}"' >> ~/.bashrc && . ~/.bashrc
 ```
 
-### Setup `anyenv`
+## Prepare Python environment
 
-Since the ease of installation, we recommend using with [anyenv](https://github.com/pyenv/pyenv).
-`anyenv` is a tool to manage multiple version management tools, include `pyenv`.
-The tool is provided in Homebrew.
-If you prefer to use Homebrew, please skip the following steps.
+### Setup anyenv
+
+Since the ease of installation, we recommend using with [anyenv](https://github.com/anyenv/anyenv). 
+`anyenv` is a tool to manage multiple version management tools, include `pyenv`. 
+The tool is provided in Homebrew (`brew install anyenv`). 
+If you prefer to use Homebrew, please skip the following steps. 
 
 1. Clone `anyenv` from GitHub
 
@@ -194,7 +241,7 @@ fi
 3. Install manifests
 
 ```bash
-anyenv install --init git@github.com:anyenv/anyenv-install.git
+anyenv install --init https://github.com/anyenv/anyenv-install.git
 ```
 
 Test the installation:
@@ -203,17 +250,33 @@ Test the installation:
 anyenv install -l
 ```
 
-### Setup Python 3.10.X
+---
 
-0. Install build dependencies
+### Setup Python 3.10.X with Pyenv
 
-Please follow the [Suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+0. Install Python build dependencies
+
+See also [Suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+
+On MacOS native (with Homebrew):
+
+```bash
+brew install openssl@1.1 readline
+```
+
+On Ubuntu:
+
+```bash
+sudo apt update && sudo apt install -y libbz2-dev libssl-dev  libreadline-dev libsqlite3-dev llvm tk-dev libxmlsec1-dev
+```
 
 1. Install `pyenv`
 
 ```bash
 anyenv install pyenv
 ```
+> **Note**  
+> Restart terminal is recommended after installing `pyenv`
 
 2. Search for the available versions
 
@@ -224,10 +287,20 @@ pyenv install -l | grep 3.10
 3. Install Python
 
 ```bash
-pyenv install <Your Selected Version>
+pyenv install <Your Selected Version> && pyenv rehash
 ```
 
+---
+
 ### Setup Poetry
+
+0. Install build dependencies
+
+On Ubuntu:
+
+```bash
+sudo apt update && sudo apt install -y python3-dev python3-pip python3-venv
+```
 
 1. Checkout to Python 3.10.x
 
@@ -254,21 +327,11 @@ You would get `Poetry version X.X.X`
 
 Please follow the following guide.
 
-NOTE: You can check your shell by `echo $SHELL`
+NOTE: You can check your shell by `echo $SHELL` or `echo $0` (current shell)
  
 Guide: https://python-poetry.org/docs/master#enable-tab-completion-for-bash-fish-or-zsh
 
-
-
-## Getting Start With RACOON-AI
-
-### Clone RACOON-AI
-
-Clone to your local workspace.
-
-```bash
-gh repo clone Rione-SSL/RACOON-AI ~/ws/racoon-ai && cd $_
-```
+---
 
 ### Install dependencies
 
@@ -290,8 +353,19 @@ NOTE: If you need extra dependencies, please specify with `-E` option.
 
 Ex) `poetry install -E pygame`
 
+---
 
-### Enable pre-commit hooks
+### Setup Git commit template
+
+
+```bash
+cd $(git rev-parse --show-toplevel) && git config commit.template .gitmessage.txt
+```
+
+## Enable pre-commit hooks
+
+> **Note**  
+> After `poetry install`, you need to checkout to the .venv with `pyenv shell --unset && poetry shell`.
 
 ```bash
 pre-commit install
@@ -309,8 +383,7 @@ Used hooks:
 - black - Python code formatter
 (See also: [Supported hooks - pre-commit](https://pre-commit.com/hooks.html))
 
-
-### Build RACOON-AI
+## Build RACOON-AI
 
 Compile proto files, build python package to `dist` directory and execute.
 

@@ -6,8 +6,10 @@
         - Robot
 """
 
-from racoon_ai.models.coordinate import Point, Pose, Vector3f
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionRobot
+from typing import Optional
+
+from racoon_ai.models.coordinate import Pose
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 
 
 class Robot(Pose):
@@ -18,6 +20,8 @@ class Robot(Pose):
         robot_id (int): robot id
 
     Attributes:
+        robot_id (int): robot id
+
         x (float): x coordinate
 
         y (float): y coordinate
@@ -26,58 +30,74 @@ class Robot(Pose):
 
         z (float): z coordinate
 
-        confidence (float): confidence
+        distance_ball_robot (float): distance between ball and robot center
 
-        robot_id (int): robot id
+        radian_ball_robot (float): radian between ball and robot center
 
-        pixel_point (Point): pixel point
+        speed (float) : speed (absolute value)
 
-        height (float): height
+        speed_slope (float) : slope of speed
 
-        velocity (Vector3f): velocity in the global coordinate system
+        speed_intercept (float) : intercept of speed
 
-        timestamp (float): timestamp
+        vel_angular (float) : angular velocity (radian/s)
+
+        is_ball_catched (bool) : is ball catched
+
+        is_online (bool) : is robot online
+
+        battery_voltage (float, optional) : battery voltage
     """
 
     def __init__(self, robot_id: int) -> None:
-        super().__init__(0, 0)
-        self.__confidence: float = 0
+        super().__init__(0, 0)  # x, y, theta, z
         self.__robot_id: int = robot_id
-        self.__pixel: Point = Point(0, 0)
-        self.__height: float = 0
-        self.__velocity: Vector3f = Vector3f(0, 0, 0)
-        self.__timestamp: float = 0
+        self.__distance_ball_robot: float = float(0)
+        self.__radian_ball_robot: float = float(0)
+        self.__speed: float = float(0)
+        self.__speed_slope: float = float(0)
+        self.__speed_intercept: float = float(0)
+        self.__vel_angular: float = float(0)
+        self.__is_ball_catched: bool = False
+        self.__is_online: bool = False
+        self.__battery_voltage: Optional[float] = None
 
     def __str__(self) -> str:
+        if self.__battery_voltage is None:
+            return (
+                "("
+                f"id={self.robot_id:2d}, "
+                f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
+                f"rad_ball_robot={self.radian_ball_robot:.1f}, "
+                f"dist_ball_robot={self.distance_ball_robot:.1f}, "
+                f"speed={self.speed:.1f}, "
+                f"speed_slope={self.speed_slope:.1f}, "
+                f"speed_intercept={self.speed_intercept:.1f}, "
+                f"vel_angular={self.vel_angular:.1f}, "
+                f"ball_catched={self.is_ball_catched:b}, "
+                f"is_online={self.is_online:b}, "
+                f"battery_vol={None}"
+                ")"
+            )
+
         return (
-            "Robot("
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
-            f"theta={self.theta:.1f}, "
-            f"z={self.z:.1f}, "
-            f"confidence={self.confidence:3.0%}, "
-            f"robot_id={self.robot_id:2d}, "
-            f"pixel={self.pixel}, "
-            f"height={self.height:.1f}, "
-            f"velocity={self.velocity}, "
+            "("
+            f"id={self.robot_id:2d}, "
+            f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
+            f"radian_ball={self.radian_ball_robot:.1f}, "
+            f"distance_ball={self.distance_ball_robot:.1f}, "
+            f"speed={self.speed:.1f}, "
+            f"speed_slope={self.speed_slope:.1f}, "
+            f"speed_intercept={self.speed_intercept:.1f}, "
+            f"vel_angular={self.vel_angular:.1f}, "
+            f"ball_catched={self.is_ball_catched:b}, "
+            f"is_online={self.is_online:b}, "
+            f"battery_voltage={self.battery_voltage:3.1%}"
             ")"
         )
 
     def __repr__(self) -> str:
-        return (
-            "Robot("
-            f"x={self.x}, "
-            f"y={self.y}, "
-            f"theta={self.theta}, "
-            f"z={self.z}, "
-            f"confidence={self.confidence}, "
-            f"robot_id={self.robot_id}, "
-            f"pixel={self.pixel}, "
-            f"height={self.height}, "
-            f"velocity={self.velocity}, "
-            f"timestamp={self.timestamp}"
-            ")"
-        )
+        raise NotImplementedError
 
     def __eq__(self, obj: object) -> bool:
         if not isinstance(obj, Robot):
@@ -85,80 +105,107 @@ class Robot(Pose):
         return self.robot_id == obj.robot_id
 
     @property
-    def confidence(self) -> float:
-        """confidence"""
-        return self.__confidence
+    def distance_ball_robot(self) -> float:
+        """distance_ball_robot"""
+        return self.__distance_ball_robot
+
+    @property
+    def radian_ball_robot(self) -> float:
+        """radian_ball_robot"""
+        return self.__radian_ball_robot
 
     @property
     def robot_id(self) -> int:
         """robot id"""
         return self.__robot_id
 
+    # pylint: disable=R0801
     @property
-    def pixel(self) -> Point:
-        """pixel"""
-        return self.__pixel
+    def speed(self) -> float:
+        """speed
 
-    @property
-    def height(self) -> float:
-        """height"""
-        return self.__height
-
-    @property
-    def velocity(self) -> Vector3f:
-        """velocity"""
-        return self.__velocity
-
-    @property
-    def timestamp(self) -> float:
-        """timestamp"""
-        return self.__timestamp
-
-    @classmethod
-    def calc_velocity(cls, prev: "Robot", curr: "Robot", span: float) -> Vector3f:
+        speed of robot (absolute value)
         """
-        calc_velocity
+        return self.__speed
 
-        Args:
-            prev (Robot): previous robot
-            curr (Robot): current robot
-            span (float): time interval between previouse and current robot state
+    # pylint: disable=R0801
+    @property
+    def speed_slope(self) -> float:
+        """speed_slope
 
-        Returns:
-            Vector3f: velocity in (x, y, theta) format
+        slope of robot speed
         """
-        if span < 1e-5:
-            return Vector3f(0, 0, 0)
+        return self.__speed_slope
 
-        # Calculate velocity
-        delta_x = curr.x - prev.x
-        delta_y = curr.y - prev.y
-        delta_theta = curr.theta - prev.theta
-        return Vector3f(delta_x / span, delta_y / span, delta_theta / span)
+    # pylint: disable=R0801
+    @property
+    def speed_intercept(self) -> float:
+        """speed_intercept
 
-    def update(self, drobot: SSL_DetectionRobot, timestamp: float) -> None:
+        intercept of robot speed relative t Y-axis
+        """
+        return self.__speed_intercept
+
+    # pylint: disable=R0801
+    @property
+    def vel_angular(self) -> float:
+        """vel_angular"""
+        return self.__vel_angular
+
+    @property
+    def is_ball_catched(self) -> bool:
+        """is_ball_catched"""
+        return self.__is_ball_catched
+
+    @property
+    def is_online(self) -> bool:
+        """is_online"""
+        return self.__is_online
+
+    @property
+    def battery_voltage(self) -> Optional[float]:
+        """battery_voltage"""
+        return self.__battery_voltage
+
+    def update(self, drobot: Robot_Infos) -> None:
         """
         Update robot
 
         Args:
-            drobot (SSL_DetectionRobot): SSL_DetectionRobot
+            drobot (Robot_Infos): Robot_Infos
         """
-        span: float = timestamp - self.timestamp
-        prev_robot: Robot = self
         self.__from_proto(drobot)
-        self.__timestamp = timestamp
-        self.__velocity = self.calc_velocity(self, prev_robot, span)
 
-    def __from_proto(self, dbot: SSL_DetectionRobot) -> None:
+    def __from_proto(self, dbot: Robot_Infos) -> None:
         """from_proto
 
         Args:
-            drobot (SSL_DetectionRobot): SSL_DetectionRobot
-            recv_time (int): receive time
+            drobot (Robot_Infos): Robot_Infos
         """
         self.x = dbot.x
         self.y = dbot.y
-        self.theta = dbot.orientation
-        self.__confidence = dbot.confidence
-        self.__pixel = Point(dbot.pixel_x, dbot.pixel_y)
-        self.__height = dbot.height
+        self.theta = dbot.theta
+        self.__distance_ball_robot = dbot.distance_ball_robot
+        self.__radian_ball_robot = dbot.radian_ball_robot
+        self.__speed = dbot.speed
+        self.__speed_slope = dbot.slope
+        self.__speed_intercept = dbot.intercept
+        self.__vel_angular = dbot.angular_velocity
+        self.__is_ball_catched = dbot.ball_catch
+        self.__is_online = dbot.online
+        self.__battery_voltage = dbot.battery_voltage
+
+    def to_pose(self) -> Pose:
+        """to_pose
+
+        convert this object to pose
+
+        Returns:
+            Pose: pose of robot
+        """
+        return Pose(self.x, self.y, self.theta)
+
+
+if __name__ == "__main__":
+    bot1: Robot = Robot(1)
+    print(f"bot1: {bot1}")

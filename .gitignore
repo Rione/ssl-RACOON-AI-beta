@@ -206,3 +206,8 @@ modules.xml
 
 # Lock file
 *.asta.lock
+
+
+### Bin dir ###
+bin/*
+!bin/verchew
