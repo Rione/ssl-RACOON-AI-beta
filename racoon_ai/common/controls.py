@@ -61,7 +61,7 @@ class Controls:
         diff_speed: NDArray[float64] = subtract(target_speed, bot_speed)
 
         self.__accumulations += multiply(diff_pose, self.__dtaime)
-        self.__logger.info("accumulation: %s", self.__accumulations)
+        self.__logger.debug("accumulation: %s", self.__accumulations)
 
         bbvel: NDArray[float64] = array([diff_pose, diff_speed, self.__accumulations])
         bvel: NDArray[float64] = dot(self.__k_gain, bbvel)
