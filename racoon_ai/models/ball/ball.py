@@ -5,10 +5,7 @@
         - Ball
 """
 
-
-from dataclasses import field
-
-from racoon_ai.models.coordinate import Point, Pose
+from racoon_ai.models.coordinate import Point
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Ball_Info
 
 
@@ -20,55 +17,45 @@ class Ball(Point):
 
         y (float): y coordinate
 
+        z (float): z coordinate
+
         filtered_x (float) : Kalman Filtered X
 
         filtered_y (float) : Kalman Filtered Y
 
-        slope_radian (float) : slope radian
+        speed (float) : ball speed (absolute value)
 
-        intercept (float) : ball intercept
+        speed_slope (float) : ball slope
 
-        speed (float) : ball speed
+        speed_slope_radian (float) : speed slope angle in radian
 
-        slope (float) : ball slope
+        speed_intercept (float) : ball intercept
     """
 
     def __init__(self) -> None:
-        super().__init__(0, 0)
-        self.__filtered_x: float = field(default=0, init=False)
-        self.__filtered_y: float = field(default=0, init=False)
-        self.__ball_speed: float = field(default=0, init=False)
-        self.__ball_slope: float = field(default=0, init=False)
-        self.__intercept: float = field(default=0, init=False)
-        self.__slope_radian: float = field(default=0, init=False)
+        super().__init__(0, 0)  # x, y, z
+        self.__filtered_x: float = float(0)
+        self.__filtered_y: float = float(0)
+        self.__speed: float = float(0)
+        self.__speed_slope: float = float(0)
+        self.__speed_slope_radian: float = float(0)
+        self.__speed_intercept: float = float(0)
 
     def __str__(self) -> str:
         return (
-            "Ball("
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
+            "("
+            f"pt=Point(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f}), "
             f"filtered_x={self.filtered_x:.1f}, "
             f"filtered_y={self.filtered_y:.1f}, "
             f"speed={self.speed:.1f}, "
-            f"slope={self.slope:.1f}, "
-            f"intercept={self.intercept:.1f}, "
-            f"slope_degree={self.slope_radian:.1f}, "
+            f"speed_slope={self.speed_slope:.1f}, "
+            f"speed_slope_radian={self.speed_slope_radian:.1f}, "
+            f"speed_intercept={self.speed_intercept:.1f}, "
             ")"
         )
 
     def __repr__(self) -> str:
-        return (
-            "Ball("
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
-            f"filtered_x={self.filtered_x:.1f}, "
-            f"filtered_y={self.filtered_y:.1f}, "
-            f"speed={self.speed:.1f}, "
-            f"slope={self.slope:.1f}, "
-            f"intercept={self.intercept:.1f}, "
-            f"slope_degree={self.slope_radian:.1f}, "
-            ")"
-        )
+        raise NotImplementedError
 
     @property
     def filtered_x(self) -> float:
@@ -80,31 +67,35 @@ class Ball(Point):
         """filtered_y"""
         return self.__filtered_y
 
-    @property
-    def slope_radian(self) -> float:
-        """slope_radian"""
-        return self.__slope_radian
-
-    @property
-    def intercept(self) -> float:
-        """intercept"""
-        return self.__intercept
-
+    # pylint: disable=R0801
     @property
     def speed(self) -> float:
         """speed
 
         speed of ball
         """
-        return self.__ball_speed
+        return self.__speed
 
+    # pylint: disable=R0801
     @property
-    def slope(self) -> float:
+    def speed_slope(self) -> float:
         """slope
 
-        slope of ball
+        slope of ball speed
         """
-        return self.__ball_slope
+        return self.__speed_slope
+
+    # pylint: disable=R0801
+    @property
+    def speed_slope_radian(self) -> float:
+        """speed_slope_radian"""
+        return self.__speed_slope_radian
+
+    # pylint: disable=R0801
+    @property
+    def speed_intercept(self) -> float:
+        """speed_intercept"""
+        return self.__speed_intercept
 
     def update(self, dball: Ball_Info) -> None:
         """update
@@ -128,12 +119,12 @@ class Ball(Point):
         self.y = dball.y
         self.__filtered_x = dball.filtered_x
         self.__filtered_y = dball.filtered_y
-        self.__slope_radian = dball.slope_radian
-        self.__intercept = dball.intercept
-        self.__ball_speed = dball.speed
-        self.__ball_slope = dball.slope
+        self.__speed = dball.speed
+        self.__speed_slope = dball.slope
+        self.__speed_slope_radian = dball.slope_radian
+        self.__speed_intercept = dball.intercept
 
-    def to_pose(self) -> Pose:
+    def to_point(self) -> Point:
         """to_pose
 
         convert this object to pose
@@ -141,4 +132,4 @@ class Ball(Point):
         Returns:
             Pose: pose
         """
-        return Pose(self.x, self.y, theta=0, z=self.z)
+        return Point(self.x, self.y, z=self.z)

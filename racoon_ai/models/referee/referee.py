@@ -6,8 +6,6 @@
         - Referee
 """
 
-from dataclasses import field
-
 from racoon_ai.models.coordinate import Point
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Referee_Info
 
@@ -23,41 +21,28 @@ class Referee:
         red_cards (int) = int of red cards
         pre_command (int, optional) = int of 1 time before command
         next_command (int, optional) = int of 1 time after command
-        ball_placement (Point, optional) = Point of ball placement
+        placement_designated_point (Point, optional) = designated Point of ball placement
     """
 
     def __init__(self) -> None:
-        self.__command: int = field(default=0, init=False)
-        self.__stage: int = field(default=0, init=False)
-        self.__yellow_cards: int = field(default=0, init=False)
-        self.__red_cards: int = field(default=0, init=False)
-        self.__pre_command: int = field(default=-1, init=False)
-        self.__next_command: int = field(default=-1, init=False)
-        self.__ball_placement: Point = field(default=Point(0, 0), init=False)
+        self.__command: int = int(0)
+        self.__stage: int = int(0)
+        self.__yellow_cards: int = int(0)
+        self.__red_cards: int = int(0)
+        self.__pre_command: int = int(0)
+        self.__next_command: int = int(0)
+        self.__placement_designated_point: Point = Point(0, 0)
 
     def __str__(self) -> str:
         return (
             "Referee("
             f"command={self.cmd_to_str(self.command)}({self.command}),"
             f"stage={self.stage_to_str(self.stage)}({self.stage}),"
-            f"yellow_cards={self.yellow_cards:1d},"
-            f"red_cards={self.red_cards:1d},"
+            f"yellow_cards={self.yellow_cards:2d},"
+            f"red_cards={self.red_cards:2d},"
             f"pre_command={self.cmd_to_str(self.pre_command)}({self.pre_command}),"
             f"next_command={self.cmd_to_str(self.next_command)}({self.next_command}),"
-            f"ball_placement={self.ball_placement}"
-            ")"
-        )
-
-    def __repr__(self) -> str:
-        return (
-            "Referee("
-            f"command={self.cmd_to_str(self.command)}({self.command}),"
-            f"stage={self.stage_to_str(self.stage)}({self.stage}),"
-            f"yellow_cards={self.yellow_cards:1d},"
-            f"red_cards={self.red_cards:1d},"
-            f"pre_command={self.cmd_to_str(self.pre_command)}({self.pre_command}),"
-            f"next_command={self.cmd_to_str(self.next_command)}({self.next_command}),"
-            f"ball_placement={self.ball_placement}"
+            f"placement_designated_point={self.placement_designated_point}"
             ")"
         )
 
@@ -92,9 +77,9 @@ class Referee:
         return self.__next_command
 
     @property
-    def ball_placement(self) -> Point:
+    def placement_designated_point(self) -> Point:
         """ball_placement"""
-        return self.__ball_placement
+        return self.__placement_designated_point
 
     def update(self, referee: Referee_Info) -> None:
         """
@@ -117,7 +102,7 @@ class Referee:
         self.__red_cards = referee.red_cards
         self.__pre_command = referee.pre_command
         self.__next_command = referee.next_command
-        self.__ball_placement = Point(referee.ball_placement_x, referee.ball_placement_y)
+        self.__placement_designated_point = Point(referee.ball_placement_x, referee.ball_placement_y)
 
     @staticmethod
     def cmd_to_str(cmd: int) -> str:

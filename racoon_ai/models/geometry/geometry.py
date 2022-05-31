@@ -6,8 +6,6 @@
         - Geometry
 """
 
-from dataclasses import field
-
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Geometry_Info
 
 
@@ -41,31 +39,28 @@ class Geometry:
         ball_radius (float): radius of ball
 
         max_robot_radius (float): max robot radius
-
-        goal_x (int): goal pose x
-        goal_y (int): goal pose y
     """
 
     def __init__(self) -> None:
-        self.__field_length: int = field(default=0, init=False)
-        self.__field_width: int = field(default=0, init=False)
-        self.__goal_width: int = field(default=0, init=False)
-        self.__goal_depth: int = field(default=0, init=False)
-        self.__boundary_width: int = field(default=0, init=False)
-        self.__penalty_area_depth: int = field(default=0, init=False)
-        self.__penalty_area_width: int = field(default=0, init=False)
-        self.__center_circle_radius: int = field(default=0, init=False)
-        self.__line_thickness: int = field(default=0, init=False)
-        self.__goal_center_to_penalty_mark: int = field(default=0, init=False)
-        self.__goal_height: int = field(default=0, init=False)
-        self.__ball_radius: float = field(default=0, init=False)
-        self.__max_robot_radius: float = field(default=0, init=False)
-        self.__goal_x: float = field(default=0, init=False)
-        self.__goal_y: float = field(default=0, init=False)
+        self.__field_length: int = int(0)
+        self.__field_width: int = int(0)
+        self.__goal_width: int = int(0)
+        self.__goal_depth: int = int(0)
+        self.__boundary_width: int = int(0)
+        self.__penalty_area_depth: int = int(0)
+        self.__penalty_area_width: int = int(0)
+        self.__center_circle_radius: int = int(0)
+        self.__line_thickness: int = int(0)
+        self.__goal_center_to_penalty_mark: int = int(0)
+        self.__goal_height: int = int(0)
+        self.__ball_radius: float = float(0)
+        self.__max_robot_radius: float = float(0)
+        self.__goal_x: float = float(0)
+        self.__goal_y: float = float(0)
 
     def __str__(self) -> str:
         return (
-            "Geometry("
+            "("
             f"field_length={self.field_length:1d},"
             f"field_width={self.field_width:1d},"
             f"goal_width={self.goal_width:1d},"
@@ -79,29 +74,29 @@ class Geometry:
             f"goal_height={self.goal_height:1d},"
             f"ball_radius={self.ball_radius:.1f},"
             f"max_robot_radius={self.max_robot_radius:.1f},"
-            f"goal_x={self.goal_x},"
-            f"goal_y={self.goal_y},"
+            f"goal_x={self.goal_x:.1f},"
+            f"goal_y={self.goal_y:.1f}"
             ")"
         )
 
     def __repr__(self) -> str:
         return (
             "Geometry("
-            f"field_length={self.field_length:1d},"
-            f"field_width={self.field_width:1d},"
-            f"goal_width={self.goal_width:1d},"
-            f"goal_depth={self.goal_depth:1d},"
-            f"boundary_width={self.boundary_width:1d},"
-            f"penalty_area_width={self.penalty_area_width:1d},"
-            f"penalty_area_depth={self.penalty_area_depth:1d},"
-            f"center_circle_radius={self.center_circle_radius:1d},"
-            f"line_thickness={self.line_thickness:1d},"
-            f"goal_center_to_penalty_mark={self.goal_center_to_penalty_mark:1d},"
-            f"goal_height={self.goal_height:1d},"
-            f"ball_radius={self.ball_radius:.1f},"
-            f"max_robot_radius={self.max_robot_radius:.1f},"
-            f"goal_x={self.goal_x},"
-            f"goal_y={self.goal_y},"
+            f"field_length={self.field_length:d},"
+            f"field_width={self.field_width:d},"
+            f"goal_width={self.goal_width:d},"
+            f"goal_depth={self.goal_depth:d},"
+            f"boundary_width={self.boundary_width:d},"
+            f"penalty_area_width={self.penalty_area_width:d},"
+            f"penalty_area_depth={self.penalty_area_depth:d},"
+            f"center_circle_radius={self.center_circle_radius:d},"
+            f"line_thickness={self.line_thickness:d},"
+            f"goal_center_to_penalty_mark={self.goal_center_to_penalty_mark:d},"
+            f"goal_height={self.goal_height:d},"
+            f"ball_radius={self.ball_radius:f},"
+            f"max_robot_radius={self.max_robot_radius:f},"
+            f"goal_x={self.goal_x:f},"
+            f"goal_y={self.goal_y:f},"
             ")"
         )
 
