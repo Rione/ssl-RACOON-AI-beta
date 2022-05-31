@@ -6,7 +6,7 @@
         - Robot
 """
 
-from dataclasses import field
+from typing import Optional
 
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
@@ -28,19 +28,21 @@ class Robot(Pose):
 
         theta (float): orientation (radian) in the x-y plane
 
-        distance_ball_robot (float): distance between ball and robot
+        z (float): z coordinate
 
-        radian_ball_robot (float): radian between ball and robot
+        distance_ball_robot (float): distance between ball and robot center
 
-        speed (float) : speed
+        radian_ball_robot (float): radian between ball and robot center
 
-        slope (float) : slope of velocity
+        speed (float) : speed (absolute value)
 
-        intercept (float) : intercept of velocity
+        speed_slope (float) : slope of speed
 
-        angular_velocity (float) : angular velocity
+        speed_intercept (float) : intercept of speed
 
-        is_ball_catch (bool) : is ball catched
+        vel_angular (float) : angular velocity (radian/s)
+
+        is_ball_catched (bool) : is ball catched
 
         is_online (bool) : is robot online
 
@@ -48,46 +50,54 @@ class Robot(Pose):
     """
 
     def __init__(self, robot_id: int) -> None:
-        super().__init__(0, 0)
+        super().__init__(0, 0)  # x, y, theta, z
         self.__robot_id: int = robot_id
-        self.__distance_ball_robot: float = field(default=0, init=False)
-        self.__radian_ball_robot: float = field(default=0, init=False)
-        self.__robot_speed: float = field(default=0, init=False)
-        self.__robot_slope: float = field(default=0, init=False)
-        self.__intercept: float = field(default=0, init=False)
-        self.__angular_velocity: float = field(default=0, init=False)
-        self.__is_ball_catch: bool = field(default=False, init=False)
-        self.__is_online: bool = field(default=False, init=False)
-        self.__battery_voltage: float = field(default=0, init=False)
+        self.__distance_ball_robot: float = float(0)
+        self.__radian_ball_robot: float = float(0)
+        self.__speed: float = float(0)
+        self.__speed_slope: float = float(0)
+        self.__speed_intercept: float = float(0)
+        self.__vel_angular: float = float(0)
+        self.__is_ball_catched: bool = False
+        self.__is_online: bool = False
+        self.__battery_voltage: Optional[float] = None
 
     def __str__(self) -> str:
+        if self.__battery_voltage is None:
+            return (
+                "("
+                f"id={self.robot_id:2d}, "
+                f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
+                f"rad_ball_robot={self.radian_ball_robot:.1f}, "
+                f"dist_ball_robot={self.distance_ball_robot:.1f}, "
+                f"speed={self.speed:.1f}, "
+                f"speed_slope={self.speed_slope:.1f}, "
+                f"speed_intercept={self.speed_intercept:.1f}, "
+                f"vel_angular={self.vel_angular:.1f}, "
+                f"ball_catched={self.is_ball_catched:b}, "
+                f"is_online={self.is_online:b}, "
+                f"battery_vol={None}"
+                ")"
+            )
+
         return (
-            "Robot("
-            f"robot_id={self.robot_id:2d}, "
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
-            f"theta={self.theta:.1f}, "
-            f"radian_ball_robot={self.radian_ball_robot:.1f}"
-            f"distance_ball_robot={self.distance_ball_robot:.1f}, "
+            "("
+            f"id={self.robot_id:2d}, "
+            f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
+            f"radian_ball={self.radian_ball_robot:.1f}, "
+            f"distance_ball={self.distance_ball_robot:.1f}, "
             f"speed={self.speed:.1f}, "
-            f"slope={self.slope:.1f}, "
-            f"intercept={self.intercept:.1f}, "
-            f"angular_velocity={self.angular_velocity:.1f}, "
-            f"ball_catch={self.is_ball_catch:1d}, "
-            f"is_online={self.is_online:1d}, "
-            f"battery_voltage={self.battery_voltage:.1f}, "
+            f"speed_slope={self.speed_slope:.1f}, "
+            f"speed_intercept={self.speed_intercept:.1f}, "
+            f"vel_angular={self.vel_angular:.1f}, "
+            f"ball_catched={self.is_ball_catched:b}, "
+            f"is_online={self.is_online:b}, "
+            f"battery_voltage={self.battery_voltage:3.1%}"
             ")"
         )
 
     def __repr__(self) -> str:
-        return (
-            "Robot("
-            f"robot_id={self.robot_id:2d}, "
-            f"x={self.x:.1f}, "
-            f"y={self.y:.1f}, "
-            f"theta={self.theta:.1f}"
-            ")"
-        )
+        raise NotImplementedError
 
     def __eq__(self, obj: object) -> bool:
         if not isinstance(obj, Robot):
@@ -109,36 +119,43 @@ class Robot(Pose):
         """robot id"""
         return self.__robot_id
 
+    # pylint: disable=R0801
     @property
     def speed(self) -> float:
         """speed
 
-        speed of robot
+        speed of robot (absolute value)
         """
-        return self.__robot_speed
+        return self.__speed
 
+    # pylint: disable=R0801
     @property
-    def slope(self) -> float:
-        """slope
+    def speed_slope(self) -> float:
+        """speed_slope
 
-        slope of robot
+        slope of robot speed
         """
-        return self.__robot_slope
+        return self.__speed_slope
+
+    # pylint: disable=R0801
+    @property
+    def speed_intercept(self) -> float:
+        """speed_intercept
+
+        intercept of robot speed relative t Y-axis
+        """
+        return self.__speed_intercept
+
+    # pylint: disable=R0801
+    @property
+    def vel_angular(self) -> float:
+        """vel_angular"""
+        return self.__vel_angular
 
     @property
-    def intercept(self) -> float:
-        """intercept"""
-        return self.__intercept
-
-    @property
-    def angular_velocity(self) -> float:
-        """angular_velocity"""
-        return self.__angular_velocity
-
-    @property
-    def is_ball_catch(self) -> bool:
-        """is_ball_catch"""
-        return self.__is_ball_catch
+    def is_ball_catched(self) -> bool:
+        """is_ball_catched"""
+        return self.__is_ball_catched
 
     @property
     def is_online(self) -> bool:
@@ -146,7 +163,7 @@ class Robot(Pose):
         return self.__is_online
 
     @property
-    def battery_voltage(self) -> float:
+    def battery_voltage(self) -> Optional[float]:
         """battery_voltage"""
         return self.__battery_voltage
 
@@ -170,11 +187,11 @@ class Robot(Pose):
         self.theta = dbot.theta
         self.__distance_ball_robot = dbot.distance_ball_robot
         self.__radian_ball_robot = dbot.radian_ball_robot
-        self.__robot_speed = dbot.speed
-        self.__robot_slope = dbot.slope
-        self.__intercept = dbot.intercept
-        self.__angular_velocity = dbot.angular_velocity
-        self.__is_ball_catch = dbot.ball_catch
+        self.__speed = dbot.speed
+        self.__speed_slope = dbot.slope
+        self.__speed_intercept = dbot.intercept
+        self.__vel_angular = dbot.angular_velocity
+        self.__is_ball_catched = dbot.ball_catch
         self.__is_online = dbot.online
         self.__battery_voltage = dbot.battery_voltage
 
@@ -187,3 +204,8 @@ class Robot(Pose):
             Pose: pose of robot
         """
         return Pose(self.x, self.y, self.theta)
+
+
+if __name__ == "__main__":
+    bot1: Robot = Robot(1)
+    print(f"bot1: {bot1}")
