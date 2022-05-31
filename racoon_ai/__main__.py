@@ -5,7 +5,9 @@
 """
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
+
 from .common.controls import Controls
+from . import __version__
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
@@ -33,6 +35,8 @@ def main() -> None:
     logger.addHandler(hdlr)
     logger.debug("Logger initialized")
 
+    logger.info("Racoon AI v%s", __version__)
+
     # List of online robot ids
     online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
@@ -44,10 +48,10 @@ def main() -> None:
 
     try:
 
-        observer = MWReceiver(host="127.0.0.1", port=30011)
-        # role = Role(observer)
-
+        observer = MWReceiver(host="localhost")
+  
         controls = Controls(observer)
+
 
         # offense = Offense(observer)
 
