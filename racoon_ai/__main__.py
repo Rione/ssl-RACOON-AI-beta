@@ -11,11 +11,9 @@ from typing import Any
 
 from PyQt5.QtWidgets import QApplication
 
-from racoon_ai.gui.main import Gui
-from racoon_ai.models.referee.referee import Referee  # type: ignore
-
 from . import __version__
 from .common.controls import Controls
+from .gui.main import Gui  # type: ignore
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender

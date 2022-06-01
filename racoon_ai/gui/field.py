@@ -6,11 +6,9 @@
 
     This module is for the Feild class.
 """
-import math
-
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QColor, QPainter, QPixmap
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt5.QtGui import QColor, QPainter
+from PyQt5.QtWidgets import QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
 
@@ -30,7 +28,7 @@ class Field(QWidget, QPainter):
         self.__ui: QPainter()
         self.__window_width: float = 1.0
         self.__window_height: float = 1.0
-        self.__observer: Observer = observer
+        self.__observer: MWReceiver = observer
 
     def paintEvent(self, event) -> None:
         self.__ui = QPainter(self)

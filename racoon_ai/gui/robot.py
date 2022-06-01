@@ -10,8 +10,8 @@ import math
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QColor, QPainter, QPixmap
-from PyQt5.QtWidgets import QLabel, QTableWidget, QWidget
+from PyQt5.QtGui import QColor, QPainter
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
 

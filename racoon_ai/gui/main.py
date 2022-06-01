@@ -7,23 +7,15 @@
     This module is for the Gui class.
 """
 
-import math
-from dataclasses import field
-from random import randint
-from re import X
-
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtChart import QChart, QChartView, QDateTimeAxis, QLineSeries, QValueAxis
-from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
-from pyqtgraph import PlotWidget, plot
 
 from racoon_ai.gui.field import Field
-from racoon_ai.gui.robot import Robot  # type: ignore
+from racoon_ai.gui.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
 
 
 class Gui(QWidget, QPainter):
