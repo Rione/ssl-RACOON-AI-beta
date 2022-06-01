@@ -37,8 +37,8 @@ class MWReceiver(IPNetAddr):
         self.__ball: Ball = Ball()
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
-        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
+        self.__our_robots: list[Robot] = [Robot(i) for i in range(11)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(11)]
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -71,12 +71,12 @@ class MWReceiver(IPNetAddr):
         bot: Robot
         enemy: Robot
         for dbot in self.__data.our_robots:
-            if dbot.robot_id < 12:
+            if dbot.robot_id < 11:
                 bot = self.__our_robots[dbot.robot_id]
                 bot.update(dbot)
 
         for debot in self.__data.enemy_robots:
-            if debot.robot_id < 12:
+            if debot.robot_id < 11:
                 enemy = self.__enemy_robots[debot.robot_id]
                 enemy.update(debot)
 

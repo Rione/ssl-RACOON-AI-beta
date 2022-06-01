@@ -34,7 +34,7 @@ class Keeper:
         self.__controls = controls
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
-        self.__radius: float = 750
+        self.__radius: float = self.__observer.geometry.goal_width + self.__observer.geometry.max_robot_radius / 2
         self.__target_pose: Pose = Pose(0, 0, 0)
 
     @property
@@ -53,10 +53,8 @@ class Keeper:
         bot: Robot
         cmd: RobotCommand
 
-        # 一番ボールに近いロボットがボールに向かって前進
         bot = self.__observer.our_robots[0]
         cmd = self.__keep_goal(bot)
-        # print(cmd)
         self.__send_cmds.append(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:

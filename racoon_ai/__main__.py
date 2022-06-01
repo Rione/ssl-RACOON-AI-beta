@@ -10,10 +10,10 @@ from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
+from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
-# from .strategy.role import Role
-from .strategy.goal_keeper import Keeper
+from .strategy.role import Role
 
 
 def main() -> None:
@@ -37,7 +37,7 @@ def main() -> None:
     logger.info("Racoon AI v%s", __version__)
 
     # List of online robot ids
-    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     # Flag if run for a real robot
     is_real: bool = False
@@ -50,6 +50,8 @@ def main() -> None:
         observer = MWReceiver(host="localhost")
 
         controls = Controls(observer)
+
+        role = Role(observer)
 
         # offense = Offense(observer)
 
@@ -64,7 +66,7 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            # role.main()
+            role.main()
             # offense.main()
             keeper.main()
 
