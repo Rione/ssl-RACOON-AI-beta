@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
 from racoon_ai.gui.field import Field
 from racoon_ai.gui.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.strategy.role import Role
 
 
 class Gui(QWidget, QPainter):
@@ -26,12 +27,12 @@ class Gui(QWidget, QPainter):
         None
     """
 
-    def __init__(self, observer: MWReceiver, is_gui_view: bool) -> None:
+    def __init__(self, observer: MWReceiver, role: Role, is_gui_view: bool) -> None:
         super(Gui, self).__init__()
         self.__ui: QPainter
         self.__geometry_width: int = 590
         self.__geometry_height: int = 850
-        self.__robot = Robot(observer)
+        self.__robot = Robot(observer, role)
         self.__field = Field(observer)
         self.__observer: MWReceiver = observer
 

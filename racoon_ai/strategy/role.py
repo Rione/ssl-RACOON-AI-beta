@@ -32,6 +32,7 @@ class Role:
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = 0
+        self.__midfielder: int = 0
         self.__offense: list[int] = []
         self.__defense: list[int] = []
         # self.__keeper_quantity: int = 0
@@ -69,6 +70,11 @@ class Role:
     def defense_ids(self) -> list[int]:
         """defense_ids"""
         return self.__defense
+
+    @property
+    def midfielder_id(self) -> int:
+        """midfielder_ids"""
+        return self.__midfielder
 
     def main(self) -> None:
         """main"""

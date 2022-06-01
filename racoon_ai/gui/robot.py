@@ -10,10 +10,11 @@ import math
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QLabel, QTableWidget, QWidget
+from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.strategy.role import Role
 
 
 class Robot(QWidget, QPainter):
@@ -24,10 +25,11 @@ class Robot(QWidget, QPainter):
         None
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, observer: MWReceiver, role: Role) -> None:
         super(Robot, self).__init__()
         self.__ui: QPainter()
         self.__observer: MWReceiver = observer
+        self.__role: Role = role
 
         self._set_texts()
 
@@ -36,17 +38,21 @@ class Robot(QWidget, QPainter):
         self.__window_width: float = 1.0
         self.__window_height: float = 1.0
 
-        self.table: QTableWidget = QTableWidget(self)
-        self.table.setRowCount(3)
-        self.table.setColumnCount(4)
-        self.table.resize(400, 120)
-        self.table.move(565, 35)
+        self.__keeper_num = QLabel(self)
+        self.__keeper_num.setFont(QFont("Arial", 30, QFont.Bold))
 
-        # self.table = QTableWidget(self)
-        # self.table.setGeometry(562, 30, 400, 68)
-        # self.table.setRowCount(2)
-        # self.table.setColumnCount(4)
-        # self.table.move(560, 30)
+        self.__midfielder_num = QLabel(self)
+        self.__midfielder_num.setFont(QFont("Arial", 30, QFont.Bold))
+
+        self.__offense_num = []
+        self.__defense_num = []
+        for i in range(3):
+            self.__offense_num.append(QLabel(self))
+            self.__offense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+            self.__defense_num.append(QLabel(self))
+            self.__defense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+
+        self.__pixmap_role = QPixmap("images/role_table.png")
 
     def paintEvent(self, event) -> None:
         self.__ui = QPainter(self)
@@ -58,6 +64,8 @@ class Robot(QWidget, QPainter):
         self._draw_robots("blue")
         self._draw_robots("yellow")
         self._draw_role()
+
+        self.__ui.drawPixmap(560, 30, 550, 115, self.__pixmap_role)
         self.__ui.end()
 
     def _draw_robots(self, color: str) -> None:
@@ -90,13 +98,26 @@ class Robot(QWidget, QPainter):
     def _draw_role(self) -> None:
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor(Qt.white))
-        self.__ui.drawRect(560, 30, 400, 70)
+        self.__ui.drawRect(560, 30, 551, 115)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(570, 30, 615, 30)
 
-        self.__role_text.move(570, 15)
-        self.__at_text.move(575, 40)
-        # self.__at_text.move(570, 28)
+        self.__role_text.move(570, 18)
+
+        self.__keeper_num.setGeometry(20, 20, 645, 70)
+        self.__keeper_num.move(645, 52)
+        self.__keeper_num.setNum(self.__role.keeper_id)
+        self.__midfielder_num.setGeometry(20, 20, 645, 70)
+        self.__midfielder_num.move(1070, 52)
+        self.__midfielder_num.setNum(self.__role.midfielder_id)
+        for i in range(3):
+            self.__offense_num[i].setGeometry(20, 20, 645, 70)
+            self.__offense_num[i].move(705 + (61 * i), 52)
+            self.__offense_num[i].setNum(self.__role.offense_ids[i])
+
+            self.__defense_num[i].setGeometry(20, 20, 645, 70)
+            self.__defense_num[i].move(888 + (61 * i), 52)
+            self.__defense_num[i].setNum(self.__role.defense_ids[i])
 
     def _drawRect(self, val1: int, val2: int, val3: int, val4: int) -> None:
         self.__ui.drawRect(
@@ -120,9 +141,3 @@ class Robot(QWidget, QPainter):
         self.__role_text = QLabel("Role", self)
         self.__role_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
         self.__role_text.setStyleSheet("QLabel { color : white; }")
-        self.__at_text = QLabel("AT", self)
-        self.__at_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
-        self.__at_text.setStyleSheet("QLabel { color : white; }")
-        # self.__at_text = QLabel("AT", self)
-        # self.__at_text.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Black))
-        # self.__at_text.setStyleSheet("QLabel { color : white; }")

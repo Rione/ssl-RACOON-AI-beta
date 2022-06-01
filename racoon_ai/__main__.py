@@ -17,10 +17,10 @@ from .gui.main import Gui  # type: ignore
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
+from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
-# from .strategy.role import Role
-from .strategy.goal_keeper import Keeper
+from .strategy.role import Role
 
 
 def main() -> None:
@@ -67,7 +67,9 @@ def main() -> None:
 
         sender = CommandSender(is_real, online_ids, host="localhost", port=20000)
 
-        gui = Gui(observer, is_gui_view)
+        role = Role(observer)
+
+        gui = Gui(observer, role, is_gui_view)
 
         logger.info("Roop started")
 
@@ -76,7 +78,7 @@ def main() -> None:
             sim_cmds = SimCommands(is_team_yellow)
             observer.main()
 
-            # role.main()
+            role.main()
             # offense.main()
             keeper.main()
 
