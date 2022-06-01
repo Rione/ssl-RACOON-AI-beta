@@ -12,7 +12,7 @@ from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import QLabel, QWidget
 
-from racoon_ai.observer.observer import Observer
+from racoon_ai.networks.receiver import MWReceiver
 
 
 class Field(QWidget, QPainter):

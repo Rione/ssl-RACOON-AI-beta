@@ -13,7 +13,7 @@ from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import QLabel, QTableWidget, QWidget
 
-from racoon_ai.observer.observer import Observer
+from racoon_ai.networks.receiver import MWReceiver
 
 
 class Robot(QWidget, QPainter):
@@ -24,10 +24,10 @@ class Robot(QWidget, QPainter):
         None
     """
 
-    def __init__(self, observer) -> None:
+    def __init__(self, observer: MWReceiver) -> None:
         super(Robot, self).__init__()
         self.__ui: QPainter()
-        self.__observer: Observer = observer
+        self.__observer: MWReceiver = observer
 
         self._set_texts()
 
@@ -60,7 +60,7 @@ class Robot(QWidget, QPainter):
             robots = self.__observer.our_robots
         else:
             self.__ui.setBrush(QColor("yellow"))
-            robots = self.__observer.their_robots
+            robots = self.__observer.enemy_robots
 
         for robot in robots:
             if robot.x != 0:

@@ -198,7 +198,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-<<<<<<< HEAD
 name = "nptyping"
 version = "1.4.4"
 description = "Type hints for Numpy."
@@ -214,8 +213,6 @@ typish = ">=1.7.0"
 test = ["pycodestyle", "pylint", "pytest", "coverage", "codecov", "scons", "radon", "xenon", "autoflake", "isort"]
 
 [[package]]
-=======
->>>>>>> 1ee641690a511e5679a90215743783d03bd78022
 name = "numpy"
 version = "1.22.3"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -490,11 +487,7 @@ pygame = ["pygame"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-<<<<<<< HEAD
 content-hash = "4f5ed952e485f6a9c78480856aeea7a721d3cbc6104a87a01dcf4920d27865e9"
-=======
-content-hash = "2b3f13bad677a544dd34b84405c1e83b525e049ae0f289b7b796c5c53308899b"
->>>>>>> 1ee641690a511e5679a90215743783d03bd78022
 
 [metadata.files]
 astroid = [
@@ -617,12 +610,9 @@ nodeenv = [
     {file = "nodeenv-1.6.0-py2.py3-none-any.whl", hash = "sha256:621e6b7076565ddcacd2db0294c0381e01fd28945ab36bcf00f41c5daf63bef7"},
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
-<<<<<<< HEAD
 nptyping = [
     {file = "nptyping-1.4.4-py3-none-any.whl", hash = "sha256:8128473b8ba0e65f3d6edc727cd99024e162edcf7e8a0ea8f9dfa6b070934d14"},
 ]
-=======
->>>>>>> 1ee641690a511e5679a90215743783d03bd78022
 numpy = [
     {file = "numpy-1.22.3-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:92bfa69cfbdf7dfc3040978ad09a48091143cffb778ec3b03fa170c494118d75"},
     {file = "numpy-1.22.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:8251ed96f38b47b4295b1ae51631de7ffa8260b5b087808ef09a39a9d66c97ab"},

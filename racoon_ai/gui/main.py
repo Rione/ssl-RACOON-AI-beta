@@ -20,10 +20,9 @@ from PyQt5.QtGui import QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
 from pyqtgraph import PlotWidget, plot
 
-from racoon_ai import observer
 from racoon_ai.gui.field import Field
 from racoon_ai.gui.robot import Robot  # type: ignore
-from racoon_ai.observer.observer import Observer
+from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.proto.pb_gen.ssl_vision_detection_pb2 import SSL_DetectionBall
 
 
@@ -35,14 +34,17 @@ class Gui(QWidget, QPainter):
         None
     """
 
-    def __init__(self, observer: Observer) -> None:
+    def __init__(self, observer: MWReceiver, is_gui_view: bool) -> None:
         super(Gui, self).__init__()
         self.__ui: QPainter
         self.__geometry_width: int = 590
         self.__geometry_height: int = 850
         self.__robot = Robot(observer)
         self.__field = Field(observer)
-        self._initui()
+        self.__observer: MWReceiver = observer
+
+        if is_gui_view is True:
+            self._initui()
 
     def _initui(self) -> None:
         self.resize(self.__geometry_width, self.__geometry_height)
@@ -119,8 +121,8 @@ class Gui(QWidget, QPainter):
         self.graphWidget = pg.PlotWidget(self)
         self.graphWidget.setGeometry(600, 450, 820, 320)
         self.graphWidget.setBackground(QColor("#2E333A"))
-        self.x = list(range(100))
-        self.y = [randint(0, 100) for _ in range(100)]
+        self.x = list(range(120))
+        self.y = [0 for _ in range(120)]
 
         pen = pg.mkPen(color=(255, 0, 0))
         self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen)
@@ -134,6 +136,7 @@ class Gui(QWidget, QPainter):
         self.x.append(self.x[-1] + 1)
 
         self.y = self.y[1:]  # Remove the first
-        self.y.append(randint(0, 100))  # Add a new random value.
+
+        self.y.append(self.__observer.ball.speed)  # Add a new random value.
 
         self.data_line.setData(self.x, self.y)

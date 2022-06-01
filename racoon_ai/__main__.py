@@ -9,11 +9,13 @@ import sys
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 from typing import Any
 
-from PyQt5.QtWidgets import QApplication  # type: ignore
+from PyQt5.QtWidgets import QApplication
 
+from racoon_ai.gui.main import Gui
+from racoon_ai.models.referee.referee import Referee  # type: ignore
 
-from .common.controls import Controls
 from . import __version__
+from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
@@ -52,27 +54,30 @@ def main() -> None:
     # Flag if our team is yellow
     is_team_yellow: bool = False
 
+    # Flag if view gui
+    is_gui_view: bool = False
+
     app: Any = QApplication(sys.argv)
     try:
 
         observer = MWReceiver(host="localhost")
-  
+
         controls = Controls(observer)
-
-
         # offense = Offense(observer)
 
         keeper = Keeper(observer, controls)
 
-        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20000)
+
+        gui = Gui(observer, is_gui_view)
 
         logger.info("Roop started")
 
         while True:
             # Create a list of commands
             sim_cmds = SimCommands(is_team_yellow)
-
             observer.main()
+
             # role.main()
             # offense.main()
             keeper.main()
@@ -81,6 +86,7 @@ def main() -> None:
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
+            gui.active()
             app.processEvents()
 
     except KeyboardInterrupt:
