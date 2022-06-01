@@ -9,7 +9,7 @@ import sys
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 from typing import Any
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication  # type: ignore
 
 from . import __version__
 from .common.controls import Controls
@@ -53,7 +53,7 @@ def main() -> None:
     is_team_yellow: bool = False
 
     # Flag if view gui
-    is_gui_view: bool = False
+    is_gui_view: bool = True
 
     app: Any = QApplication(sys.argv)
     try:

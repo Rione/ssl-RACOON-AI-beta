@@ -11,7 +11,7 @@ import math
 from PyQt5 import QtGui
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QTableWidget, QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
 
@@ -35,6 +35,12 @@ class Robot(QWidget, QPainter):
         self.__geometry_height: int = 850
         self.__window_width: float = 1.0
         self.__window_height: float = 1.0
+
+        self.table: QTableWidget = QTableWidget(self)
+        self.table.setRowCount(3)
+        self.table.setColumnCount(4)
+        self.table.resize(400, 120)
+        self.table.move(565, 35)
 
         # self.table = QTableWidget(self)
         # self.table.setGeometry(562, 30, 400, 68)
@@ -89,7 +95,7 @@ class Robot(QWidget, QPainter):
         self.__ui.drawLine(570, 30, 615, 30)
 
         self.__role_text.move(570, 15)
-
+        self.__at_text.move(575, 40)
         # self.__at_text.move(570, 28)
 
     def _drawRect(self, val1: int, val2: int, val3: int, val4: int) -> None:
@@ -114,6 +120,9 @@ class Robot(QWidget, QPainter):
         self.__role_text = QLabel("Role", self)
         self.__role_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
         self.__role_text.setStyleSheet("QLabel { color : white; }")
+        self.__at_text = QLabel("AT", self)
+        self.__at_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+        self.__at_text.setStyleSheet("QLabel { color : white; }")
         # self.__at_text = QLabel("AT", self)
         # self.__at_text.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Black))
         # self.__at_text.setStyleSheet("QLabel { color : white; }")
