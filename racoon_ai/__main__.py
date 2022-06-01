@@ -5,9 +5,8 @@
 """
 from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
 
-
-from .common.controls import Controls
 from . import __version__
+from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
@@ -49,15 +48,14 @@ def main() -> None:
     try:
 
         observer = MWReceiver(host="localhost")
-  
-        controls = Controls(observer)
 
+        controls = Controls(observer)
 
         # offense = Offense(observer)
 
         keeper = Keeper(observer, controls)
 
-        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
+        sender = CommandSender(is_real, online_ids, host="localhost")
 
         logger.info("Roop started")
 
