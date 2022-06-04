@@ -6,18 +6,14 @@
 
     This module is for the Game class.
 """
-import math
-
 from PyQt5 import QtGui
-from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
-from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox, QVBoxLayout, QWidget
-from qtwidgets import AnimatedToggle, Toggle
+from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox
+from qtwidgets import AnimatedToggle
 
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.gui.main import Main
 
 
-class Game(QWidget, QPainter):
+class Game:
     """Game
     Args:
         None
@@ -25,108 +21,109 @@ class Game(QWidget, QPainter):
         None
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, main: Main) -> None:
         super(Game, self).__init__()
-        self.__ui: QPainter()
-        self.__observer: MWReceiver = observer
+        self.__main = main
 
         self._set_texts()
+        self._set_toggle()
+        self._set_combo()
+        self._set_box()
+        self._set_button()
 
-        combo = QComboBox(self)
+    def _set_texts(self) -> None:
+
+        self.__gc_text = QLabel("Game Control", self.__main)
+        self.__gc_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__gc_text.setStyleSheet("QLabel { color : white; }")
+        self.__gc_text.move(1172, 44)
+
+        self.__local_text = QLabel("Local:", self.__main)
+        self.__local_text.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__local_text.setStyleSheet("QLabel { color : white; }")
+        self.__local_text.move(1167, 80)
+
+        self.__command_text = QLabel("Cmd :", self.__main)
+        self.__command_text.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__command_text.setStyleSheet("QLabel { color : white; }")
+        self.__command_text.move(1169, 122)
+
+        self.__command = QLabel("NORMAL_START", self.__main)
+        self.__command.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__command.setStyleSheet("QLabel { color : white; }")
+        self.__command.move(1232, 124)
+
+        self.__replacement = QLabel("Replace", self.__main)
+        self.__replacement.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__replacement.setStyleSheet("QLabel { color : white; }")
+        self.__replacement.move(1169, 177)
+
+        self.__replacement_x = QLabel("X  :", self.__main)
+        self.__replacement_x.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
+        self.__replacement_x.setStyleSheet("QLabel { color : white; }")
+        self.__replacement_x.move(1217, 202)
+        self.__replacement_y = QLabel("Y  :", self.__main)
+        self.__replacement_y.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
+        self.__replacement_y.setStyleSheet("QLabel { color : white; }")
+        self.__replacement_y.move(1217, 227)
+        self.__mm_x = QLabel("mm", self.__main)
+        self.__mm_x.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__mm_x.setStyleSheet("QLabel { color : white; }")
+        self.__mm_x.move(1337, 202)
+        self.__mm_y = QLabel("mm", self.__main)
+        self.__mm_y.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__mm_y.setStyleSheet("QLabel { color : white; }")
+        self.__mm_y.move(1337, 229)
+
+        self.__score = QLabel("Score", self.__main)
+        self.__score.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__score.setStyleSheet("QLabel { color : white; }")
+        self.__score.move(1169, 295)
+        self.__score_blue = QLabel("Blue :", self.__main)
+        self.__score_blue.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__score_blue.setStyleSheet("QLabel { color : white; }")
+        self.__score_blue.move(1197, 324)
+        self.__score_yellow = QLabel("Yellow :", self.__main)
+        self.__score_yellow.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__score_yellow.setStyleSheet("QLabel { color : white; }")
+        self.__score_yellow.move(1180, 351)
+
+    def _set_toggle(self) -> None:
+        toggle_referee = AnimatedToggle(self.__main, checked_color="#FFB000", pulse_checked_color="#44FFB000")
+        toggle_referee.resize(70, 50)
+        toggle_referee.move(1222, 68)
+
+    def _set_combo(self) -> None:
+        combo = QComboBox(self.__main)
         combo.addItem("NORMAL_START")
         combo.addItem("STOP")
         combo.resize(150, 140)
-        combo.move(1205, 70)
+        combo.move(1227, 92)
 
-        replace_x = QSpinBox(self)
+    def _set_box(self) -> None:
+        replace_x = QSpinBox(self.__main)
         replace_x.resize(70, 30)
         replace_x.setMaximum(6000)
         replace_x.setMinimum(-6000)
-        replace_x.move(1230, 175)
-        replace_y = QSpinBox(self)
+        replace_x.move(1252, 197)
+        replace_y = QSpinBox(self.__main)
         replace_y.resize(70, 30)
         replace_y.setMaximum(60000)
         replace_y.setMinimum(-6000)
-        replace_y.move(1230, 200)
+        replace_y.move(1252, 222)
 
-        score_blue = QSpinBox(self)
+        score_blue = QSpinBox(self.__main)
         score_blue.resize(90, 30)
         score_blue.setMaximum(6000)
         score_blue.setMinimum(-6000)
-        score_blue.move(1230, 300)
-        score_yellow = QSpinBox(self)
+        score_blue.move(1252, 322)
+        score_yellow = QSpinBox(self.__main)
         score_yellow.resize(90, 30)
         score_yellow.setMaximum(60000)
         score_yellow.setMinimum(-6000)
-        score_yellow.move(1230, 328)
+        score_yellow.move(1252, 350)
 
-        button = QPushButton("Send Replacement !", self)
+    def _set_button(self) -> None:
+        button = QPushButton("Send Replacement !", self.__main)
         button.resize(240, 32)
-        button.move(1147, 232)
-
-    def paintEvent(self, event) -> None:
-        self.__ui = QPainter(self)
-
-        self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
-        self.__ui.drawRect(1130, 35, 270, 355)
-        self.__ui.setPen(QColor("#2E333A"))
-        self.__ui.drawLine(1145, 35, 1290, 35)
-
-        self.__ui.end()
-
-    def _set_texts(self) -> None:
-        self.__gc_text = QLabel("Game Control", self)
-        self.__gc_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
-        self.__gc_text.setStyleSheet("QLabel { color : white; }")
-        self.__gc_text.move(1150, 22)
-
-        self.__local_text = QLabel("Local:", self)
-        self.__local_text.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
-        self.__local_text.setStyleSheet("QLabel { color : white; }")
-        self.__local_text.move(1145, 58)
-
-        self.__command_text = QLabel("Cmd :", self)
-        self.__command_text.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
-        self.__command_text.setStyleSheet("QLabel { color : white; }")
-        self.__command_text.move(1147, 100)
-
-        self.__command = QLabel("NORMAL_START", self)
-        self.__command.setFont(QtGui.QFont("Times", 18, QtGui.QFont.Black))
-        self.__command.setStyleSheet("QLabel { color : white; }")
-        self.__command.move(1210, 102)
-
-        self.__replacement = QLabel("Replace", self)
-        self.__replacement.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
-        self.__replacement.setStyleSheet("QLabel { color : white; }")
-        self.__replacement.move(1147, 155)
-
-        self.__replacement_x = QLabel("X  :", self)
-        self.__replacement_x.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
-        self.__replacement_x.setStyleSheet("QLabel { color : white; }")
-        self.__replacement_x.move(1195, 180)
-        self.__replacement_y = QLabel("Y  :", self)
-        self.__replacement_y.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
-        self.__replacement_y.setStyleSheet("QLabel { color : white; }")
-        self.__replacement_y.move(1195, 205)
-        self.__mm_x = QLabel("mm", self)
-        self.__mm_x.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
-        self.__mm_x.setStyleSheet("QLabel { color : white; }")
-        self.__mm_x.move(1315, 180)
-        self.__mm_y = QLabel("mm", self)
-        self.__mm_y.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
-        self.__mm_y.setStyleSheet("QLabel { color : white; }")
-        self.__mm_y.move(1315, 207)
-
-        self.__score = QLabel("Score", self)
-        self.__score.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
-        self.__score.setStyleSheet("QLabel { color : white; }")
-        self.__score.move(1147, 273)
-        self.__score_blue = QLabel("Blue :", self)
-        self.__score_blue.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
-        self.__score_blue.setStyleSheet("QLabel { color : white; }")
-        self.__score_blue.move(1175, 302)
-        self.__score_yellow = QLabel("Yellow :", self)
-        self.__score_yellow.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
-        self.__score_yellow.setStyleSheet("QLabel { color : white; }")
-        self.__score_yellow.move(1158, 329)
+        button.move(1169, 254)

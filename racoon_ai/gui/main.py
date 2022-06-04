@@ -4,79 +4,70 @@
 # type: ignore
 """main.py
 
-    This module is for the Gui class.
+    This module is for the Main class.
 """
+import math
 
-import pyqtgraph as pg
-from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QPainter, QPixmap
-from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
-from qtwidgets import AnimatedToggle, Toggle
+from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
+from PyQt5.QtWidgets import QLabel, QWidget
 
-from racoon_ai.gui.field import Field
-from racoon_ai.gui.game_control import Game
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
 
 
-class Gui(QWidget, QPainter):
-    """Gui
+class Main(QWidget):
+    """Main
     Args:
         None
     Attributes:
         None
     """
 
-    def __init__(self, observer: MWReceiver, role: Role, is_gui_view: bool) -> None:
-        super(Gui, self).__init__()
-        self.__ui: QPainter
+    def __init__(self, observer: MWReceiver, role: Role) -> None:
+        super(Main, self).__init__()
         self.__geometry_width: int = 590
         self.__geometry_height: int = 850
-        self.__field = Field(observer)
 
-        self.__game = Game(observer)
         self.__observer: MWReceiver = observer
+        self.__role: Role = role
 
-        if is_gui_view is True:
-            self._initui()
+        self._initui()
 
     def _initui(self) -> None:
         self.resize(self.__geometry_width, self.__geometry_height)
         self.setWindowTitle("RACOON-AI")
 
-        self._set_texts()
         self._set_images()
-
-        self.__grid = QGridLayout()
-        self.__grid.addWidget(self.__field, 0, 0)
-        self.__grid.addWidget(self.__game, 0, 0)
-        self._set_charts()
-        self.setLayout(self.__grid)
-
-        self._set_toggle()
-
-    def _set_texts(self):
-        self.__ai_text = QLabel("RACOON-AI", self)
-        self.__ai_text.setGeometry(0, 0, 150, 50)
-        self.__ai_text.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
-        self.__ai_text.setStyleSheet("background-color: white")
-        self.__ai_text.setStyleSheet("QLabel { color : white; }")
-        self.__ai_text.move(50, -5)
-
-        self.__speed_text = QLabel("Ball Speed", self)
-        self.__speed_text.setGeometry(0, 0, 150, 50)
-        self.__speed_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
-        self.__speed_text.setStyleSheet("background-color: white")
-        self.__speed_text.setStyleSheet("QLabel { color : white; }")
-        self.__speed_text.move(600, 400)
+        self._set_num()
 
     def _set_images(self):
-        self.__pixmap_racoon = QPixmap("images/racoon2.png")
-        self.__pixmap_game = QPixmap("images/game_2.png")
-        self.__pixmap_block = QPixmap("images/block.png")
-        self.__pixmap_referee = QPixmap("images/referee.png")
-        self.__pixmap_gear = QPixmap("images/gear.png")
+        self.__pixmap_racoon = QPixmap("racoon_ai/gui/images/racoon2.png")
+        self.__pixmap_game = QPixmap("racoon_ai/gui/images/game_2.png")
+        self.__pixmap_block = QPixmap("racoon_ai/gui/images/block.png")
+        self.__pixmap_referee = QPixmap("racoon_ai/gui/images/referee.png")
+        self.__pixmap_gear = QPixmap("racoon_ai/gui/images/gear.png")
+        self.__pixmap_role = QPixmap("racoon_ai/gui/images/role_table.png")
+
+    def _set_num(self):
+        self.__keeper_num = QLabel(self)
+        self.__keeper_num.setFont(QFont("Arial", 30, QFont.Bold))
+
+        self.__midfielder_num = QLabel(self)
+        self.__midfielder_num.setFont(QFont("Arial", 30, QFont.Bold))
+
+        self.__offense_num = []
+        self.__defense_num = []
+        for i in range(3):
+            self.__offense_num.append(QLabel(self))
+            self.__offense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+            self.__defense_num.append(QLabel(self))
+            self.__defense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+
+        self.__fps_num = QLabel(self)
+        self.__fps_num.setFont(QFont("Arial", 16, QFont.Bold))
+        self.__fps_num.setGeometry(100, 100, 200, 200)
+        self.__fps_num.move(707, 160)
 
     def active(self) -> None:
         self.update()
@@ -104,92 +95,118 @@ class Gui(QWidget, QPainter):
         self.__ui.drawPixmap(2, 148, 42, 40, self.__pixmap_referee)
         self.__ui.drawPixmap(0, 198, 45, 45, self.__pixmap_gear)
 
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setBrush(QColor(Qt.gray))
+        # Feild全体
+        self.__ui.drawRect(47, 42, 520, 730)
+        # Feild line
+        self.__ui.drawRect(87, 82, 440, 650)
+        # Center line
+        self.__ui.drawEllipse(282, 362, 30, 30)
+        # Down Goal line
+        self.__ui.drawRect(242, 672, 120, 60)
+        # Up Goal line
+        self.__ui.drawRect(242, 82, 120, 60)
+        # Down Goal
+        self.__ui.drawRect(272, 731, 60, 10)
+        # Up Goal
+        self.__ui.drawRect(272, 72, 60, 10)
+
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor(Qt.white))
         self.__ui.drawRect(586, 425, 840, 350)  # Ball of the rectangle
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(600, 425, 705, 425)
 
+        self.__ui.setBrush(QColor("orange"))
+        self.__ui.drawEllipse(
+            int((self.__observer.ball.y * 0.05) + 302), int((self.__observer.ball.x * 0.05) + 392), 2, 2
+        )
+        self._draw_robots("blue", self.__ui)
+        self._draw_robots("yellow", self.__ui)
+        self._draw_role(self.__ui)
+
+        self.__ui.drawPixmap(590, 297, 550, 115, self.__pixmap_role)
+
+        self.__ui.setBrush(QColor("#2E333A"))
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.drawRect(822, 57, 310, 95)  # To draw of robot
+        self.__ui.setPen(QColor("#2E333A"))
+        self.__ui.drawLine(832, 57, 962, 57)
+
+        self.__ui.setBrush(QColor("#2E333A"))
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.drawRect(822, 167, 180, 115)  # To draw of Control Robot
+        self.__ui.setPen(QColor("#2E333A"))
+        self.__ui.drawLine(832, 167, 944, 167)
+
+        self.__ui.setBrush(QColor("#2E333A"))
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.drawRect(1014, 167, 125, 115)  # To draw of Camera
+        self.__ui.setPen(QColor("#2E333A"))
+        self.__ui.drawLine(1019, 167, 1074, 167)
+
+        self.__ui.setBrush(QColor("#2E333A"))
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.drawRect(588, 57, 222, 225)
+        self.__ui.setPen(QColor("#2E333A"))
+        self.__ui.drawLine(599, 57, 662, 57)
+
+        self.__ui.setBrush(QColor("#2E333A"))
+        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.drawRect(1152, 57, 270, 355)
+        self.__ui.setPen(QColor("#2E333A"))
+        self.__ui.drawLine(1167, 57, 1312, 57)
+
+        self.__fps_num.setNum(60)
+
         self.__ui.end()
 
-    def _set_charts(self) -> None:
-        self.graphWidget = pg.PlotWidget(self)
-        self.graphWidget.setGeometry(600, 450, 820, 320)
-        self.graphWidget.setBackground(QColor("#2E333A"))
-        self.x = list(range(120))
-        self.y = [0 for _ in range(120)]
+    def _draw_robots(self, color: str, ui: QPainter) -> None:
+        if color == "blue":
+            self.__ui.setBrush(QColor("blue"))
+            robots = self.__observer.our_robots
+        else:
+            self.__ui.setBrush(QColor("yellow"))
+            robots = self.__observer.enemy_robots
 
-        pen = pg.mkPen(color=(255, 0, 0))
-        self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen)
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(50)
-        self.timer.timeout.connect(self.update_plot_data)
-        self.timer.start()
+        for robot in robots:
+            if robot.x != 0:
+                self.__ui.setPen(QColor(Qt.black))
+                self.__ui.drawChord(
+                    int(((robot.y * 0.05) + 302) - 6),
+                    int(((robot.x * 0.05) + 392) - 7),
+                    14,
+                    14,
+                    int((math.degrees(robot.theta) + 342) * 16),
+                    302 * 16,
+                )
+                self.__ui.setPen(QColor(Qt.white))
+                self.__ui.drawLine(
+                    int(((robot.y * 0.05) + 302)),
+                    int(((robot.x * 0.05) + 392)),
+                    int((((robot.y * 0.05) + 302)) - 4 * math.cos(-robot.theta - math.pi / 2)),
+                    int((((robot.x * 0.05) + 392)) - 4 * math.sin(-robot.theta - math.pi / 2)),
+                )
 
-    def update_plot_data(self) -> None:
-        self.x = self.x[1:]
-        self.x.append(self.x[-1] + 1)
+    def _draw_role(self, ui: QPainter) -> None:
+        ui.setBrush(QColor("#2E333A"))
+        ui.setPen(QColor(Qt.white))
+        ui.drawRect(588, 297, 553, 115)  # To draw of role
+        ui.setPen(QColor("#2E333A"))
+        ui.drawLine(602, 297, 647, 297)
 
-        self.y = self.y[1:]  # Remove the first
+        self.__keeper_num.setGeometry(20, 20, 645, 70)
+        self.__keeper_num.move(675, 319)
+        self.__keeper_num.setNum(self.__role.keeper_id)
+        self.__midfielder_num.setGeometry(20, 20, 645, 70)
+        self.__midfielder_num.move(1100, 319)
+        self.__midfielder_num.setNum(self.__role.midfielder_id)
+        for i in range(3):
+            self.__offense_num[i].setGeometry(20, 20, 645, 70)
+            self.__offense_num[i].move(735 + (61 * i), 319)
+            self.__offense_num[i].setNum(self.__role.offense_ids[i])
 
-        self.y.append(self.__observer.ball.speed)  # Add a new random value.
-
-        self.data_line.setData(self.x, self.y)
-
-    def _set_toggle(self) -> None:
-        toggle_referee = AnimatedToggle(self, checked_color="#FFB000", pulse_checked_color="#44FFB000")
-        toggle_referee.resize(70, 50)
-        toggle_referee.move(1220, 65)
-
-        toggle = AnimatedToggle(
-            self,
-            bar_color="#224726",
-            handle_color="#57BD37",
-            checked_color="#3F3F3F",
-            pulse_unchecked_color="#57BD37",
-            pulse_checked_color="#3F3F3F",
-        )
-        toggle.resize(120, 60)
-        toggle.move(640, 58)
-        toggle_color = AnimatedToggle(
-            self,
-            bar_color="#0000D6",
-            handle_color="#00B0FF",
-            checked_color="#D6D600",
-            pulse_unchecked_color="#00B0FF",
-            pulse_checked_color="#D6D600",
-        )
-        toggle_color.resize(120, 60)
-        toggle_color.move(640, 104)
-
-        joystick = AnimatedToggle(
-            self,
-            bar_color="#0000D6",
-            handle_color="#00B0FF",
-            checked_color="#D6D600",
-            pulse_unchecked_color="#00B0FF",
-            pulse_checked_color="#D6D600",
-        )
-        joystick.resize(80, 50)
-        joystick.move(915, 174)
-
-        mode = AnimatedToggle(
-            self,
-            bar_color="#0000D6",
-            handle_color="#00B0FF",
-            checked_color="#D6D600",
-            pulse_unchecked_color="#00B0FF",
-            pulse_checked_color="#D6D600",
-        )
-        mode.resize(70, 50)
-        mode.move(1075, 174)
-        mode = AnimatedToggle(
-            self,
-            bar_color="#5E5E5E",
-            handle_color="#3F3F3F",
-            checked_color="#D6D600",
-            pulse_unchecked_color="#00B0FF",
-            pulse_checked_color="#D6D600",
-        )
-        mode.resize(70, 50)
-        mode.move(1075, 234)
+            self.__defense_num[i].setGeometry(20, 20, 645, 70)
+            self.__defense_num[i].move(918 + (61 * i), 319)
+            self.__defense_num[i].setNum(self.__role.defense_ids[i])
