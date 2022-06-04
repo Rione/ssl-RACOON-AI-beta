@@ -69,7 +69,7 @@ def main() -> None:
 
         role = Role(observer)
 
-        gui = Gui(observer, role, is_gui_view)
+        gui = Gui(is_gui_view, observer, role)
 
         logger.info("Roop started")
 

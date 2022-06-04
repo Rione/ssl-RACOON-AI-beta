@@ -17,7 +17,7 @@ from racoon_ai.strategy.role import Role
 
 
 class Gui:
-    def __init__(self, observer: MWReceiver, role: Role, is_gui_view: bool):
+    def __init__(self, is_gui_view: bool, observer: MWReceiver, role: Role):
         self.__is_gui_view = is_gui_view
         if self.__is_gui_view:
             self.__main = Main(observer, role)
