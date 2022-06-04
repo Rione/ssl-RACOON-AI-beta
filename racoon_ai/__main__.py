@@ -53,7 +53,7 @@ def main() -> None:
     is_team_yellow: bool = False
 
     # Flag if view gui
-    is_gui_view: bool = True
+    is_gui_view: bool = False
 
     app: Any = QApplication(sys.argv)
     try:
