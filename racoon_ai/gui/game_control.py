@@ -8,8 +8,8 @@
 """
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox
-from qtwidgets import AnimatedToggle
 
+from racoon_ai.gui.animated_toggle import AnimatedToggle
 from racoon_ai.gui.main import Main
 
 

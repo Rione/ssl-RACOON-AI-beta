@@ -9,8 +9,8 @@
 from PyQt5 import QtGui
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtWidgets import QComboBox, QLabel, QSpinBox
-from qtwidgets import AnimatedToggle
 
+from racoon_ai.gui.animated_toggle import AnimatedToggle
 from racoon_ai.gui.main import Main
 
 
