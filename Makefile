@@ -93,9 +93,9 @@ install:
 	@poetry install
 
 .PHONY: run
-run: doctor $(TGZ) $(RACOON_MW)
+run: doctor $(TGZ) install $(RACOON_MW)
 	@echo ""
-	poetry run python -m $(PKG)
+	@poetry run python -m $(PKG)
 
 .PHONY: clean
 clean: clean-dirs clean-deps
