@@ -1,21 +1,27 @@
 #!/usr/bin/env python3.10
+# pylint: disable-all
 
 """
     This is the main script.
 """
+
+import sys
 from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
-from typing import Tuple
+from typing import Any, Tuple
+
+from PyQt5.QtWidgets import QApplication  # type: ignore
 
 from . import __version__
 from .common.controls import Controls
+from .gui.view import Gui  # type: ignore
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
+from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
-# from .strategy.role import Role
-from .strategy.goal_keeper import Keeper
+from .strategy.role import Role
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
@@ -43,6 +49,10 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     is_team_yellow: bool = conf.getboolean("commons", "isTeamYellow", fallback=False)
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
+    # Flag if view gui
+    is_gui_view: bool = False
+
+    app: Any = QApplication(sys.argv)
     try:
         observer: MWReceiver
         if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
@@ -64,8 +74,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
         else:
             controls = Controls(observer)
 
-        # role: Role = Role(observer)
-
         # offense: Offense = Offense(observer)
 
         keeper: Keeper = Keeper(observer, controls)
@@ -78,6 +86,9 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
         else:
             sender = CommandSender(is_real, online_ids)
 
+        role = Role(observer)
+        gui = Gui(is_gui_view, observer, role)
+
         logger.info("Roop started")
 
         while True:
@@ -85,13 +96,18 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            # role.main()
+
+            role.main()
             # offense.main()
             keeper.main()
 
             # sim_cmds.robot_commands += offense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
+
+            # update gui
+            gui.update()
+            app.processEvents()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)

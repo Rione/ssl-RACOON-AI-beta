@@ -42,6 +42,7 @@ class Offense:
         Returns:
             list[RobotCommand]: send_cmds
         """
+
         return self.__send_cmds
 
     @property
