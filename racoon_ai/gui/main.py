@@ -12,9 +12,10 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
+from qtwidgets import AnimatedToggle, Toggle
 
 from racoon_ai.gui.field import Field
-from racoon_ai.gui.robot import Robot
+from racoon_ai.gui.game_control import Game
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
 
@@ -32,8 +33,9 @@ class Gui(QWidget, QPainter):
         self.__ui: QPainter
         self.__geometry_width: int = 590
         self.__geometry_height: int = 850
-        self.__robot = Robot(observer, role)
         self.__field = Field(observer)
+
+        self.__game = Game(observer)
         self.__observer: MWReceiver = observer
 
         if is_gui_view is True:
@@ -48,11 +50,11 @@ class Gui(QWidget, QPainter):
 
         self.__grid = QGridLayout()
         self.__grid.addWidget(self.__field, 0, 0)
-        self.__grid.addWidget(self.__robot, 0, 0)
+        self.__grid.addWidget(self.__game, 0, 0)
         self._set_charts()
         self.setLayout(self.__grid)
 
-        self.show()
+        self._set_toggle()
 
     def _set_texts(self):
         self.__ai_text = QLabel("RACOON-AI", self)
@@ -104,7 +106,7 @@ class Gui(QWidget, QPainter):
 
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor(Qt.white))
-        self.__ui.drawRect(590, 425, 840, 350)
+        self.__ui.drawRect(586, 425, 840, 350)  # Ball of the rectangle
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(600, 425, 705, 425)
 
@@ -133,3 +135,61 @@ class Gui(QWidget, QPainter):
         self.y.append(self.__observer.ball.speed)  # Add a new random value.
 
         self.data_line.setData(self.x, self.y)
+
+    def _set_toggle(self) -> None:
+        toggle_referee = AnimatedToggle(self, checked_color="#FFB000", pulse_checked_color="#44FFB000")
+        toggle_referee.resize(70, 50)
+        toggle_referee.move(1220, 65)
+
+        toggle = AnimatedToggle(
+            self,
+            bar_color="#224726",
+            handle_color="#57BD37",
+            checked_color="#3F3F3F",
+            pulse_unchecked_color="#57BD37",
+            pulse_checked_color="#3F3F3F",
+        )
+        toggle.resize(120, 60)
+        toggle.move(640, 58)
+        toggle_color = AnimatedToggle(
+            self,
+            bar_color="#0000D6",
+            handle_color="#00B0FF",
+            checked_color="#D6D600",
+            pulse_unchecked_color="#00B0FF",
+            pulse_checked_color="#D6D600",
+        )
+        toggle_color.resize(120, 60)
+        toggle_color.move(640, 104)
+
+        joystick = AnimatedToggle(
+            self,
+            bar_color="#0000D6",
+            handle_color="#00B0FF",
+            checked_color="#D6D600",
+            pulse_unchecked_color="#00B0FF",
+            pulse_checked_color="#D6D600",
+        )
+        joystick.resize(80, 50)
+        joystick.move(915, 174)
+
+        mode = AnimatedToggle(
+            self,
+            bar_color="#0000D6",
+            handle_color="#00B0FF",
+            checked_color="#D6D600",
+            pulse_unchecked_color="#00B0FF",
+            pulse_checked_color="#D6D600",
+        )
+        mode.resize(70, 50)
+        mode.move(1075, 174)
+        mode = AnimatedToggle(
+            self,
+            bar_color="#5E5E5E",
+            handle_color="#3F3F3F",
+            checked_color="#D6D600",
+            pulse_unchecked_color="#00B0FF",
+            pulse_checked_color="#D6D600",
+        )
+        mode.resize(70, 50)
+        mode.move(1075, 234)

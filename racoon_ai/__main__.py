@@ -14,6 +14,8 @@ from PyQt5.QtWidgets import QApplication  # type: ignore
 from . import __version__
 from .common.controls import Controls
 from .gui.main import Gui  # type: ignore
+from .gui.robot import Robot
+from .gui.vision import Vision
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
@@ -70,6 +72,9 @@ def main() -> None:
         role = Role(observer)
 
         gui = Gui(observer, role, is_gui_view)
+        # gui_vision = Vision(gui)
+        gui_robot = Robot(gui, observer, role)
+        gui.show()
 
         logger.info("Roop started")
 

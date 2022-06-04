@@ -396,6 +396,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "qtwidgets"
+version = "0.18"
+description = "Custom widget library for PyQt5 and PySide2 (Qt for Python). Free to use in your own applications."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "shiboken2"
 version = "5.15.2.1"
 description = "Python / C++ bindings helper module"
@@ -487,7 +495,7 @@ pygame = ["pygame"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "4f5ed952e485f6a9c78480856aeea7a721d3cbc6104a87a01dcf4920d27865e9"
+content-hash = "17098f2fd5c670d4a588ac3a28d36af5129facf3921753aad2da3d6dfe64b8d2"
 
 [metadata.files]
 astroid = [
@@ -844,6 +852,9 @@ pyyaml = [
     {file = "PyYAML-6.0-cp39-cp39-win32.whl", hash = "sha256:b5b9eccad747aabaaffbc6064800670f0c297e52c12754eb1d976c57e4f74dcb"},
     {file = "PyYAML-6.0-cp39-cp39-win_amd64.whl", hash = "sha256:b3d267842bf12586ba6c734f89d1f5b871df0273157918b0ccefa29deb05c21c"},
     {file = "PyYAML-6.0.tar.gz", hash = "sha256:68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"},
+]
+qtwidgets = [
+    {file = "qtwidgets-0.18.tar.gz", hash = "sha256:6c37675607987fe8a2e4bfcb9c62cfd90db04e376a7ebea7af7dcf01fb7557a4"},
 ]
 shiboken2 = [
     {file = "shiboken2-5.15.2.1-5.15.2-cp27-cp27m-macosx_10_13_intel.whl", hash = "sha256:f890f5611ab8f48b88cfecb716da2ac55aef99e2923198cefcf781842888ea65"},
