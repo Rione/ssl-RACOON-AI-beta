@@ -50,7 +50,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     # Flag if view gui
-    is_gui_view: bool = True
+    is_gui_view: bool = False
 
     app: Any = QApplication(sys.argv)
     try:
@@ -73,8 +73,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             controls = Controls(observer, k_gain=custom_gains)
         else:
             controls = Controls(observer)
-
-        # role: Role = Role(observer)
 
         # offense: Offense = Offense(observer)
 
