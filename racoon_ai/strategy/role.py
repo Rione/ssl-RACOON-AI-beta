@@ -32,7 +32,6 @@ class Role:
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = 0
-        self.__midfielder: int = 0
         self.__offense: list[int] = []
         self.__defense: list[int] = []
         # self.__keeper_quantity: int = 0
@@ -71,20 +70,15 @@ class Role:
         """defense_ids"""
         return self.__defense
 
-    @property
-    def midfielder_id(self) -> int:
-        """midfielder_ids"""
-        return self.__midfielder
-
     def main(self) -> None:
         """main"""
         self.__decide_quantity()
         self.__decide_keeper()
         self.__decide_defense()
         self.__decide_offense()
-        # self.__logger.info(self.keeper_id)
-        # self.__logger.info(self.offense_ids)
-        # self.__logger.info(self.defense_ids)
+        self.__logger.info(self.keeper_id)
+        self.__logger.info(self.offense_ids)
+        self.__logger.info(self.defense_ids)
 
     def __decide_quantity(self) -> None:
         robot_quantity = len(self.__observer.our_robots)
