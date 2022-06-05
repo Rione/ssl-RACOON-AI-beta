@@ -13,7 +13,6 @@ from numpy import array, divide, dot, float64, multiply, subtract
 from numpy.linalg import norm
 from numpy.typing import NDArray
 
-# from numpy import linalg as LA
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.networks.receiver import MWReceiver
@@ -23,7 +22,7 @@ class Controls:
     """Controls
     Args:
         observer (Observer): Observer instance
-        k_gain (Tuple[float, float, float]): PID gain
+        k_gain (Tuple[float, float, float]): PID gain (kp, ki, kd)
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.
@@ -40,7 +39,7 @@ class Controls:
         self.__pre_bot_theta: float = float(0)
         self.__theta_accumulation: float = float(0)
 
-    def pid(self, target: Pose, bot: Robot) -> RobotCommand:
+    def pid(self, target: Pose, bot: Robot) -> RobotCommand:  # pylint: disable=R0914
         """pid
 
         Args:
@@ -60,6 +59,9 @@ class Controls:
         diff_pose: NDArray[float64] = subtract(target_pose, bot_pose)
         diff_speed: NDArray[float64] = subtract(target_speed, bot_speed)
 
+        self.__pre_bot_pose = bot_pose
+        self.__pre_target_pose = target_pose
+
         self.__accumulations += multiply(diff_pose, self.__dtaime)
         self.__logger.debug("accumulation: %s", self.__accumulations)
 
@@ -75,17 +77,15 @@ class Controls:
         )
 
         vel: NDArray[float64] = dot(bvel, local_pose)
-        abs_vel_xy = norm(vel[:2].transpose())  # Convert into [x, y], and get the norm
+        vel_xy: NDArray[float64] = vel[:2]
+
+        abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
         if (abs_vel_xy**2) > 1:
-            divide(vel, abs_vel_xy, vel)
+            vel_xy = divide(vel_xy, abs_vel_xy)
 
-        cmd.vel_fwd = float(vel[0])
-        cmd.vel_sway = float(vel[1])
+        cmd.vel_fwd = float(vel_xy[0])
+        cmd.vel_sway = float(vel_xy[1])
         cmd.vel_angular = float(vel[2])
-
-        self.__pre_bot_pose = bot_pose
-        self.__pre_target_pose = target_pose
-
         return cmd
 
     def pid_radian(self, target_theta: float, bot: Robot) -> float:
