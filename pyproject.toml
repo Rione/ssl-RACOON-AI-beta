@@ -11,13 +11,13 @@ protobuf = "3.19.1"
 protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
 PyQt5 = {version = "^5.15.6", optional = true, extras = ["Qt"]}
+brainflow = {version = "^4.9.3", optional = true}
+PySide2 = {version = "^5.15.2", optional = true}
+PyQtChart = {version = "^5.15.5", optional = true}
+pyqtgraph = {version = "0.12.1", optional = true}
+qtwidgets = {version = "^0.18", optional = true}
 pygame = {version = "^2.1.2", optional = true, extras = ["pygame"]}
-PySide2 = "^5.15.2"
-PyQtChart = "^5.15.5"
-brainflow = "^4.9.3"
-pyqtgraph = "0.12.1"
 numpy = "^1.22.3"
-qtwidgets = "^0.18"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
@@ -29,7 +29,7 @@ pre-commit = "^2.16.0"
 pylint = "^2.12.2"
 
 [tool.poetry.extras]
-Qt = ["PyQt5"]
+Qt = ["PyQt5", "brainflow", "PySide2", "PyQtChart", "pyqtgraph", "qtwidgets"]
 pygame = ["pygame"]
 
 [tool.black]

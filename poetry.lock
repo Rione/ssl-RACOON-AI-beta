@@ -41,7 +41,7 @@ name = "brainflow"
 version = "4.9.3"
 description = "Python Binding for BrainFlow"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.5.6"
 
 [package.dependencies]
@@ -202,7 +202,7 @@ name = "nptyping"
 version = "1.4.4"
 description = "Type hints for Numpy."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.5"
 
 [package.dependencies]
@@ -321,7 +321,7 @@ name = "pyqt5"
 version = "5.15.6"
 description = "Python bindings for the Qt cross platform application toolkit"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -333,7 +333,7 @@ name = "pyqt5-qt5"
 version = "5.15.2"
 description = "The subset of a Qt installation needed by PyQt5."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -341,7 +341,7 @@ name = "pyqt5-sip"
 version = "12.9.1"
 description = "The sip module support for PyQt5"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.5"
 
 [[package]]
@@ -349,7 +349,7 @@ name = "pyqtchart"
 version = "5.15.5"
 description = "Python bindings for the Qt Charts library"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -362,7 +362,7 @@ name = "pyqtchart-qt5"
 version = "5.15.2"
 description = "The subset of a Qt installation needed by PyQtChart."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -370,7 +370,7 @@ name = "pyqtgraph"
 version = "0.12.1"
 description = "Scientific Graphics and GUI Library for Python"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -381,7 +381,7 @@ name = "pyside2"
 version = "5.15.2.1"
 description = "Python bindings for the Qt cross-platform application and UI framework"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <3.11"
 
 [package.dependencies]
@@ -400,7 +400,7 @@ name = "qtwidgets"
 version = "0.18"
 description = "Custom widget library for PyQt5 and PySide2 (Qt for Python). Free to use in your own applications."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -408,7 +408,7 @@ name = "shiboken2"
 version = "5.15.2.1"
 description = "Python / C++ bindings helper module"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <3.11"
 
 [[package]]
@@ -456,7 +456,7 @@ name = "typish"
 version = "1.9.3"
 description = "Functionality for types"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.extras]
@@ -489,13 +489,13 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [extras]
-Qt = ["PyQt5"]
+Qt = ["PyQt5", "brainflow", "PySide2", "PyQtChart", "pyqtgraph", "qtwidgets"]
 pygame = ["pygame"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "17098f2fd5c670d4a588ac3a28d36af5129facf3921753aad2da3d6dfe64b8d2"
+content-hash = "9e6bb4da86a4c5a2a9235f73fe3ca1f6dac7c7730fddd8d050e675c29d9d1aad"
 
 [metadata.files]
 astroid = [
