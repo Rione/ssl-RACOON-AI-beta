@@ -30,6 +30,8 @@ class Geometry:
 
         penalty_area_width (int): width of penalty
 
+        penalty_area_width_half (float): width of penalty / 2
+
         center_circle_radius (int): radius of center circle
 
         line_thickness (int): thickness of line
@@ -70,6 +72,7 @@ class Geometry:
             f"goal_depth={self.goal_depth:1d},"
             f"boundary_width={self.boundary_width:1d},"
             f"penalty_area_width={self.penalty_area_width:1d},"
+            f"penalty_area_width_half={self.penalty_area_width_half:f},"
             f"penalty_area_depth={self.penalty_area_depth:1d},"
             f"center_circle_radius={self.center_circle_radius:1d},"
             f"line_thickness={self.line_thickness:1d},"
@@ -92,6 +95,7 @@ class Geometry:
             f"goal_depth={self.goal_depth:d},"
             f"boundary_width={self.boundary_width:d},"
             f"penalty_area_width={self.penalty_area_width:d},"
+            f"penalty_area_width_half={self.penalty_area_width_half:f},"
             f"penalty_area_depth={self.penalty_area_depth:d},"
             f"center_circle_radius={self.center_circle_radius:d},"
             f"line_thickness={self.line_thickness:d},"
@@ -143,6 +147,11 @@ class Geometry:
     def penalty_area_width(self) -> int:
         """penalty_area_width"""
         return self.__penalty_area_width
+
+    @property
+    def penalty_area_width_half(self) -> float:
+        """penalty_area_width"""
+        return self.__penalty_area_width / 2
 
     @property
     def center_circle_radius(self) -> int:
