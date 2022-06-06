@@ -3,4 +3,6 @@
 
 from .ball import Ball
 
-__all__ = ["Ball"]
+__all__ = [
+    "Ball",
+]

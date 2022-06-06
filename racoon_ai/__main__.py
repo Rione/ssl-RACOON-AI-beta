@@ -3,20 +3,25 @@
 """
     This is the main script.
 """
-from logging import INFO, Formatter, StreamHandler, getLogger, shutdown
+from configparser import ConfigParser
+from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
+from typing import Tuple
 
 from . import __version__
 from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
+
+# from .strategy.offense import Offense
+# from .strategy.role import Role
 from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
 
 
-def main() -> None:
+def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
     """main
 
     This function is for the main function.
@@ -24,40 +29,57 @@ def main() -> None:
     Returns:
         None
     """
+    logger.info("Running v%s", __version__)
 
-    # Settings for logger
-    fmt = Formatter("[%(levelname)s] %(asctime)s %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    hdlr = StreamHandler()
-    hdlr.setFormatter(fmt)
-    logger = getLogger("racoon_ai")
-    logger.setLevel(INFO)
-    logger.addHandler(hdlr)
-    logger.debug("Logger initialized")
-
-    logger.info("Racoon AI v%s", __version__)
+    num_bots: int = conf.getint("commons", "num_robots")
+    logger.info("Number of robots: %d", num_bots)
 
     # List of online robot ids
-    online_ids: list[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    online_ids: list[int] = list(range(num_bots + 1))
+    logger.info("Online robot ids: %s", online_ids)
 
     # Flag if run for a real robot
-    is_real: bool = False
+    is_real: bool = conf.getboolean("commons", "isReal", fallback=False)
+    logger.info("Mode: %s", ("Real" if is_real else "Simulation"))
 
     # Flag if our team is yellow
-    is_team_yellow: bool = False
+    is_team_yellow: bool = conf.getboolean("commons", "isTeamYellow", fallback=False)
+    logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     try:
+        observer: MWReceiver
+        if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
+            mw_host: str = conf.get("mw_receiver", "host", fallback="localhost")
+            mw_port: int = int(conf.get("mw_receiver", "port") or 30011)
+            logger.info("Using custom address for MW: %s:%d", mw_host, mw_port)
+            observer = MWReceiver(host=mw_host, port=mw_port)
+        else:
+            observer = MWReceiver()
 
-        observer = MWReceiver(host="localhost")
+        controls: Controls
+        if conf.getboolean("pid_gains", "use_custom_gains", fallback=False):
+            kp: float = float(conf.get("pid_gains", "kp") or 1)
+            ki: float = float(conf.get("pid_gains", "ki") or 0)
+            kd: float = float(conf.get("pid_gains", "kd") or 0)
+            custom_gains: Tuple[float, float, float] = (kp, ki, kd)
+            logger.info("Using custom PID gains: %s", custom_gains)
+            controls = Controls(observer, k_gain=custom_gains)
+        else:
+            controls = Controls(observer)
 
-        controls = Controls(observer)
+        role: Role = Role(observer)
 
-        role = Role(observer)
+        # offense: Offense = Offense(observer)
 
-        # offense = Offense(observer)
+        keeper: Keeper = Keeper(observer, controls)
 
-        keeper = Keeper(observer, controls)
-
-        sender = CommandSender(is_real, online_ids, host="localhost", port=20025)
+        sender: CommandSender
+        if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
+            target_host: str = conf.get("command_sender", "host", fallback="localhost")
+            target_port: int = int(conf.get("command_sender", "port") or 20011)
+            sender = CommandSender(is_real, online_ids, host=target_host, port=target_port)
+        else:
+            sender = CommandSender(is_real, online_ids)
 
         logger.info("Roop started")
 
@@ -79,9 +101,31 @@ def main() -> None:
 
     finally:
         logger.info("Cleaning up...")
-        del sender
         shutdown()
 
 
 if __name__ == "__main__":
-    main()
+    logo: str = """
+        ######     ###      ####    #####    #####   ##   ##             ###     ######
+        ##  ##   ## ##    ##  ##  ### ###  ### ###  ###  ##            ## ##      ##
+        ##  ##  ##   ##  ##       ##   ##  ##   ##  #### ##           ##   ##    ##
+        #####   ##   ##  ##       ##   ##  ##   ##  #######           ##   ##    ##
+        ## ##   #######  ##       ##   ##  ##   ##  ## ####           #######    ##
+        ## ##   ##   ##   ##  ##  ### ###  ### ###  ##  ###           ##   ##     ##
+        ### ###  ##   ##    ####    #####    #####   ##   ##           ##   ##   ######
+    """
+    print(logo)
+
+    # Settings for logger
+    fmt = Formatter("[%(levelname)s] %(asctime)s %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    hdlr = StreamHandler()
+    hdlr.setFormatter(fmt)
+    log = getLogger("racoon_ai")
+    log.setLevel(INFO)
+    log.addHandler(hdlr)
+    log.debug("Logger initialized")
+
+    parser = ConfigParser()
+    parser.read("racoon_ai/config.ini")
+
+    main(parser, log)

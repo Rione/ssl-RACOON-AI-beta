@@ -43,6 +43,10 @@ $(TGZ):
 	@echo ""
 	$(error [ERROR] Please compile with `make build`, or use just `make` (compile and run at the same time))
 
+$(RACOON_MW):
+	@echo ""
+	@[ ! -f $@ ] && echo '[WARN] Please download RACOON_MW from https://github.com/Rione/ssl-RACOON-MW/releases/latest and place it in $(BIN_DIR)/'
+
 $(WHEEL): $(PROJECT_DIR) $(PROTO_GENDIR)/%.pyi
 	@echo "Creating $(PKG)@$(VERSION) distribution..."
 	@poetry build -vv
@@ -89,9 +93,9 @@ install:
 	@poetry install
 
 .PHONY: run
-run: doctor $(TGZ)
+run: doctor $(TGZ) install $(RACOON_MW)
 	@echo ""
-	poetry run python -m $(PKG)
+	@poetry run python -m $(PKG)
 
 .PHONY: clean
 clean: clean-dirs clean-deps
