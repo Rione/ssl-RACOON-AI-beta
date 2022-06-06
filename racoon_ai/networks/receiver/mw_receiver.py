@@ -65,6 +65,7 @@ class MWReceiver(IPNetAddr):
         proto.ParseFromString(packet)
         self.__logger.debug("Received %s", proto)
         self.update(proto)
+        print(self.geometry)
 
     def update(self, proto: RacoonMW_Packet) -> None:
         """update

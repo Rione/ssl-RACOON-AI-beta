@@ -20,6 +20,8 @@ class Geometry:
 
         goal_width (int): width of goal
 
+        goal_width_half (float): width of goal / 2
+
         goal_depth (int): depth of goal
 
         boundary_width (int): width of boundary
@@ -64,6 +66,7 @@ class Geometry:
             f"field_length={self.field_length:1d},"
             f"field_width={self.field_width:1d},"
             f"goal_width={self.goal_width:1d},"
+            f"goal_width_half={self.goal_width_half:f},"
             f"goal_depth={self.goal_depth:1d},"
             f"boundary_width={self.boundary_width:1d},"
             f"penalty_area_width={self.penalty_area_width:1d},"
@@ -85,6 +88,7 @@ class Geometry:
             f"field_length={self.field_length:d},"
             f"field_width={self.field_width:d},"
             f"goal_width={self.goal_width:d},"
+            f"goal_width_half={self.goal_width_half:f},"
             f"goal_depth={self.goal_depth:d},"
             f"boundary_width={self.boundary_width:d},"
             f"penalty_area_width={self.penalty_area_width:d},"
@@ -114,6 +118,11 @@ class Geometry:
     def goal_width(self) -> int:
         """goal_width"""
         return self.__goal_width
+
+    @property
+    def goal_width_half(self) -> float:
+        """goal_width"""
+        return self.__goal_width / 2
 
     @property
     def goal_depth(self) -> int:
