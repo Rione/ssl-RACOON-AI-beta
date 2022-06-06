@@ -71,7 +71,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
         # offense: Offense = Offense(observer)
 
-        keeper: Keeper = Keeper(observer, controls)
+        keeper: Keeper = Keeper(observer, role, controls)
 
         sender: CommandSender
         if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
