@@ -20,6 +20,8 @@ class Geometry:
 
         goal_width (int): width of goal
 
+        goal_width_half (float): width of goal / 2
+
         goal_depth (int): depth of goal
 
         boundary_width (int): width of boundary
@@ -27,6 +29,8 @@ class Geometry:
         penalty_area_depth (int): depth of penalty
 
         penalty_area_width (int): width of penalty
+
+        penalty_area_width_half (float): width of penalty / 2
 
         center_circle_radius (int): radius of center circle
 
@@ -64,9 +68,11 @@ class Geometry:
             f"field_length={self.field_length:1d},"
             f"field_width={self.field_width:1d},"
             f"goal_width={self.goal_width:1d},"
+            f"goal_width_half={self.goal_width_half:f},"
             f"goal_depth={self.goal_depth:1d},"
             f"boundary_width={self.boundary_width:1d},"
             f"penalty_area_width={self.penalty_area_width:1d},"
+            f"penalty_area_width_half={self.penalty_area_width_half:f},"
             f"penalty_area_depth={self.penalty_area_depth:1d},"
             f"center_circle_radius={self.center_circle_radius:1d},"
             f"line_thickness={self.line_thickness:1d},"
@@ -85,9 +91,11 @@ class Geometry:
             f"field_length={self.field_length:d},"
             f"field_width={self.field_width:d},"
             f"goal_width={self.goal_width:d},"
+            f"goal_width_half={self.goal_width_half:f},"
             f"goal_depth={self.goal_depth:d},"
             f"boundary_width={self.boundary_width:d},"
             f"penalty_area_width={self.penalty_area_width:d},"
+            f"penalty_area_width_half={self.penalty_area_width_half:f},"
             f"penalty_area_depth={self.penalty_area_depth:d},"
             f"center_circle_radius={self.center_circle_radius:d},"
             f"line_thickness={self.line_thickness:d},"
@@ -116,6 +124,11 @@ class Geometry:
         return self.__goal_width
 
     @property
+    def goal_width_half(self) -> float:
+        """goal_width"""
+        return self.__goal_width / 2
+
+    @property
     def goal_depth(self) -> int:
         """goal_depth"""
         return self.__goal_depth
@@ -134,6 +147,11 @@ class Geometry:
     def penalty_area_width(self) -> int:
         """penalty_area_width"""
         return self.__penalty_area_width
+
+    @property
+    def penalty_area_width_half(self) -> float:
+        """penalty_area_width"""
+        return self.__penalty_area_width / 2
 
     @property
     def center_circle_radius(self) -> int:
