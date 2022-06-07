@@ -5,7 +5,7 @@
     This module is for the Keeper class.
 """
 
-from math import cos, pi, sin, sqrt
+from math import cos, pi, sin
 from typing import Tuple
 
 from numpy import array, divide, dot, float64, multiply, subtract, zeros
@@ -43,12 +43,10 @@ class Controls:
         Args:
             target (Pose): Target pose
             bot (Robot): Robot instance
+            limiter (float, optional): speed limit (default: 1, nolimit: -1)
 
         Returns:
             RobotCommand: RobotCommand instance
-            :param bot:
-            :param target:
-            :param limiter:
         """
         cmd = RobotCommand(bot.robot_id)
         bot_pose: NDArray[float64] = array([bot.x / 1000, bot.y / 1000, bot.theta])
@@ -82,7 +80,7 @@ class Controls:
 
         abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
         if abs_vel_xy > limiter >= 0:
-            vel_xy = divide(divide(vel_xy, abs_vel_xy), sqrt(2))
+            vel_xy = multiply(divide(vel_xy, abs_vel_xy), limiter)
 
         cmd.vel_fwd = float(vel_xy[0])
         cmd.vel_sway = float(vel_xy[1])
