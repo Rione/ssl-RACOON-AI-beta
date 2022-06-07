@@ -5,7 +5,7 @@
     This module is for the Keeper class.
 """
 
-from math import cos, pi, sin
+from math import cos, pi, sin, sqrt
 from typing import Tuple
 
 from numpy import array, divide, dot, float64, multiply, subtract, zeros
@@ -37,7 +37,7 @@ class Controls:
         self.__pre_bot_theta: NDArray[float64] = zeros((11, 1), dtype="float64")
         self.__theta_accumulation: NDArray[float64] = zeros((11, 1), dtype="float64")
 
-    def pid(self, target: Pose, bot: Robot) -> RobotCommand:  # pylint: disable=R0914
+    def pid(self, target: Pose, bot: Robot, limiter: float = 1) -> RobotCommand:  # pylint: disable=R0914
         """pid
 
         Args:
@@ -46,6 +46,9 @@ class Controls:
 
         Returns:
             RobotCommand: RobotCommand instance
+            :param bot:
+            :param target:
+            :param limiter:
         """
         cmd = RobotCommand(bot.robot_id)
         bot_pose: NDArray[float64] = array([bot.x / 1000, bot.y / 1000, bot.theta])
@@ -78,8 +81,8 @@ class Controls:
         vel_xy: NDArray[float64] = vel[0][:2]
 
         abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
-        if (abs_vel_xy**2) > 1:
-            vel_xy = divide(vel_xy, abs_vel_xy)
+        if abs_vel_xy > limiter >= 0:
+            vel_xy = divide(divide(vel_xy, abs_vel_xy), sqrt(2))
 
         cmd.vel_fwd = float(vel_xy[0])
         cmd.vel_sway = float(vel_xy[1])
