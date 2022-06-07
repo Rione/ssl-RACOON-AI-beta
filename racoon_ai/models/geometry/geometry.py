@@ -180,6 +180,11 @@ class Geometry:
         """goal_y"""
         return self.goal.y
 
+    @property
+    def their_goal(self) -> Point:
+        """their_goal"""
+        return Point(-self.goal_x, self.goal_y)
+
     def update(self, geometry: Geometry_Info) -> None:
         """
         Update robot
