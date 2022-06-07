@@ -5,11 +5,10 @@
     This module is for the Keeper class.
 """
 
-from logging import getLogger
 from math import cos, pi, sin
 from typing import Tuple
 
-from numpy import array, divide, dot, float64, multiply, subtract
+from numpy import array, divide, dot, float64, multiply, subtract, zeros
 from numpy.linalg import norm
 from numpy.typing import NDArray
 
@@ -29,15 +28,14 @@ class Controls:
     """
 
     def __init__(self, observer: MWReceiver, k_gain: Tuple[float, float, float] = (8, 0.5, 1)) -> None:
-        self.__logger = getLogger(__name__)
-        self.__pre_target_pose: NDArray[float64] = array([0, 0, 0], dtype="float64")
-        self.__pre_bot_pose: NDArray[float64] = array([0, 0, 0], dtype="float64")
-        self.__accumulations: NDArray[float64] = array([0, 0, 0], dtype="float64")
+        self.__pre_target_pose: NDArray[float64] = zeros((11, 3), dtype="float64")
+        self.__pre_bot_pose: NDArray[float64] = zeros((11, 3), dtype="float64")
+        self.__accumulations: NDArray[float64] = zeros((11, 3), dtype="float64")
         self.__k_gain: NDArray[float64] = array(k_gain, dtype="float64")
         self.__dtaime: float = observer.sec_per_frame
-        self.__pre_target_theta: float = float(0)
-        self.__pre_bot_theta: float = float(0)
-        self.__theta_accumulation: float = float(0)
+        self.__pre_target_theta: NDArray[float64] = zeros((11, 1), dtype="float64")
+        self.__pre_bot_theta: NDArray[float64] = zeros((11, 1), dtype="float64")
+        self.__theta_accumulation: NDArray[float64] = zeros((11, 1), dtype="float64")
 
     def pid(self, target: Pose, bot: Robot) -> RobotCommand:  # pylint: disable=R0914
         """pid
@@ -52,18 +50,18 @@ class Controls:
         cmd = RobotCommand(bot.robot_id)
         bot_pose: NDArray[float64] = array([bot.x / 1000, bot.y / 1000, bot.theta])
         target_pose: NDArray[float64] = array([target.x / 1000, target.y / 1000, target.theta])
+        bot_id: int = int(bot.robot_id)
 
-        bot_speed: NDArray[float64] = divide(subtract(bot_pose, self.__pre_bot_pose), self.__dtaime)
-        target_speed: NDArray[float64] = divide(subtract(target_pose, self.__pre_target_pose), self.__dtaime)
+        bot_speed: NDArray[float64] = divide(subtract(bot_pose, self.__pre_bot_pose[bot_id][:]), self.__dtaime)
+        target_speed: NDArray[float64] = divide(subtract(target_pose, self.__pre_target_pose[bot_id][:]), self.__dtaime)
 
         diff_pose: NDArray[float64] = subtract(target_pose, bot_pose)
         diff_speed: NDArray[float64] = subtract(target_speed, bot_speed)
 
-        self.__pre_bot_pose = bot_pose
-        self.__pre_target_pose = target_pose
+        self.__pre_bot_pose[bot_id][:] = bot_pose
+        self.__pre_target_pose[bot_id][:] = target_pose
 
-        self.__accumulations += multiply(diff_pose, self.__dtaime)
-        self.__logger.debug("accumulation: %s", self.__accumulations)
+        self.__accumulations[bot_id][:] += multiply(diff_pose, self.__dtaime)
 
         bbvel: NDArray[float64] = array([diff_pose, diff_speed, self.__accumulations])
         bvel: NDArray[float64] = dot(self.__k_gain, bbvel)
@@ -77,7 +75,7 @@ class Controls:
         )
 
         vel: NDArray[float64] = dot(bvel, local_pose)
-        vel_xy: NDArray[float64] = vel[:2]
+        vel_xy: NDArray[float64] = vel[0][:2]
 
         abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
         if (abs_vel_xy**2) > 1:
@@ -85,7 +83,7 @@ class Controls:
 
         cmd.vel_fwd = float(vel_xy[0])
         cmd.vel_sway = float(vel_xy[1])
-        cmd.vel_angular = float(vel[2])
+        cmd.vel_angular = float(vel[0][2])
         return cmd
 
     def pid_radian(self, target_theta: float, bot: Robot) -> float:
@@ -99,17 +97,21 @@ class Controls:
         kp: float = float(self.__k_gain[0])
         kd: float = float(self.__k_gain[1])
         ki: float = float(self.__k_gain[2])
+        bot_id: int = int(bot.robot_id)
 
-        e_bot: float = bot.theta - self.__pre_bot_theta
-        e_target: float = target_theta - self.__pre_target_theta
+        e_bot: float = bot.theta - self.__pre_bot_theta[bot_id][0]
+        e_target: float = target_theta - self.__pre_target_theta[bot_id][0]
         self.__theta_accumulation += (e_target - e_bot) * self.__dtaime
 
         vel_angular += kp * (target_theta - bot.theta)
         vel_angular += kd * ((e_target / self.__dtaime) - (e_bot / self.__dtaime))
-        vel_angular += ki * self.__theta_accumulation
+        vel_angular += ki * self.__theta_accumulation[bot_id][0]
 
-        self.__pre_target_theta = target_theta
-        self.__pre_bot_theta = bot.theta
+        self.__pre_target_theta[bot_id][0] = target_theta
+        self.__pre_bot_theta[bot_id][0] = bot.theta
 
-        vel_angular = min(vel_angular, pi)
+        if vel_angular > pi:
+            vel_angular = min(vel_angular, pi)
+        elif vel_angular < -pi:
+            vel_angular = max(vel_angular, -pi)
         return vel_angular
