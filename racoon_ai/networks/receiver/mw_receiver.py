@@ -5,8 +5,8 @@
     This module is for the MwReceiver class.
 """
 
-import socket
 from logging import getLogger
+from socket import AF_INET, IPPROTO_UDP, SO_REUSEADDR, SOCK_DGRAM, SOL_SOCKET, socket
 from typing import Optional
 
 from racoon_ai.models.ball import Ball
@@ -46,8 +46,8 @@ class MWReceiver(IPNetAddr):
         self.__attack_direction: int
 
         # 受信ソケット作成 (指定ポートへのパケットをすべて受信)
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.__sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+        self.__sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.__sock.bind((self.host, self.port))
 
         self.main()
@@ -65,7 +65,6 @@ class MWReceiver(IPNetAddr):
         proto.ParseFromString(packet)
         self.__logger.debug("Received %s", proto)
         self.update(proto)
-        print(self.geometry)
 
     def update(self, proto: RacoonMW_Packet) -> None:
         """update
@@ -74,18 +73,21 @@ class MWReceiver(IPNetAddr):
             proto (RacoonMW_Packet): Parsed packet
         """
         self.ball.update(proto.ball)
+        self.__logger.debug("Ball: %s", self.ball)
 
         self.geometry.update(proto.geometry)
+        self.__logger.debug("Geometry: %s", self.geometry)
 
         self.referee.update(proto.referee)
+        self.__logger.debug("Referee: %s", self.referee)
 
         bot: Optional[Robot]
         proto_bot: Robot_Infos
         for proto_bot in proto.our_robots:
             bot = self.get_our_by_id(proto_bot.robot_id, only_online=False)
-            self.__logger.info(bot)
             if bot is not None:
                 bot.update(proto_bot)
+                self.__logger.debug(bot)
             else:
                 self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
 
@@ -93,6 +95,7 @@ class MWReceiver(IPNetAddr):
             bot = self.get_enemy_by_id(proto_bot.robot_id, only_online=False)
             if bot is not None:
                 bot.update(proto_bot)
+                self.__logger.debug(bot)
             else:
                 self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
 

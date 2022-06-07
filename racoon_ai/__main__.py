@@ -25,8 +25,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     Returns:
         None
     """
-    logger.info("Running v%s", __version__)
-
     num_bots: int = conf.getint("commons", "num_robots")
     logger.info("Number of robots: %d", num_bots)
 
@@ -122,6 +120,7 @@ if __name__ == "__main__":
     log.setLevel(INFO)
     log.addHandler(hdlr)
     log.debug("Logger initialized")
+    log.info("Running v%s", __version__)
 
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
