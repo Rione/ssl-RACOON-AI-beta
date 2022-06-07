@@ -6,6 +6,7 @@
         - Geometry
 """
 
+from racoon_ai.models.coordinate import Point
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Geometry_Info
 
 
@@ -43,6 +44,12 @@ class Geometry:
         ball_radius (float): radius of ball
 
         max_robot_radius (float): max robot radius
+
+        goal (Point): goal (x, y)
+
+        goal_x (float): goal x
+
+        goal_y (float): goal y
     """
 
     def __init__(self) -> None:
@@ -59,52 +66,27 @@ class Geometry:
         self.__goal_height: int = int(0)
         self.__ball_radius: float = float(0)
         self.__max_robot_radius: float = float(0)
-        self.__goal_x: float = float(0)
-        self.__goal_y: float = float(0)
+        self.__goal: Point = Point(0, 0)
 
     def __str__(self) -> str:
         return (
             "("
-            f"field_length={self.field_length:1d},"
-            f"field_width={self.field_width:1d},"
-            f"goal_width={self.goal_width:1d},"
-            f"goal_width_half={self.goal_width_half:f},"
-            f"goal_depth={self.goal_depth:1d},"
-            f"boundary_width={self.boundary_width:1d},"
-            f"penalty_area_width={self.penalty_area_width:1d},"
-            f"penalty_area_width_half={self.penalty_area_width_half:f},"
-            f"penalty_area_depth={self.penalty_area_depth:1d},"
-            f"center_circle_radius={self.center_circle_radius:1d},"
-            f"line_thickness={self.line_thickness:1d},"
-            f"goal_center_to_penalty_mark={self.goal_center_to_penalty_mark:1d},"
-            f"goal_height={self.goal_height:1d},"
-            f"ball_radius={self.ball_radius:.1f},"
-            f"max_robot_radius={self.max_robot_radius:.1f},"
-            f"goal_x={self.goal_x:.1f},"
-            f"goal_y={self.goal_y:.1f}"
-            ")"
-        )
-
-    def __repr__(self) -> str:
-        return (
-            "Geometry("
-            f"field_length={self.field_length:d},"
-            f"field_width={self.field_width:d},"
-            f"goal_width={self.goal_width:d},"
-            f"goal_width_half={self.goal_width_half:f},"
-            f"goal_depth={self.goal_depth:d},"
-            f"boundary_width={self.boundary_width:d},"
-            f"penalty_area_width={self.penalty_area_width:d},"
-            f"penalty_area_width_half={self.penalty_area_width_half:f},"
-            f"penalty_area_depth={self.penalty_area_depth:d},"
-            f"center_circle_radius={self.center_circle_radius:d},"
-            f"line_thickness={self.line_thickness:d},"
-            f"goal_center_to_penalty_mark={self.goal_center_to_penalty_mark:d},"
-            f"goal_height={self.goal_height:d},"
-            f"ball_radius={self.ball_radius:f},"
-            f"max_robot_radius={self.max_robot_radius:f},"
-            f"goal_x={self.goal_x:f},"
-            f"goal_y={self.goal_y:f},"
+            f"field_length={self.field_length:1d}, "
+            f"field_width={self.field_width:1d}, "
+            f"goal_width={self.goal_width:1d}, "
+            f"goal_width_half={self.goal_width_half:f}, "
+            f"goal_depth={self.goal_depth:1d}, "
+            f"boundary_width={self.boundary_width:1d}, "
+            f"penalty_area_width={self.penalty_area_width:1d}, "
+            f"penalty_area_width_half={self.penalty_area_width_half:f}, "
+            f"penalty_area_depth={self.penalty_area_depth:1d}, "
+            f"center_circle_radius={self.center_circle_radius:1d}, "
+            f"line_thickness={self.line_thickness:1d}, "
+            f"goal_center_to_penalty_mark={self.goal_center_to_penalty_mark:1d}, "
+            f"goal_height={self.goal_height:1d}, "
+            f"ball_radius={self.ball_radius:.1f}, "
+            f"max_robot_radius={self.max_robot_radius:.1f}, "
+            f"goal=Point(x={self.goal_x:.1f}, y={self.goal_y:.1f})"
             ")"
         )
 
@@ -184,14 +166,19 @@ class Geometry:
         return self.__max_robot_radius
 
     @property
+    def goal(self) -> Point:
+        """goal"""
+        return self.__goal
+
+    @property
     def goal_x(self) -> float:
         """goal_x"""
-        return self.__goal_x
+        return self.goal.x
 
     @property
     def goal_y(self) -> float:
         """goal_y"""
-        return self.__goal_y
+        return self.goal.y
 
     def update(self, geometry: Geometry_Info) -> None:
         """
@@ -221,5 +208,4 @@ class Geometry:
         self.__goal_height = geometry.goal_height
         self.__ball_radius = geometry.ball_radius
         self.__max_robot_radius = geometry.max_robot_radius
-        self.__goal_x = geometry.goal_x
-        self.__goal_y = geometry.goal_y
+        self.__goal = Point(geometry.goal_x, geometry.goal_y)
