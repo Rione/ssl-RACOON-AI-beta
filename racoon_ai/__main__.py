@@ -58,7 +58,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
             kp: float = float(conf.get("pid_gains", "kp") or 1)
             ki: float = float(conf.get("pid_gains", "ki") or 0)
             kd: float = float(conf.get("pid_gains", "kd") or 0)
-            custom_gains: Tuple[float, float, float] = (kp, ki, kd)
+            custom_gains: Tuple[float, float, float] = (kp, kd, ki)
             logger.info("Using custom PID gains: %s", custom_gains)
             controls = Controls(observer, k_gain=custom_gains)
         else:
