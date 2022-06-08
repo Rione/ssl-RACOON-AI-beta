@@ -9,8 +9,7 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
-
-# from racoon_ai.models.coordinate import Point
+from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 
 
@@ -53,7 +52,7 @@ class Role:
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
-        # self.__their_goal: Point = Point(6000, 0)
+        self.__their_goal: Point = Point(-self.__observer.goal.x, 0)
 
     @property
     def keeper_id(self) -> int:
@@ -76,9 +75,9 @@ class Role:
         self.__decide_keeper()
         self.__decide_defense()
         self.__decide_offense()
-        self.__logger.info(self.keeper_id)
-        self.__logger.info(self.offense_ids)
-        self.__logger.info(self.defense_ids)
+        self.__logger.debug(self.keeper_id)
+        self.__logger.debug(self.offense_ids)
+        self.__logger.debug(self.defense_ids)
 
     def __decide_quantity(self) -> None:
         robot_quantity = len(self.__observer.our_robots)
@@ -124,9 +123,9 @@ class Role:
         robot_dis = MU.distance(robot, self.__observer.goal)
 
         if abs(theta) < MU.PI / 4:
-            basis_dis = robot_dis - 1200 / cos(theta)
+            basis_dis = robot_dis - self.__observer.geometry.penalty_area_depth / cos(theta)
         else:
-            basis_dis = robot_dis - 1200 / sin(theta)
+            basis_dis = robot_dis - self.__observer.geometry.penalty_area_width / sin(theta)
 
         return basis_dis
 
@@ -140,13 +139,13 @@ class Role:
 
         offense: list[tuple[int, float, float]]
         offense = [
-            (robot.robot_id, robot.x, robot.y)
+            (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
             for robot in self.__observer.our_robots
             if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
         ]
 
         if offense:
-            offense.sort(reverse=True, key=lambda x: x[1])
+            offense.sort(reverse=False, key=lambda x: x[1])
             del offense[self.__offense_quantity :]
-            offense.sort(reverse=True, key=lambda x: x[2])
+            offense.sort(reverse=False, key=lambda x: x[2])
         self.__offense = list(row[0] for row in offense)

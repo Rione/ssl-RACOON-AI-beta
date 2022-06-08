@@ -16,8 +16,11 @@ from .networks.sender import CommandSender
 # from .strategy.role import Role
 from .strategy.goal_keeper import Keeper
 
+# from .strategy.offense import Offense
+from .strategy.role import Role
 
-def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
+
+def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
     """main
 
     This function is for the main function.
@@ -61,11 +64,11 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
         else:
             controls = Controls(observer)
 
-        # role: Role = Role(observer)
+        role: Role = Role(observer)
 
         # offense: Offense = Offense(observer)
 
-        keeper: Keeper = Keeper(observer, controls)
+        keeper: Keeper = Keeper(observer, role, controls)
 
         sender: CommandSender
         if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
@@ -82,7 +85,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            # role.main()
+            role.main()
             # offense.main()
             keeper.main()
 

@@ -4,6 +4,8 @@
     This module is for the Role class.
 """
 
+from logging import getLogger
+
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
@@ -22,6 +24,7 @@ class SubRole:
     """
 
     def __init__(self, observer: MWReceiver, role: Role) -> None:
+        self.__logger = getLogger(__name__)
         self.__attacker: int = -1
         self.__receiver: int = -1
         self.__observer = observer
@@ -34,8 +37,8 @@ class SubRole:
         """
         self.decide_attacker()
         self.decide_receiver()
-        print(self.__attacker)
-        print(self.__receiver)
+        self.__logger.debug(self.__attacker)
+        self.__logger.debug(self.__receiver)
 
     def decide_attacker(self) -> None:
         """decide_attacker
@@ -61,7 +64,7 @@ class SubRole:
           None
         """
         receiver: list[tuple[int, float]]
-        attacker: Robot = self.__observer.get_our_by_id(self.__attacker)
+        attacker: Robot = self.__observer.our_robots[self.__attacker]
         receiver = [
             (
                 robot.robot_id,
