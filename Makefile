@@ -1,13 +1,22 @@
 ROOT     = $(shell git rev-parse --show-toplevel)
+OS       = $(shell uname -s)
+ARCH     = $(shell uname -m | sed -e 's/i.86/i386/' -e 's/aarch64/arm64/' -e 's/amd64/x86_64/')
 PKG      = $(shell sed -n 's/^ *name.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
 VERSION  = $(shell sed -n 's/^ *version.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
 
 DIST_DIR		    = $(ROOT)/dist
+CACHE_DIR		    = $(ROOT)/.cache
 VENV_DIR        = $(ROOT)/.venv
 BIN_DIR         = $(ROOT)/bin
 PROJECT_DIR     = $(ROOT)/$(PKG)
-PROTO_SRCDIR    = $(ROOT)/$(PKG)/proto/pb_src
-PROTO_GENDIR    = $(ROOT)/$(PKG)/proto/pb_gen
+
+MW_TMP_DIR      = $(CACHE_DIR)/racoon-mw
+MW_OUT_DIR      = $(MW_TMP_DIR)/out
+MW_FILENAME     = ssl-RACOON-MW_*_$(OS)_$(ARCH).tar.gz
+MW_DOWNLOADED   = $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME))
+
+PROTO_SRCDIR    = $(PROJECT_DIR)/proto/pb_src
+PROTO_GENDIR    = $(PROJECT_DIR)/proto/pb_gen
 
 PKG_FILENAME    = $(PKG)-$(VERSION)
 WHEEL           = $(DIST_DIR)/$(PKG_FILENAME)-py3-none-any.whl
@@ -24,7 +33,6 @@ PY_LOCKFILE     = $(ROOT)/$(PKG)/poetry.lock
 PROTOC          = protoc
 RACOON_MW       = $(BIN_DIR)/RACOON_MW
 VERCHEW         = $(BIN_DIR)/verchew
-
 
 PROTOC_GEN_MYPY = $(VENV_DIR)/bin/protoc-gen-mypy
 PROTOL          = $(VENV_DIR)/bin/protol
@@ -43,10 +51,6 @@ $(TGZ):
 	@echo ""
 	$(error [ERROR] Please compile with `make build`, or use just `make` (compile and run at the same time))
 
-$(RACOON_MW):
-	@echo ""
-	@[ ! -f $@ ] && echo '[WARN] Please download RACOON_MW from https://github.com/Rione/ssl-RACOON-MW/releases/latest and place it in $(BIN_DIR)/'
-
 $(WHEEL): $(PROJECT_DIR) $(PROTO_GENDIR)/%.pyi
 	@echo "Creating $(PKG)@$(VERSION) distribution..."
 	@poetry build -vv
@@ -56,17 +60,17 @@ $(PROTO_GENDIR)/%.pyi: $(PROTO_GENDIR)/%.py $(PROTOL)
 	$(info Editing stub files)
 	@poetry run protol \
 		--in-place \
-		--python-out $(PROTO_GENDIR) \
-		$(PROTOC) --proto-path=$(PROTO_SRCDIR)	$(PROTO_SRCS)
+		--python-out $(@D) \
+		$(PROTOC) --proto-path=$(PROTO_SRCDIR) $(PROTO_SRCS)
 
 $(PROTO_GENDIR)/%.py: $(PROTO_SRCS) $(PROTOC_GEN_MYPY)
 	@echo ""
 	$(info Compiling protobuf files)
 	@$(PROTOC) \
-		--proto_path=$(PROTO_SRCDIR) \
+		--proto_path=$(<D) \
 		--plugin=protoc-gen-mypy=$(PROTOC_GEN_MYPY) \
-		--python_out=$(PROTO_GENDIR) \
-	  --mypy_out=$(PROTO_GENDIR) \
+		--python_out=$(@D) \
+	  --mypy_out=$(@D) \
 		$(PROTO_SRCS)
 
 $(PROTOL): $(VENV_DIR)
@@ -77,7 +81,24 @@ $(PROTOC_GEN_MYPY): $(VENV_DIR)
 	@echo ""
 	@poetry install
 
-$(VENV_DIR): doctor poetry.lock clean-deps
+$(VENV_DIR): doctor poetry.lock clean-deps $(BIN_DIR)/RACOON-MW
+
+$(BIN_DIR)/RACOON-MW: $(MW_OUT_DIR)/%
+	@echo ""
+	@ln -sf $(MW_OUT_DIR)/ssl-RACOON-MW $@
+
+$(MW_OUT_DIR)/%: $(MW_OUT_DIR)/% $(MW_TMP_DIR)/%
+	@echo ""
+	tar -xzvf $(wildcard $(MW_DOWNLOADED)) -C $(@D)
+
+$(MW_TMP_DIR)/%:
+ifneq (, $(wildcard $(@D)/$(MW_FILENAME)))
+	$(error [ERROR] Please download the MW-Reciever with `make download`)
+endif
+	@echo ""
+
+$(MW_OUT_DIR)/%:
+	@mkdir -p $(@D)
 
 # *************************************************************************** #
 
@@ -87,13 +108,22 @@ doctor:
 	$(info Checking dependencies versions for $(PKG)@$(VERSION))
 	@$(VERCHEW) --exit-code
 
+.PHONY: download
+download-mw:
+	@echo ""
+	$(info Downloading RACOON-MW...)
+	@gh release download \
+		--repo Rione/ssl-RACOON-MW \
+		--dir $(MW_TMP_DIR) \
+		--pattern $(MW_FILENAME)
+
 .PHONY: install
 install:
 	@echo ""
 	@poetry install
 
 .PHONY: run
-run: doctor $(TGZ) install $(RACOON_MW)
+run: doctor $(TGZ) install
 	@echo ""
 	@poetry run python -m $(PKG)
 
