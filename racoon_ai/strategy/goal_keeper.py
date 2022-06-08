@@ -33,6 +33,7 @@ class Keeper:
         self.__role = role
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
+
         self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius / 2
 
     @property
