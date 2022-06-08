@@ -7,7 +7,6 @@ from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
 from typing import Tuple
 
-from . import __version__
 from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
@@ -29,8 +28,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
     Returns:
         None
     """
-    logger.info("Running v%s", __version__)
-
     num_bots: int = conf.getint("commons", "num_robots")
     logger.info("Number of robots: %d", num_bots)
 
@@ -49,7 +46,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
     try:
         observer: MWReceiver
         if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
-            mw_host: str = conf.get("mw_receiver", "host", fallback="localhost")
+            mw_host: str = conf.get("mw_receiver", "host") or "localhost"
             mw_port: int = int(conf.get("mw_receiver", "port") or 30011)
             logger.info("Using custom address for MW: %s:%d", mw_host, mw_port)
             observer = MWReceiver(host=mw_host, port=mw_port)
@@ -75,7 +72,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
         sender: CommandSender
         if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
-            target_host: str = conf.get("command_sender", "host", fallback="localhost")
+            target_host: str = conf.get("command_sender", "host") or "localhost"
             target_port: int = int(conf.get("command_sender", "port") or 20011)
             sender = CommandSender(is_real, online_ids, host=target_host, port=target_port)
         else:
@@ -105,6 +102,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
 
 if __name__ == "__main__":
+    from . import __version__
+
     logo: str = """
         ######     ###      ####    #####    #####   ##   ##             ###     ######
         ##  ##   ## ##    ##  ##  ### ###  ### ###  ###  ##            ## ##      ##
@@ -124,6 +123,7 @@ if __name__ == "__main__":
     log.setLevel(INFO)
     log.addHandler(hdlr)
     log.debug("Logger initialized")
+    log.info("Running v%s", __version__)
 
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
