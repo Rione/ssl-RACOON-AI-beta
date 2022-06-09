@@ -11,10 +11,11 @@ from .common.controls import Controls
 from .models.robot import SimCommands
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
+from .strategy.defense import Defense
+from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
-# from .strategy.role import Role
-from .strategy.goal_keeper import Keeper
+from .strategy.role import Role
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
@@ -61,9 +62,11 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
         else:
             controls = Controls(observer)
 
-        # role: Role = Role(observer)
+        role: Role = Role(observer)
 
         # offense: Offense = Offense(observer)
+
+        defense = Defense(observer, controls)
 
         keeper: Keeper = Keeper(observer, controls)
 
@@ -82,11 +85,13 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
-            # role.main()
+            role.main()
             # offense.main()
+            defense.main()
             keeper.main()
 
             # sim_cmds.robot_commands += offense.send_cmds
+            sim_cmds.robot_commands += defense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
