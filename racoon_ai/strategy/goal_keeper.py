@@ -8,10 +8,10 @@
 from logging import getLogger
 from math import cos, sin
 
-from racoon_ai.common import Controls
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
+from racoon_ai.movement import Controls
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
 
