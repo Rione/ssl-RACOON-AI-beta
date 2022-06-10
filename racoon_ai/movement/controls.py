@@ -32,7 +32,7 @@ class Controls:
     def __init__(self, observer: MWReceiver, k_gain: Tuple[float, float, float] = (8, 0.5, 1)) -> None:
         self.__logger = getLogger(__name__)
         self.__observer = observer
-        self.__dtaime: float = observer.sec_per_frame
+        self.__dtaime: float = self.__observer.sec_per_frame
         self.__k_gain: NDArray[float64] = array(k_gain, dtype=float64)
         self.__pre_target_pose: NDArray[float64] = zeros((11, 3), dtype=float64)
         self.__pre_bot_pose: NDArray[float64] = zeros((11, 3), dtype=float64)
@@ -123,6 +123,10 @@ class Controls:
         self.__pre_target_theta[bot_id] = target_theta
         self.__pre_bot_theta[bot_id] = bot.theta
 
-        vel_angular = MU.radian_normalize(vel_angular)
+        if vel_angular > MU.PI:
+            vel_angular = min(vel_angular, MU.PI)
+        elif vel_angular < -MU.PI:
+            vel_angular = max(vel_angular, -MU.PI)
+
         self.__logger.debug("vel_angular: %s", vel_angular)
         return vel_angular
