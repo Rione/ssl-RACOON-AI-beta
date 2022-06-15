@@ -7,18 +7,19 @@ from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
 from typing import Tuple
 
-from .common.controls import Controls
 from .models.robot import SimCommands
+from .movement import Controls
 from .networks.receiver import MWReceiver
 from .networks.sender import CommandSender
-from .strategy.defense import Defense
+
+# from .strategy.defense import Defense
 from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
 
 
-def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
+def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
     """main
 
     This function is for the main function.
@@ -26,12 +27,12 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     Returns:
         None
     """
-    num_bots: int = conf.getint("commons", "num_robots")
-    logger.info("Number of robots: %d", num_bots)
-
     # List of online robot ids
-    online_ids: list[int] = list(range(num_bots + 1))
+    online_ids: list[int] = [int(i) for i in conf.get("commons", "onlineIds", fallback="").split(",")]
     logger.info("Online robot ids: %s", online_ids)
+
+    num_bots: int = len(online_ids)
+    logger.info("Number of robots: %d", num_bots)
 
     # Flag if run for a real robot
     is_real: bool = conf.getboolean("commons", "isReal", fallback=False)
@@ -56,7 +57,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             kp: float = float(conf.get("pid_gains", "kp") or 1)
             ki: float = float(conf.get("pid_gains", "ki") or 0)
             kd: float = float(conf.get("pid_gains", "kd") or 0)
-            custom_gains: Tuple[float, float, float] = (kp, ki, kd)
+            custom_gains: Tuple[float, float, float] = (kp, kd, ki)
             logger.info("Using custom PID gains: %s", custom_gains)
             controls = Controls(observer, k_gain=custom_gains)
         else:
@@ -66,9 +67,9 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
         # offense: Offense = Offense(observer)
 
-        defense = Defense(observer, controls)
+        # defense = Defense(observer, controls)
 
-        keeper: Keeper = Keeper(observer, controls)
+        keeper: Keeper = Keeper(observer, role, controls)
 
         sender: CommandSender
         if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
@@ -81,17 +82,17 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
         logger.info("Roop started")
 
         while True:
-            # Create a list of commands
+            # Create a list of commands (Timestamp is set at this initialization)
             sim_cmds = SimCommands(is_team_yellow)
 
             observer.main()
             role.main()
             # offense.main()
-            defense.main()
+            # defense.main()
             keeper.main()
 
             # sim_cmds.robot_commands += offense.send_cmds
-            sim_cmds.robot_commands += defense.send_cmds
+            # sim_cmds.robot_commands += defense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 

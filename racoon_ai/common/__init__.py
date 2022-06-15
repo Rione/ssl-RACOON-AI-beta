@@ -7,7 +7,6 @@ from typing import TypeAlias
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 
-from .controls import Controls
 from .math_utils import MathUtils
 
 MAX_SPEED: float = 1000.0
@@ -35,27 +34,9 @@ def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
     return command
 
 
-def halt(robot: Robot) -> RobotCommand:
-    """halt
-
-    Returns:
-        RobotCommand: halt value
-    """
-    command = RobotCommand(robot.robot_id)
-    command.vel_fwd = 0.0
-    command.vel_sway = 0.0
-    command.vel_angular = 0.0
-    command.kickpow = 0.0
-    command.dribble_pow = 0.0
-
-    return command
-
-
 __all__ = [
     "MathUtils",
-    "Controls",
     "CLOSE_BALL",
     "MAX_SPEED",
     "move2pose",
-    "halt",
 ]

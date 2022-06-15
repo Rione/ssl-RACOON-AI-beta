@@ -40,19 +40,33 @@ class RobotCommand:
 
     use_wheels_speed: bool = field(default=False, kw_only=True)
 
-    vel_fwd: float = field(default=0, init=False)
+    vel_fwd: float = field(default_factory=float, init=False)
 
-    vel_sway: float = field(default=0, init=False)
+    vel_sway: float = field(default_factory=float, init=False)
 
-    vel_angular: float = field(default=0, init=False)
+    vel_angular: float = field(default_factory=float, init=False)
 
-    dribble_pow: float = field(default=0, init=False)
+    dribble_pow: float = field(default_factory=float, init=False)
 
-    kickpow: float = field(default=0, init=False)
+    kickpow: float = field(default_factory=float, init=False)
 
-    kickpow_z: float = field(default=0, init=False, kw_only=True)
+    kickpow_z: float = field(default_factory=float, init=False)
 
-    wheels: tuple[float, float, float, float] = field(default=(0, 0, 0, 0), init=False, kw_only=True)
+    wheels: tuple[float, float, float, float] = field(default=(float(0), float(0), float(0), float(0)), init=False)
+
+    def __str__(self) -> str:
+        msg: str = "("
+        msg += f"id={self.robot_id:02d} "
+        msg += "(chip_disabled), " if not self.chip_enabled else ""
+        msg += f"vel_fwd={self.vel_fwd:.2E}, " if not self.use_wheels_speed else ""
+        msg += f"vel_sway={self.vel_sway:.2E}, " if not self.use_wheels_speed else ""
+        msg += f"vel_angular={self.vel_angular:.2E}, " if not self.use_wheels_speed else ""
+        msg += f"dribble_pow={self.dribble_pow:.2E}, "
+        msg += f"kickpow={self.kickpow:.2E}, "
+        msg += f"kickpow_z={self.kickpow_z:.2E}, " if self.chip_enabled else ""
+        msg += f"wheels={self.wheels}" if self.use_wheels_speed else ""
+        msg += ")"
+        return msg
 
     def to_proto(self) -> grSim_Robot_Command:
         """to_proto
@@ -65,7 +79,7 @@ class RobotCommand:
         # Required
         proto.id = self.robot_id
         proto.kickspeedx = self.kickpow
-        proto.kickspeedz = self.kickpow_z if self.chip_enabled else 0
+        proto.kickspeedz = self.kickpow_z if self.chip_enabled else float(0)
         proto.veltangent = self.vel_fwd
         proto.velnormal = self.vel_sway
         proto.velangular = self.vel_angular

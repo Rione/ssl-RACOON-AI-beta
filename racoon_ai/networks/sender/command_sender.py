@@ -5,11 +5,12 @@
     This module is for the CommandSender class.
 """
 
-import socket
 from logging import getLogger
+from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRAM, socket
 
 from racoon_ai.models.network import IPNetAddr
-from racoon_ai.models.robot import RobotCommand, SimCommands
+from racoon_ai.models.robot import SimCommands
+from racoon_ai.models.robot.commands import RobotCommand
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
 
@@ -44,7 +45,7 @@ class CommandSender:
 
         self.__online_ids: list[int] = online_ids
 
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.__sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
 
         self.__dists: list[IPNetAddr]
 
@@ -53,7 +54,7 @@ class CommandSender:
             self.__dists = [IPNetAddr(host, port, mod_name=__name__) for host in host_ips]
         else:
             self.__dists = [IPNetAddr(host, port, mod_name=__name__)]
-            self.__sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+            self.__sock.setsockopt(IPPROTO_IP, IP_MULTICAST_TTL, 2)
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
@@ -115,14 +116,5 @@ class CommandSender:
         """
 
         for _ in range(10):
-            commands = SimCommands()
-            for robot in range(11):
-                command = RobotCommand(robot)
-                command.vel_fwd = 0
-                command.vel_sway = 0
-                command.vel_angular = 0
-                command.kickpow = 0
-                command.dribble_pow = 0
-
-                commands.robot_commands.append(command)
+            commands = SimCommands(robot_commands=[RobotCommand(i) for i in range(len(self.online_ids))])
             self.send(commands)

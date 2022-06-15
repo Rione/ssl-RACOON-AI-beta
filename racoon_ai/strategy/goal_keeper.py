@@ -7,12 +7,16 @@
 
 from logging import getLogger
 from math import cos, sin
+from typing import Optional
 
-from racoon_ai.common import Controls
+from numpy import sign
+
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
+from racoon_ai.movement import Controls
 from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.strategy.role import Role
 
 
 class Keeper:
@@ -24,14 +28,16 @@ class Keeper:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, controls: Controls) -> None:
+    def __init__(self, observer: MWReceiver, role: Role, controls: Controls) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
         self.__observer = observer
         self.__controls = controls
+        self.__role = role
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
-        self.__radius: float = 750
+
+        self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -46,12 +52,13 @@ class Keeper:
         """main"""
         # commandの情報を格納するリスト
         self.__send_cmds = []
-        bot: Robot
+        bot: Optional[Robot]
         cmd: RobotCommand
 
-        bot = self.__observer.our_robots[0]
-        cmd = self.__keep_goal(bot)
-        self.__send_cmds.append(cmd)
+        bot = self.__observer.get_our_by_id(self.__role.keeper_id)
+        if bot:
+            cmd = self.__keep_goal(bot)
+            self.__send_cmds.append(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
@@ -59,7 +66,7 @@ class Keeper:
         radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
         if abs(radian_ball_goal) >= MU.PI / 2:
-            radian_ball_goal = ((radian_ball_goal / abs(radian_ball_goal)) * MU.PI) / 2
+            radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
             (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)),
             (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)),
