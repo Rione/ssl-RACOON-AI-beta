@@ -34,7 +34,7 @@ class CommandSender:
         is_real: bool,
         online_ids: list[int],
         *,
-        host: str = "224.5.23.2",
+        host: str = "127.0.0.1",
         port: int = 20011,
     ) -> None:
 
@@ -50,6 +50,7 @@ class CommandSender:
 
         if is_real and online_ids:
             host_ips: list[str] = [f"192.168.100.{robot_id:03d}" for robot_id in online_ids]
+            print(host_ips)
             self.__dists = [IPNetAddr(host, port, mod_name=__name__) for host in host_ips]
         else:
             self.__dists = [IPNetAddr(host, port, mod_name=__name__)]
@@ -105,6 +106,7 @@ class CommandSender:
         packet: bytes = send_packet.SerializeToString()
 
         for dist in self.dists:
+            print(dist.port)
             self.__logger.debug("Sending to %s:%d (%s)", dist.host, dist.port, ("real" if self.is_real else "sim"))
             self.__sock.sendto(packet, (dist.host, dist.port))
 

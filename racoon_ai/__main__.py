@@ -32,10 +32,10 @@ def main() -> None:
     logger.debug("Logger initialized")
 
     # List of online robot ids
-    online_ids: list[int] = [1, 3]
+    online_ids: list[int] = [1]
 
     # Flag if run for a real robot
-    is_real: bool = False
+    is_real: bool = True
 
     # Flag if our team is yellow
     is_team_yellow: bool = False
@@ -43,7 +43,7 @@ def main() -> None:
     try:
 
         observer = Observer(
-            VisionReceiver(),
+            VisionReceiver(port=10006),
             is_team_yellow,
         )
 
@@ -51,7 +51,7 @@ def main() -> None:
 
         offense = Offense(observer, role)
 
-        sender = CommandSender(is_real, online_ids, host="localhost")
+        sender = CommandSender(is_real, online_ids, host="localhost", port=20011)
 
         logger.info("Roop started")
 

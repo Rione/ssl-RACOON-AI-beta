@@ -59,16 +59,19 @@ class Offense:
         cmd: RobotCommand
 
         # 一番ボールに近いロボットがボールに向かって前進
-        bot = self.__observer.our_robots[self.__role.offense_ids[0]]
-        cmd = self.__straight2ball(bot)
+        bot = self.__observer.our_robots[1]
+        #bot = self.__observer.our_robots[self.__role.offense_ids[1]]
+        cmd = self.__straight2balltest(bot)
+        #cmd = self.__shoot2goal(bot)
         self.__send_cmds.append(cmd)
+        print(self.__observer.ball.x)
 
         # (x,y)=(2000,2000)の地点に１番ロボットを移動させる
-        bot = self.__observer.our_robots[1]
-        target_position = Pose(2000, 2000, 0, radian(self.__observer.ball, bot))
-        cmd = move2pose(bot, target_position)
-        self.__logger.debug(cmd)
-        self.__send_cmds.append(cmd)
+        #bot = self.__observer.our_robots[5]
+        #target_position = Pose(2000, 2000, 0, radian(self.__observer.ball, bot))
+        #cmd = move2pose(bot, target_position)
+        #self.__logger.debug(cmd)
+        #self.__send_cmds.append(cmd)
 
     # def _pass_receive(self, robot: Robot) -> RobotCommand:
     #     command = RobotCommand(robot.robot_id)
@@ -102,7 +105,7 @@ class Offense:
 
     #     return command
 
-    def __straight2ball(self, robot: Robot) -> RobotCommand:
+    '''def __straight2ball(self, robot: Robot) -> RobotCommand:
         """straight2ball"""
         radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
         distance_target_robot = distance(self.__observer.ball, robot)
@@ -121,4 +124,52 @@ class Offense:
         command.vel_angular = radian_ball_robot
         command.dribble_pow = dribble_power
         command.kickpow = 0
+        return command'''
+
+    def __straight2balltest(self,robot: Robot) -> RobotCommand:
+        radian_ball_robot = radian_normalize(radian(self.__observer.ball, robot) - robot.theta)
+        distance_target_robot = distance(self.__observer.ball, robot)
+        speed = distance_target_robot / 1000.0
+
+        #speed=min(speed, 0.2)
+
+        dribble_power = 0
+        #self.__logger.info()
+
+        command = RobotCommand(robot.robot_id)
+        command.vel_fwd = math.cos(radian_ball_robot) * speed
+        command.vel_sway = math.sin(radian_ball_robot) * speed
+        command.vel_angular = radian_ball_robot
+        command.dribble_pow = dribble_power
+        command.kickpow = 0
         return command
+
+    def __rotate2goal(self,robot: Robot) -> RobotCommand:
+
+        radian_goal_robot = radian_normalize(math.atan2(0 - robot.y,6000 - robot.x) - robot.theta)
+
+        command = RobotCommand(robot.robot_id)
+        command.vel_fwd = 0
+        command.vel_sway = 0
+        command.vel_angular = radian_goal_robot
+        command.dribble_pow = 1
+        command.kickpow = 0
+        return command
+
+    def __kick(self,robot: Robot) -> RobotCommand:
+
+        kickpower = 1
+
+        command = RobotCommand(robot.robot_id)
+        command.vel_fwd = 0
+        command.vel_sway = 0
+        command.vel_angular = 0
+        command.dribble_pow = 1
+        command.kickpow = kickpower
+        return command
+
+    '''def __shoot2goal(self,robot: Robot) -> RobotCommand:
+
+        self.__straight2balltest(self.__observer.our_robots[1])
+
+        return'''
