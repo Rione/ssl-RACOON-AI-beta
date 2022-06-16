@@ -37,8 +37,8 @@ class MWReceiver(IPNetAddr):
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
-        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
+        self.__our_robots: list[Robot] = [Robot(i) for i in range(8)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(8)]
 
         self.__sec_per_frame: float
         self.__n_camras: int

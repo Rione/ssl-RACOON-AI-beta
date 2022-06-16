@@ -17,6 +17,7 @@ from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
+from .strategy.subrole import SubRole
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
@@ -65,6 +66,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
         role: Role = Role(observer)
 
+        subrole: SubRole = SubRole(observer, role)
+
         # offense: Offense = Offense(observer)
 
         # defense = Defense(observer, controls)
@@ -87,6 +90,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
             observer.main()
             role.main()
+            subrole.main()
             # offense.main()
             # defense.main()
             keeper.main()
