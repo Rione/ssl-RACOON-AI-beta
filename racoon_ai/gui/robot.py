@@ -7,8 +7,8 @@
     This module is for the Feild class.
 """
 
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QCheckBox, QLabel, QSpinBox
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QCheckBox, QLabel, QSpinBox
 
 from racoon_ai.gui.animated_toggle import AnimatedToggle
 from racoon_ai.gui.main import Main
@@ -26,9 +26,9 @@ class Robot:
 
         self.__main = main
 
-        self._set_texts()
+        # self._set_texts()
         self._set_box()
-        self._set_toggle()
+        # self._set_toggle()
 
     def _set_box(self) -> None:
         robot_check = []

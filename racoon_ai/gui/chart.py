@@ -8,9 +8,9 @@
 """
 
 import pyqtgraph as pg
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QLabel
+from PyQt6 import QtCore, QtGui
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QLabel
 
 from racoon_ai.gui.main import Main
 from racoon_ai.networks.receiver import MWReceiver

@@ -10,7 +10,7 @@ from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
 from typing import Any, Tuple
 
-from PyQt5.QtWidgets import QApplication  # type: ignore
+from PyQt6.QtWidgets import QApplication  # type: ignore
 
 from . import __version__
 from .common.controls import Controls
@@ -50,7 +50,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     # Flag if view gui
-    is_gui_view: bool = False
+    is_gui_view: bool = True
 
     app: Any = QApplication(sys.argv)
     try:

@@ -14,10 +14,11 @@ PyQt5 = {version = "^5.15.6", optional = true, extras = ["Qt"]}
 brainflow = {version = "^4.9.3", optional = true}
 PySide2 = {version = "^5.15.2", optional = true}
 PyQtChart = {version = "^5.15.5", optional = true}
-pyqtgraph = {version = "0.12.1", optional = true}
 qtwidgets = {version = "^0.18", optional = true}
 pygame = {version = "^2.1.2", optional = true, extras = ["pygame"]}
 numpy = "^1.22.3"
+PyQt6 = "^6.3.0"
+pyqtgraph = "^0.12.4"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"

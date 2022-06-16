@@ -8,9 +8,9 @@
 """
 import math
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
-from PyQt5.QtWidgets import QLabel, QWidget
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor, QFont, QPainter, QPixmap
+from PyQt6.QtWidgets import QLabel, QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
@@ -51,21 +51,21 @@ class Main(QWidget):
 
     def _set_num(self):
         self.__keeper_num = QLabel(self)
-        self.__keeper_num.setFont(QFont("Arial", 30, QFont.Bold))
+        self.__keeper_num.setFont(QFont("Arial", 30))
 
         self.__midfielder_num = QLabel(self)
-        self.__midfielder_num.setFont(QFont("Arial", 30, QFont.Bold))
+        self.__midfielder_num.setFont(QFont("Arial", 30))
 
         self.__offense_num = []
         self.__defense_num = []
         for i in range(3):
             self.__offense_num.append(QLabel(self))
-            self.__offense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+            self.__offense_num[i].setFont(QFont("Arial", 30))
             self.__defense_num.append(QLabel(self))
-            self.__defense_num[i].setFont(QFont("Arial", 30, QFont.Bold))
+            self.__defense_num[i].setFont(QFont("Arial", 30))
 
         self.__fps_num = QLabel(self)
-        self.__fps_num.setFont(QFont("Arial", 16, QFont.Bold))
+        self.__fps_num.setFont(QFont("Arial", 16))
         self.__fps_num.setGeometry(100, 100, 200, 200)
         self.__fps_num.move(707, 160)
 
@@ -95,8 +95,8 @@ class Main(QWidget):
         self.__ui.drawPixmap(2, 148, 42, 40, self.__pixmap_referee)
         self.__ui.drawPixmap(0, 198, 45, 45, self.__pixmap_gear)
 
-        self.__ui.setPen(QColor(Qt.white))
-        self.__ui.setBrush(QColor(Qt.gray))
+        self.__ui.setPen(QColor("white"))
+        self.__ui.setBrush(QColor("gray"))
         # Feild全体
         self.__ui.drawRect(47, 42, 520, 730)
         # Feild line
@@ -113,7 +113,7 @@ class Main(QWidget):
         self.__ui.drawRect(272, 72, 60, 10)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(586, 425, 840, 350)  # Ball of the rectangle
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(600, 425, 705, 425)
@@ -129,31 +129,31 @@ class Main(QWidget):
         self.__ui.drawPixmap(590, 297, 550, 115, self.__pixmap_role)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(822, 57, 310, 95)  # To draw of robot
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(832, 57, 962, 57)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(822, 167, 180, 115)  # To draw of Control Robot
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(832, 167, 944, 167)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(1014, 167, 125, 115)  # To draw of Camera
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(1019, 167, 1074, 167)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(588, 57, 222, 225)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(599, 57, 662, 57)
 
         self.__ui.setBrush(QColor("#2E333A"))
-        self.__ui.setPen(QColor(Qt.white))
+        self.__ui.setPen(QColor("white"))
         self.__ui.drawRect(1152, 57, 270, 355)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(1167, 57, 1312, 57)
@@ -191,7 +191,7 @@ class Main(QWidget):
 
     def _draw_role(self, ui: QPainter) -> None:
         ui.setBrush(QColor("#2E333A"))
-        ui.setPen(QColor(Qt.white))
+        ui.setPen(QColor("white"))
         ui.drawRect(588, 297, 553, 115)  # To draw of role
         ui.setPen(QColor("#2E333A"))
         ui.drawLine(602, 297, 647, 297)

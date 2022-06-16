@@ -6,9 +6,9 @@
 
     This module is for the Vision class.
 """
-from PyQt5 import QtGui
-from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QComboBox, QLabel, QSpinBox
+from PyQt6 import QtGui
+from PyQt6.QtGui import QColor, QPainter
+from PyQt6.QtWidgets import QComboBox, QLabel, QSpinBox
 
 from racoon_ai.gui.animated_toggle import AnimatedToggle
 from racoon_ai.gui.main import Main
@@ -38,45 +38,45 @@ class Vision:
 
     def _set_texts(self) -> None:
         self.__role_text = QLabel("Vision", self.__main)
-        self.__role_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__role_text.setFont(QtGui.QFont("Arial", 20))
         self.__role_text.setStyleSheet("QLabel { color : white; }")
         self.__role_text.move(601, 44)
 
         self.__simu_text = QLabel("Simu", self.__main)
-        self.__simu_text.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__simu_text.setFont(QtGui.QFont("Arial", 15))
         self.__simu_text.setStyleSheet("QLabel { color : white; }")
         self.__simu_text.move(602, 82)
         self.__real_text = QLabel("Real", self.__main)
-        self.__real_text.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__real_text.setFont(QtGui.QFont("Arial", 15))
         self.__real_text.setStyleSheet("QLabel { color : white; }")
         self.__real_text.move(760, 80)
 
         self.__simu_text = QLabel("Blue", self.__main)
-        self.__simu_text.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__simu_text.setFont(QtGui.QFont("Arial", 15))
         self.__simu_text.setStyleSheet("QLabel { color : white; }")
         self.__simu_text.move(602, 126)
         self.__real_text = QLabel("Yellow", self.__main)
-        self.__real_text.setFont(QtGui.QFont("Arial", 15, QtGui.QFont.Black))
+        self.__real_text.setFont(QtGui.QFont("Arial", 15))
         self.__real_text.setStyleSheet("QLabel { color : white; }")
         self.__real_text.move(757, 126)
 
         self.__receive_text = QLabel("Receive Port:", self.__main)
-        self.__receive_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+        self.__receive_text.setFont(QtGui.QFont("Arial", 14))
         self.__receive_text.setStyleSheet("QLabel { color : white; }")
         self.__receive_text.move(602, 170)
 
         self.__send_text = QLabel("Send Port:", self.__main)
-        self.__send_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+        self.__send_text.setFont(QtGui.QFont("Arial", 14))
         self.__send_text.setStyleSheet("QLabel { color : white; }")
         self.__send_text.move(620, 198)
 
         self.__camera_text = QLabel("Camera Num:", self.__main)
-        self.__camera_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+        self.__camera_text.setFont(QtGui.QFont("Arial", 14))
         self.__camera_text.setStyleSheet("QLabel { color : white; }")
         self.__camera_text.move(600, 224)
 
         self.__fps_text = QLabel("Vision Fps:", self.__main)
-        self.__fps_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+        self.__fps_text.setFont(QtGui.QFont("Arial", 14))
         self.__fps_text.setStyleSheet("QLabel { color : white; }")
         self.__fps_text.move(615, 250)
 

@@ -7,8 +7,8 @@
     This module is for the Back class.
 """
 
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QLabel
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QLabel
 
 from racoon_ai.gui.main import Main
 

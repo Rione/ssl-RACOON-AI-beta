@@ -6,8 +6,8 @@
 
     This module is for the Game class.
 """
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox
 
 from racoon_ai.gui.animated_toggle import AnimatedToggle
 from racoon_ai.gui.main import Main
