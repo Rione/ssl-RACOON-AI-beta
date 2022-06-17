@@ -42,6 +42,8 @@ class MWReceiver(IPNetAddr):
 
         self.__sec_per_frame: float
         self.__n_camras: int
+        self.__num_of_our_robots: int
+        self.__num_of_enemy_robots: int
         self.__is_vision_recv: bool
         self.__attack_direction: int
 
@@ -65,6 +67,7 @@ class MWReceiver(IPNetAddr):
         proto.ParseFromString(packet)
         self.__logger.debug("Received %s", proto)
         self.update(proto)
+        print(self.our_robots[9])
 
     def update(self, proto: RacoonMW_Packet) -> None:
         """update
@@ -102,6 +105,10 @@ class MWReceiver(IPNetAddr):
         self.__sec_per_frame = proto.info.secperframe
 
         self.__n_camras = proto.info.num_of_cameras
+
+        self.__num_of_our_robots = proto.info.num_of_our_robots
+
+        self.__num_of_enemy_robots = proto.info.num_of_enemy_robots
 
         self.__is_vision_recv = proto.info.is_vision_recv
 
@@ -256,6 +263,39 @@ class MWReceiver(IPNetAddr):
             int
         """
         return self.__n_camras
+
+    @property
+    def num_of_our_robots(self) -> int:
+        """num_of_our_robots
+
+        How many our robots visible
+
+        Returns:
+            int
+        """
+        return self.__num_of_our_robots
+
+    @property
+    def num_of_enemy_robots(self) -> int:
+        """num_of_enemy_robots
+
+        How many enemy robots visible
+
+        Returns:
+            int
+        """
+        return self.__num_of_enemy_robots
+
+    @property
+    def num_of_all_robots(self) -> int:
+        """num_of_all_robots
+
+        How many all robots visible
+
+        Returns:
+            int
+        """
+        return self.__num_of_enemy_robots + self.__num_of_our_robots
 
     @property
     def is_vision_recv(self) -> bool:
