@@ -8,11 +8,12 @@
 from logging import getLogger
 from math import cos, sin
 
-from racoon_ai.common import Controls
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
+from racoon_ai.movement import Controls
 from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.strategy.role import Role
 
 
 class Keeper:
@@ -24,14 +25,16 @@ class Keeper:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, controls: Controls) -> None:
+    def __init__(self, observer: MWReceiver, role: Role, controls: Controls) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
         self.__observer = observer
         self.__controls = controls
+        self.__role = role
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
-        self.__radius: float = 750
+
+        self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius / 2
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -49,7 +52,7 @@ class Keeper:
         bot: Robot
         cmd: RobotCommand
 
-        bot = self.__observer.our_robots[0]
+        bot = self.__observer.our_robots[self.__role.keeper_id]
         cmd = self.__keep_goal(bot)
         self.__send_cmds.append(cmd)
 

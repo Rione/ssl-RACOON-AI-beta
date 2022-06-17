@@ -3,7 +3,6 @@
 # pylint: disable-all
 # type: ignore
 """main.py
-
     This module is for the Main class.
 """
 import math
@@ -200,7 +199,7 @@ class Main(QWidget):
         self.__keeper_num.setNum(self.__role.keeper_id)
         self.__midfielder_num.setGeometry(20, 20, 645, 70)
         self.__midfielder_num.move(1100, 319)
-        self.__midfielder_num.setNum(self.__role.midfielder_id)
+        # self.__midfielder_num.setNum(1)
         for i in range(3):
             self.__offense_num[i].setGeometry(20, 20, 645, 70)
             self.__offense_num[i].move(735 + (61 * i), 319)

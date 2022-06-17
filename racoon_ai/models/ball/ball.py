@@ -19,6 +19,12 @@ class Ball(Point):
 
         z (float): z coordinate
 
+        diff_x (float): difference between x coordinate and last x coordinate
+
+        diff_y (float): difference between y coordinate and last y coordinate
+
+        filtered (Point): filtered coordinate (x, y)
+
         filtered_x (float) : Kalman Filtered X
 
         filtered_y (float) : Kalman Filtered Y
@@ -34,8 +40,9 @@ class Ball(Point):
 
     def __init__(self) -> None:
         super().__init__(0, 0)  # x, y, z
-        self.__filtered_x: float = float(0)
-        self.__filtered_y: float = float(0)
+        self.__filtered: Point = Point(0, 0)
+        self.__diff_x: float = float(0)
+        self.__diff_y: float = float(0)
         self.__speed: float = float(0)
         self.__speed_slope: float = float(0)
         self.__speed_slope_radian: float = float(0)
@@ -45,12 +52,11 @@ class Ball(Point):
         return (
             "("
             f"pt=Point(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f}), "
-            f"filtered_x={self.filtered_x:.1f}, "
-            f"filtered_y={self.filtered_y:.1f}, "
+            f"filtered=Point(x={self.filtered_x:.1f}, y={self.filtered_y:.1f}), "
             f"speed={self.speed:.1f}, "
             f"speed_slope={self.speed_slope:.1f}, "
             f"speed_slope_radian={self.speed_slope_radian:.1f}, "
-            f"speed_intercept={self.speed_intercept:.1f}, "
+            f"speed_intercept={self.speed_intercept:.1f}"
             ")"
         )
 
@@ -58,25 +64,47 @@ class Ball(Point):
         raise NotImplementedError
 
     @property
+    def filtered(self) -> Point:
+        """filtered
+
+        get filtered point
+
+        Returns:
+            Point: filtered point
+
+        Note:
+            Z is not available in filtered point
+        """
+        return self.__filtered
+
+    @property
     def filtered_x(self) -> float:
         """filtered_x"""
-        return self.__filtered_x
+        return self.filtered.x
 
     @property
     def filtered_y(self) -> float:
         """filtered_y"""
-        return self.__filtered_y
+        return self.filtered.y
 
-    # pylint: disable=R0801
+    @property
+    def diff_x(self) -> float:
+        """diff_x"""
+        return self.__diff_x
+
+    @property
+    def diff_y(self) -> float:
+        """diff_y"""
+        return self.__diff_y
+
     @property
     def speed(self) -> float:
         """speed
 
-        speed of ball
+        speed of ball (absolute value)
         """
         return self.__speed
 
-    # pylint: disable=R0801
     @property
     def speed_slope(self) -> float:
         """slope
@@ -85,16 +113,20 @@ class Ball(Point):
         """
         return self.__speed_slope
 
-    # pylint: disable=R0801
     @property
     def speed_slope_radian(self) -> float:
-        """speed_slope_radian"""
+        """speed_slope_radian
+
+        slope of ball speed in radian
+        """
         return self.__speed_slope_radian
 
-    # pylint: disable=R0801
     @property
     def speed_intercept(self) -> float:
-        """speed_intercept"""
+        """speed_intercept
+
+        intercept of ball speed with Y-axis
+        """
         return self.__speed_intercept
 
     def update(self, dball: Ball_Info) -> None:
@@ -117,8 +149,9 @@ class Ball(Point):
         """
         self.x = dball.x
         self.y = dball.y
-        self.__filtered_x = dball.filtered_x
-        self.__filtered_y = dball.filtered_y
+        self.__diff_x = dball.diff_x
+        self.__diff_y = dball.diff_y
+        self.__filtered = Point(dball.filtered_x, dball.filtered_y)
         self.__speed = dball.speed
         self.__speed_slope = dball.slope
         self.__speed_slope_radian = dball.slope_radian
