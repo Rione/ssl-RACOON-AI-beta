@@ -28,6 +28,12 @@ class Robot(Pose):
 
         theta (float): orientation (radian) in the x-y plane
 
+        diff_x (float): difference between x coordinate and last x coordinate
+
+        diff_y (float): difference between y coordinate and last y coordinate
+
+        diff_theta (float): difference between orientation and last orientation
+
         z (float): z coordinate
 
         distance_ball_robot (float): distance between ball and robot center
@@ -46,12 +52,17 @@ class Robot(Pose):
 
         is_online (bool) : is robot online
 
+        is_visible (bool) : is robot visible
+
         battery_voltage (float, optional) : battery voltage
     """
 
     def __init__(self, robot_id: int) -> None:
         super().__init__(0, 0)  # x, y, theta, z
         self.__robot_id: int = robot_id
+        self.__diff_x: float = float(0)
+        self.__diff_y: float = float(0)
+        self.__diff_theta: float = float(0)
         self.__distance_ball_robot: float = float(0)
         self.__radian_ball_robot: float = float(0)
         self.__speed: float = float(0)
@@ -60,6 +71,7 @@ class Robot(Pose):
         self.__vel_angular: float = float(0)
         self.__is_ball_catched: bool = False
         self.__is_online: bool = False
+        self.__is_visible: bool = False
         self.__battery_voltage: Optional[float] = None
 
     def __str__(self) -> str:
@@ -76,6 +88,7 @@ class Robot(Pose):
                 f"vel_angular={self.vel_angular:.1f}, "
                 f"ball_catched={self.is_ball_catched:b}, "
                 f"is_online={self.is_online:b}, "
+                f"is_visible={self.is_visible:b},"
                 f"battery_vol={None}"
                 ")"
             )
@@ -92,6 +105,7 @@ class Robot(Pose):
             f"vel_angular={self.vel_angular:.1f}, "
             f"ball_catched={self.is_ball_catched:b}, "
             f"is_online={self.is_online:b}, "
+            f"is_visible={self.is_visible:b},"
             f"battery_voltage={self.battery_voltage:3.1%}"
             ")"
         )
@@ -118,6 +132,24 @@ class Robot(Pose):
     def robot_id(self) -> int:
         """robot id"""
         return self.__robot_id
+
+    # pylint: disable=R0801
+    @property
+    def diff_x(self) -> float:
+        """diff_x"""
+        return self.__diff_x
+
+    # pylint: disable=R0801
+    @property
+    def diff_y(self) -> float:
+        """diff_y"""
+        return self.__diff_y
+
+    # pylint: disable=R0801
+    @property
+    def diff_theta(self) -> float:
+        """diff_theta"""
+        return self.__diff_theta
 
     # pylint: disable=R0801
     @property
@@ -163,6 +195,11 @@ class Robot(Pose):
         return self.__is_online
 
     @property
+    def is_visible(self) -> bool:
+        """is_visible"""
+        return self.__is_visible
+
+    @property
     def battery_voltage(self) -> Optional[float]:
         """battery_voltage"""
         return self.__battery_voltage
@@ -185,6 +222,9 @@ class Robot(Pose):
         self.x = dbot.x
         self.y = dbot.y
         self.theta = dbot.theta
+        self.__diff_x = dbot.diff_x
+        self.__diff_y = dbot.diff_y
+        self.__diff_theta = dbot.diff_theta
         self.__distance_ball_robot = dbot.distance_ball_robot
         self.__radian_ball_robot = dbot.radian_ball_robot
         self.__speed = dbot.speed
@@ -193,6 +233,7 @@ class Robot(Pose):
         self.__vel_angular = dbot.angular_velocity
         self.__is_ball_catched = dbot.ball_catch
         self.__is_online = dbot.online
+        self.__is_visible = dbot.visible
         self.__battery_voltage = dbot.battery_voltage
 
     def to_pose(self) -> Pose:
