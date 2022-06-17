@@ -6,7 +6,6 @@
 
     This module is for the Gui class.
 """
-from threading import Timer
 
 from racoon_ai.gui.background import Back
 from racoon_ai.gui.chart import Chart
@@ -30,8 +29,6 @@ class Gui:
             _ = Game(self.__main)
 
             self.__main.show()
-
-            self.thread = Timer(0.05, self.__chart.update_plot_data)
 
     def update(self) -> None:
         if self.__is_gui_view:
