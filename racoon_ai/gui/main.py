@@ -8,7 +8,6 @@
 """
 import math
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QFont, QPainter, QPixmap
 from PyQt6.QtWidgets import QLabel, QWidget
 
@@ -172,7 +171,7 @@ class Main(QWidget):
 
         for robot in robots:
             if robot.x != 0:
-                self.__ui.setPen(QColor(Qt.black))
+                self.__ui.setPen(QColor("black"))
                 self.__ui.drawChord(
                     int(((robot.y * 0.05) + 302) - 6),
                     int(((robot.x * 0.05) + 392) - 7),
@@ -181,7 +180,7 @@ class Main(QWidget):
                     int((math.degrees(robot.theta) + 342) * 16),
                     302 * 16,
                 )
-                self.__ui.setPen(QColor(Qt.white))
+                self.__ui.setPen(QColor("white"))
                 self.__ui.drawLine(
                     int(((robot.y * 0.05) + 302)),
                     int(((robot.x * 0.05) + 392)),

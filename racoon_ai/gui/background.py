@@ -30,7 +30,7 @@ class Back:
     def _set_text(self) -> None:
         self.__ai_text = QLabel("RACOON-AI", self.__main)
         self.__ai_text.setGeometry(0, 0, 150, 50)
-        self.__ai_text.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Black))
+        self.__ai_text.setFont(QtGui.QFont("Arial", 16))
         self.__ai_text.setStyleSheet("background-color: white")
         self.__ai_text.setStyleSheet("QLabel { color : white; }")
         self.__ai_text.move(50, -5)

@@ -8,8 +8,6 @@
 from logging import getLogger
 from math import cos, sin
 
-from click import command
-
 from racoon_ai.common import Controls
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
@@ -57,19 +55,19 @@ class Keeper:
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
-        # radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.goal)
-        # radian_ball_robot = MU.radian(self.__observer.ball, robot)
+        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.goal)
+        radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
-        # if abs(radian_ball_goal) >= MU.PI / 2:
-        #     radian_ball_goal = ((radian_ball_goal / abs(radian_ball_goal)) * MU.PI) / 2
-        # target_pose = Pose(
-        #     (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)),
-        #     (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)),
-        #     radian_ball_robot,
-        # )
+        if abs(radian_ball_goal) >= MU.PI / 2:
+            radian_ball_goal = ((radian_ball_goal / abs(radian_ball_goal)) * MU.PI) / 2
+        target_pose = Pose(
+            (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)),
+            (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)),
+            radian_ball_robot,
+        )
 
-        # command = self.__controls.pid(target_pose, robot)
-        # command.vel_fwd = 1
+        command = self.__controls.pid(target_pose, robot)
+        command.vel_fwd = 1
         command.dribble_pow = 0
         command.kickpow = 0
         return command

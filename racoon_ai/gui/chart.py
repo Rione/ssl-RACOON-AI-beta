@@ -34,7 +34,7 @@ class Chart:
     def _set_text(self) -> None:
         self.__speed_text = QLabel("Ball Speed", self.__main)
         self.__speed_text.setGeometry(0, 0, 150, 50)
-        self.__speed_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__speed_text.setFont(QtGui.QFont("Arial", 20))
         self.__speed_text.setStyleSheet("background-color: white")
         self.__speed_text.setStyleSheet("QLabel { color : white; }")
         self.__speed_text.move(600, 400)
@@ -54,6 +54,7 @@ class Chart:
         self.timer.start()
 
     def update_plot_data(self) -> None:
+
         self.x = self.x[1:]
         self.x.append(self.x[-1] + 1)
 

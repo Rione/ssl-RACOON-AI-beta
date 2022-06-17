@@ -95,7 +95,7 @@ class CommandSender:
         送信実行
         :return: None
         """
-        self.__logger.info(sim_cmds)
+        # self.__logger.info(sim_cmds)
         send_data = grSim_Commands(
             timestamp=sim_cmds.timestamp,
             isteamyellow=sim_cmds.isteamyellow,

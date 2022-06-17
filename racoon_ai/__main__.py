@@ -5,6 +5,7 @@
     This is the main script.
 """
 
+import signal
 import sys
 from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
@@ -22,6 +23,9 @@ from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
+
+# Enable gui keyboard interrupt
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914

@@ -26,9 +26,9 @@ class Robot:
 
         self.__main = main
 
-        # self._set_texts()
+        self._set_texts()
         self._set_box()
-        # self._set_toggle()
+        self._set_toggle()
 
     def _set_box(self) -> None:
         robot_check = []
@@ -55,18 +55,18 @@ class Robot:
 
     def _set_texts(self) -> None:
         self.__role_text = QLabel("Role", self.__main)
-        self.__role_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__role_text.setFont(QtGui.QFont("Arial", 20))
         self.__role_text.setStyleSheet("QLabel { color : white; }")
         self.__role_text.move(602, 284)
 
         self.__robot_text = QLabel("Active Robot", self.__main)
-        self.__robot_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__robot_text.setFont(QtGui.QFont("Arial", 20))
         self.__robot_text.setGeometry(10, 10, 600, 36)
         self.__robot_text.setStyleSheet("QLabel { color : white; }")
         self.__robot_text.move(834, 40)
 
         self.__camera_active_text = QLabel("Mode", self.__main)
-        self.__camera_active_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__camera_active_text.setFont(QtGui.QFont("Arial", 20))
         self.__camera_active_text.setStyleSheet("QLabel { color : white; }")
         self.__camera_active_text.move(1020, 154)
 
@@ -75,7 +75,7 @@ class Robot:
         for num in robot_num:
             count = count + 1
             self.__robot_num_text = QLabel(num, self.__main)
-            self.__robot_num_text.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Black))
+            self.__robot_num_text.setFont(QtGui.QFont("Arial", 14))
             self.__robot_num_text.setStyleSheet("QLabel { color : white; }")
             if count < 8:
                 self.__robot_num_text.move(832 + count * 35, 83)
@@ -97,34 +97,34 @@ class Robot:
         #         self.__camera_num_text.move(1000 + (count - 4) * 28, 210)
 
         self.__robot_text = QLabel("Joy Control", self.__main)
-        self.__robot_text.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Black))
+        self.__robot_text.setFont(QtGui.QFont("Arial", 20))
         self.__robot_text.setGeometry(10, 10, 600, 156)
         self.__robot_text.setStyleSheet("QLabel { color : white; }")
         self.__robot_text.move(834, 88)
 
         self.__joy_enable_text = QLabel("JoyStick :", self.__main)
-        self.__joy_enable_text.setFont(QtGui.QFont("Arial", 17, QtGui.QFont.Black))
+        self.__joy_enable_text.setFont(QtGui.QFont("Arial", 17))
         self.__joy_enable_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_enable_text.move(837, 190)
 
         self.__joy_robot_text = QLabel("Number :", self.__main)
-        self.__joy_robot_text.setFont(QtGui.QFont("Arial", 17, QtGui.QFont.Black))
+        self.__joy_robot_text.setFont(QtGui.QFont("Arial", 17))
         self.__joy_robot_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_robot_text.move(842, 224)
         self.__joy_status_text = QLabel("Connect :", self.__main)
-        self.__joy_status_text.setFont(QtGui.QFont("Arial", 17, QtGui.QFont.Black))
+        self.__joy_status_text.setFont(QtGui.QFont("Arial", 17))
         self.__joy_status_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_status_text.move(838, 252)
         self.__joy_connect_text = QLabel("OK", self.__main)
-        self.__joy_connect_text.setFont(QtGui.QFont("Arial", 17, QtGui.QFont.Black))
+        self.__joy_connect_text.setFont(QtGui.QFont("Arial", 17))
         self.__joy_connect_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_connect_text.move(927, 252)
         self.__joy_connect_text = QLabel("Kill:", self.__main)
-        self.__joy_connect_text.setFont(QtGui.QFont("Arial", 18, QtGui.QFont.Black))
+        self.__joy_connect_text.setFont(QtGui.QFont("Arial", 18))
         self.__joy_connect_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_connect_text.move(1044, 254)
         self.__joy_enable_text = QLabel("Status:", self.__main)
-        self.__joy_enable_text.setFont(QtGui.QFont("Arial", 17, QtGui.QFont.Black))
+        self.__joy_enable_text.setFont(QtGui.QFont("Arial", 17))
         self.__joy_enable_text.setStyleSheet("QLabel { color : white; }")
         self.__joy_enable_text.move(1022, 190)
 
