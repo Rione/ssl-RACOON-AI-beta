@@ -42,7 +42,7 @@ ISORT           = $(VENV_DIR)/bin/isort
 # *************************************************************************** #
 
 .PHONY: all
-all: clean build run
+all: clean build
 
 .PHONY: build
 build: $(WHEEL)
@@ -92,14 +92,7 @@ $(BIN_DIR)/RACOON-MW: $(MW_OUT_DIR)/%
 	$(info Linking RACOON-MW...)
 	@ln -sf $(<D)/ssl-RACOON-MW $@
 
-$(MW_OUT_DIR)/%: $(MW_TMP_DIR)/%
-	@echo ""
-	$(info ----------------------------------------------)
-	$(info Extracting RACOON-MW...)
-	@mkdir -p $(@D)
-	@tar -xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
-
-$(MW_TMP_DIR)/%:
+$(MW_OUT_DIR)/%:
 	@echo ""
 	$(info ----------------------------------------------)
 	$(info Downloading RACOON-MW...)
@@ -107,6 +100,10 @@ $(MW_TMP_DIR)/%:
 		--repo Rione/ssl-RACOON-MW \
 		--dir $(MW_TMP_DIR) \
 		--pattern $(MW_FILENAME)
+	$(info ----------------------------------------------)
+	$(info Extracting RACOON-MW...)
+	@mkdir -p $(@D)
+	@tar -xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
 
 # *************************************************************************** #
 
