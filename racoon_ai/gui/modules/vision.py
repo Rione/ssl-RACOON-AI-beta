@@ -1,20 +1,18 @@
 #!/usr/bin/env python3.10
-# flake8: ignore-errors
-# pylint: disable-all
 
 """vision.py
 
     This module is for the Vision class.
 """
 
-from PyQt6.QtGui import QColor, QFont, QPainter, QPaintEvent
-from PyQt6.QtWidgets import QComboBox, QLabel, QSpinBox
+from PyQt6.QtGui import QColor, QFont, QPainter, QPaintEvent  # pylint: disable=E0611
+from PyQt6.QtWidgets import QComboBox, QLabel, QSpinBox  # pylint: disable=E0611
 
 from .animated_toggle import AnimatedToggle
 from .main import Main
 
 
-class Vision:
+class Vision:  # pylint: disable=R0903
     """Vision
     Args:
         None
@@ -32,15 +30,16 @@ class Vision:
         self.__send_text: QLabel
         self.__camera_text: QLabel
         self.__fps_text: QLabel
-        self._set_texts()
-        self._set_box()
-        self._set_toggle()
+        self.__set_texts()
+        self.__set_box()
+        self.__set_toggle()
 
-    def paintEvent(self, _: QPaintEvent) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # pylint: disable=C0103
+        """paintEvent"""
         self.__ui.setBrush(QColor("orange"))
         self.__ui.end()
 
-    def _set_texts(self) -> None:
+    def __set_texts(self) -> None:
         self.__role_text = QLabel("Vision", self.__main)
         self.__role_text.setFont(QFont("Arial", 20))
         self.__role_text.setStyleSheet("QLabel { color : white; }")
@@ -84,7 +83,8 @@ class Vision:
         self.__fps_text.setStyleSheet("QLabel { color : white; }")
         self.__fps_text.move(615, 250)
 
-    def _set_toggle(self) -> None:
+    def __set_toggle(self) -> None:
+        # pylint: disable=R0801
         toggle = AnimatedToggle(
             self.__main,
             bar_color="#224726",
@@ -106,7 +106,7 @@ class Vision:
         toggle_color.resize(120, 60)
         toggle_color.move(640, 114)
 
-    def _set_box(self) -> None:
+    def __set_box(self) -> None:
         receive_box = QSpinBox(self.__main)
         receive_box.resize(70, 20)
         receive_box.setMaximum(20000)

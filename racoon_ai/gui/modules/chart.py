@@ -1,6 +1,4 @@
 #!/usr/bin/env python3.10
-# pylint: disable-all
-# type: ignore
 
 """chart.py
 
@@ -9,16 +7,17 @@
 
 from itertools import repeat
 
-from PyQt6.QtCore import QTimer
-from PyQt6.QtGui import QColor, QFont
-from PyQt6.QtWidgets import QLabel
-from pyqtgraph import PlotWidget, mkPen
+from PyQt6.QtCore import QTimer  # pylint: disable=E0611
+from PyQt6.QtGui import QColor, QFont  # pylint: disable=E0611
+from PyQt6.QtWidgets import QLabel  # pylint: disable=E0611
+from pyqtgraph import PlotWidget, mkPen  # type: ignore
 
-from racoon_ai.gui.main import Main
 from racoon_ai.networks.receiver import MWReceiver
 
+from .main import Main
 
-class Chart:
+
+class Chart:  # pylint: disable=R0903
     """Chart
     Args:
         None
@@ -29,8 +28,7 @@ class Chart:
     def __init__(self, main: Main, observer: MWReceiver) -> None:
         self.__observer: MWReceiver = observer
         self.__main: Main = main
-        self.graphWidget: PlotWidget = PlotWidget(self.__main)
-        self.graphWidget: PlotWidget
+        self.graphWidget: PlotWidget = PlotWidget(self.__main)  # pylint: disable=C0103
         self.__speed_text: QLabel
         self.x: list[float]
         self.y: list[float]
@@ -54,11 +52,11 @@ class Chart:
         self.data_line = self.graphWidget.plot(self.x, self.y, pen=mkPen(color=(255, 0, 0)))
         self.timer = QTimer(self.__main)
         self.timer.setInterval(50)
-        self.timer.timeout.connect(self.update_plot_data)
+        self.timer.timeout.connect(self.update_plot_data)  # type: ignore
         self.timer.start()
 
     def update_plot_data(self) -> None:
-
+        """update_plot_data"""
         self.x = self.x[1:]
         self.x.append(self.x[-1] + 1)
 
