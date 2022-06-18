@@ -1,13 +1,12 @@
 #!/usr/bin/env python3.10
-# flake8: ignore-errors
 # pylint: disable-all
-# type: ignore
+
 """main.py
     This module is for the Main class.
 """
 import math
 
-from PyQt6.QtGui import QColor, QFont, QPainter, QPixmap
+from PyQt6.QtGui import QColor, QFont, QPainter, QPaintEvent, QPixmap
 from PyQt6.QtWidgets import QLabel, QWidget
 
 from racoon_ai.networks.receiver import MWReceiver
@@ -23,23 +22,37 @@ class Main(QWidget):
     """
 
     def __init__(self, observer: MWReceiver, role: Role) -> None:
-        super(Main, self).__init__()
+        super().__init__()
+        self.__ui: QPainter
         self.__geometry_width: int = 590
         self.__geometry_height: int = 850
 
         self.__observer: MWReceiver = observer
         self.__role: Role = role
 
+        self.__pixmap_racoon: QPixmap
+        self.__pixmap_game: QPixmap
+        self.__pixmap_block: QPixmap
+        self.__pixmap_referee: QPixmap
+        self.__pixmap_gear: QPixmap
+        self.__pixmap_role: QPixmap
+
+        self.__keeper_num: QLabel
+        self.__midfielder_num: QLabel
+        self.__offense_num: list[QLabel]
+        self.__defense_num: list[QLabel]
+
+        self.__fps_num: QLabel
+
         self._initui()
 
     def _initui(self) -> None:
         self.resize(self.__geometry_width, self.__geometry_height)
         self.setWindowTitle("RACOON-AI")
-
         self._set_images()
         self._set_num()
 
-    def _set_images(self):
+    def _set_images(self) -> None:
         self.__pixmap_racoon = QPixmap("racoon_ai/gui/images/racoon2.png")
         self.__pixmap_game = QPixmap("racoon_ai/gui/images/game_2.png")
         self.__pixmap_block = QPixmap("racoon_ai/gui/images/block.png")
@@ -47,7 +60,7 @@ class Main(QWidget):
         self.__pixmap_gear = QPixmap("racoon_ai/gui/images/gear.png")
         self.__pixmap_role = QPixmap("racoon_ai/gui/images/role_table.png")
 
-    def _set_num(self):
+    def _set_num(self) -> None:
         self.__keeper_num = QLabel(self)
         self.__keeper_num.setFont(QFont("Arial", 30))
 
@@ -70,7 +83,7 @@ class Main(QWidget):
     def active(self) -> None:
         self.update()
 
-    def paintEvent(self, event) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:
         self.__ui = QPainter(self)
         self.__ui.setBrush(QColor("#2E333A"))  # 背景
         self.__ui.setPen(QColor("#2E333A"))
@@ -160,7 +173,7 @@ class Main(QWidget):
 
         self.__ui.end()
 
-    def _draw_robots(self, color: str, ui: QPainter) -> None:
+    def _draw_robots(self, color: str, _: QPainter) -> None:
         if color == "blue":
             self.__ui.setBrush(QColor("blue"))
             robots = self.__observer.our_robots

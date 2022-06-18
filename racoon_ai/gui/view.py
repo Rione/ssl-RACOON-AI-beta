@@ -1,5 +1,4 @@
 #!/usr/bin/env python3.10
-# flake8: ignore-errors
 # pylint: disable-all
 
 """view.py
@@ -37,4 +36,4 @@ class Gui:
     def update(self) -> None:
         if self.__is_gui_view:
             self.__main.update()
-            self.__app.processEvents()
+            self.__app.processEvents()  # type: ignore

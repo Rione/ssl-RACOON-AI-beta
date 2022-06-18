@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.10
-# flake8: ignore-errors
 # pylint: disable-all
-# type: ignore
+
 """game_control.py
 
     This module is for the Game class.
@@ -9,8 +8,8 @@
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox
 
-from racoon_ai.gui.animated_toggle import AnimatedToggle
-from racoon_ai.gui.main import Main
+from .animated_toggle import AnimatedToggle
+from .main import Main
 
 
 class Game:
@@ -89,7 +88,11 @@ class Game:
         self.__score_yellow.move(1180, 351)
 
     def _set_toggle(self) -> None:
-        toggle_referee = AnimatedToggle(self.__main, checked_color="#FFB000", pulse_checked_color="#44FFB000")
+        toggle_referee = AnimatedToggle(
+            self.__main,
+            checked_color="#FFB000",
+            pulse_checked_color="#44FFB000",
+        )
         toggle_referee.resize(70, 50)
         toggle_referee.move(1222, 68)
 

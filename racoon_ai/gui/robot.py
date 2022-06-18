@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.10
 # flake8: ignore-errors
 # pylint: disable-all
-# type: ignore
+
 """field.py
 
     This module is for the Feild class.
@@ -10,8 +10,8 @@
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QCheckBox, QLabel, QSpinBox
 
-from racoon_ai.gui.animated_toggle import AnimatedToggle
-from racoon_ai.gui.main import Main
+from .animated_toggle import AnimatedToggle
+from .main import Main
 
 
 class Robot:
@@ -23,15 +23,21 @@ class Robot:
     """
 
     def __init__(self, main: Main) -> None:
-
-        self.__main = main
-
+        self.__main: Main = main
+        self.__role_text: QLabel
+        self.__robot_text: QLabel
+        self.__camera_active_text: QLabel
+        self.__robot_num_text: QLabel
+        self.__joy_enable_text: QLabel
+        self.__joy_robot_text: QLabel
+        self.__joy_status_text: QLabel
+        self.__joy_connect_text: QLabel
         self._set_texts()
         self._set_box()
         self._set_toggle()
 
     def _set_box(self) -> None:
-        robot_check = []
+        robot_check: list[QCheckBox] = []
         for i in range(16):
             robot_check.append(QCheckBox(self.__main))
             if i < 8:
@@ -70,20 +76,17 @@ class Robot:
         self.__camera_active_text.setStyleSheet("QLabel { color : white; }")
         self.__camera_active_text.move(1020, 154)
 
-        robot_num = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
-        count = -1
-        for num in robot_num:
-            count = count + 1
-            self.__robot_num_text = QLabel(num, self.__main)
+        for num in range(16):
+            self.__robot_num_text = QLabel(str(num), self.__main)
             self.__robot_num_text.setFont(QtGui.QFont("Arial", 14))
             self.__robot_num_text.setStyleSheet("QLabel { color : white; }")
-            if count < 8:
-                self.__robot_num_text.move(832 + count * 35, 83)
+            if num < 8:
+                self.__robot_num_text.move(832 + num * 35, 83)
             else:
                 increase = 0
-                if count >= 10:
+                if num >= 10:
                     increase = -6
-                self.__robot_num_text.move(832 + (count - 8) * 35 + increase, 113)
+                self.__robot_num_text.move(832 + (num - 8) * 35 + increase, 113)
         # camera_num = ["0", "1", "2", "3", "4", "5", "6", "7"]
         # count = -1
         # for num in camera_num:
