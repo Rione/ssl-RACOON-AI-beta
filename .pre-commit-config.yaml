@@ -45,6 +45,8 @@ repos:
         additional_dependencies:
           - "types-protobuf==3.18.2"
           - "numpy==1.22.3"
+          - "pyqt6==6.3.0"
+          - "pyqtgraph==0.12.4"
 
   - repo: https://github.com/psf/black
     rev: 22.3.0
