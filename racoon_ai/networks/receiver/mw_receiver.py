@@ -117,7 +117,7 @@ class MWReceiver(IPNetAddr):
 
         self.__n_camras = proto.info.num_of_cameras
 
-        self.__num_of_our_robots = proto.info.num_of_our_robots
+        self.__num_of_our_robots = min(proto.info.num_of_our_robots, len(self.__target_ids))
 
         self.__num_of_enemy_robots = proto.info.num_of_enemy_robots
 
@@ -252,7 +252,7 @@ class MWReceiver(IPNetAddr):
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                self.__logger.warning("Robot id %d is invalid", mid)
+                self.__logger.warning("Robot id %d is offline", mid)
                 return None
             if only_visible and (not bot.is_visible):
                 self.__logger.warning("Robot id %d is not on stage", mid)
