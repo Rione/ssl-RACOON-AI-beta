@@ -3,15 +3,11 @@
 """
     This is the main script.
 """
-import signal
-import sys
 from configparser import ConfigParser
-from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
-from typing import Any, Tuple
+from logging import Logger, shutdown
+from typing import Tuple
 
-from PyQt6.QtWidgets import QApplication  # type: ignore
-
-from .gui.view import Gui  # type: ignore
+from .gui import Gui
 from .models.robot import SimCommands
 from .movement import Controls
 from .networks.receiver import MWReceiver
@@ -21,11 +17,8 @@ from .strategy.goal_keeper import Keeper
 # from .strategy.offense import Offense
 from .strategy.role import Role
 
-# Enable gui keyboard interrupt
-signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-
-def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
+def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
     """main
 
     This function is for the main function.
@@ -51,7 +44,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
     # Flag if view gui
     is_gui_view: bool = False
 
-    app: Any = QApplication(sys.argv)
     try:
         observer: MWReceiver
         if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
@@ -68,14 +60,14 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
             ki: float = float(conf.get("pid_gains", "ki") or 0)
             kd: float = float(conf.get("pid_gains", "kd") or 0)
             custom_gains: Tuple[float, float, float] = (kp, kd, ki)
-            logger.info("Using custom PID gains: %s", custom_gains)
+            logger.info("Using custom PID gains (kp, kd, ki): %s", custom_gains)
             controls = Controls(observer, k_gain=custom_gains)
         else:
             controls = Controls(observer)
 
         role: Role = Role(observer)
 
-        gui = Gui(is_gui_view, observer, role)
+        gui = Gui(argv, is_gui_view, observer, role)
 
         # offense: Offense = Offense(observer)
 
@@ -106,7 +98,6 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
             # update gui
             gui.update()
-            app.processEvents()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
@@ -117,6 +108,9 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
 
 
 if __name__ == "__main__":
+    from logging import INFO, Formatter, StreamHandler, getLogger
+    from sys import argv
+
     from . import __version__
 
     logo: str = """
@@ -143,4 +137,4 @@ if __name__ == "__main__":
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
 
-    main(parser, log)
+    main(argv, parser, log)
