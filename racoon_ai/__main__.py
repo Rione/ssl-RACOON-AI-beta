@@ -94,7 +94,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
             sim_cmds = SimCommands(is_team_yellow)
-
+            #print(gui.get_referee_command())
             observer.main()
             role.main()
             # offense.main()

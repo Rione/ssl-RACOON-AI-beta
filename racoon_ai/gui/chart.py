@@ -50,7 +50,7 @@ class Chart:
         self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen)
         self.timer = QtCore.QTimer(self.__main)
         self.timer.setInterval(50)
-        self.timer.timeout.connect(self.update_plot_data)
+        #self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
     def update_plot_data(self) -> None:
