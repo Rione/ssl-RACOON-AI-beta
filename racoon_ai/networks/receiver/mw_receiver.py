@@ -117,7 +117,7 @@ class MWReceiver(IPNetAddr):
 
         self.__n_camras = proto.info.num_of_cameras
 
-        self.__num_of_our_robots = min(proto.info.num_of_our_robots, len(self.__target_ids))
+        self.__num_of_our_robots = proto.info.num_of_our_robots
 
         self.__num_of_enemy_robots = proto.info.num_of_enemy_robots
 
@@ -303,10 +303,29 @@ class MWReceiver(IPNetAddr):
     def num_of_our_robots(self) -> int:
         """num_of_our_robots
 
-        How many our robots visible
+        - How many our robots visible.
 
         Returns:
             int
+
+        NOTE:
+            - This is not the same as `len(our_robots)`
+            - If the vision detect more than `len(self.__target_ids)`,
+            it will be returned as `len(self.__target_ids)`.
+        """
+        return min(self.num_of_our_robots, len(self.__target_ids))
+
+    @property
+    def num_of_our_vision_robots(self) -> int:
+        """num_of_our_vision_robots
+
+        How many our robots visible.
+
+        Returns:
+            int
+
+        NOTE:
+            - This returns the actual number of our robots detected by vision.
         """
         return self.__num_of_our_robots
 
@@ -328,7 +347,7 @@ class MWReceiver(IPNetAddr):
         How many all robots visible
 
         Returns:
-            int
+            int (num_of_our_robots + num_of_enemy_robots)
         """
         return self.__num_of_enemy_robots + self.__num_of_our_robots
 
