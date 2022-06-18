@@ -26,12 +26,9 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
     Returns:
         None
     """
-    # List of online robot ids
-    online_ids: list[int] = [int(i) for i in conf.get("commons", "onlineIds", fallback="").split(",")]
-    logger.info("Online robot ids: %s", online_ids)
-
-    num_bots: int = len(online_ids)
-    logger.info("Number of robots: %d", num_bots)
+    # List of target robot ids
+    target_ids: list[int] = [int(i) for i in conf.get("commons", "onlineIds", fallback="").split(",")]
+    logger.info("Target robot ids: %s", target_ids)
 
     # Flag if run for a real robot
     is_real: bool = conf.getboolean("commons", "isReal", fallback=False)
@@ -50,9 +47,9 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
             mw_host: str = conf.get("mw_receiver", "host") or "localhost"
             mw_port: int = int(conf.get("mw_receiver", "port") or 30011)
             logger.info("Using custom address for MW: %s:%d", mw_host, mw_port)
-            observer = MWReceiver(host=mw_host, port=mw_port)
+            observer = MWReceiver(target_ids, is_team_yellow, host=mw_host, port=mw_port)
         else:
-            observer = MWReceiver()
+            observer = MWReceiver(target_ids, is_team_yellow)
 
         controls: Controls
         if conf.getboolean("pid_gains", "use_custom_gains", fallback=False):
@@ -77,27 +74,29 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
         if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
             target_host: str = conf.get("command_sender", "host") or "localhost"
             target_port: int = int(conf.get("command_sender", "port") or 20011)
-            sender = CommandSender(is_real, online_ids, host=target_host, port=target_port)
+            sender = CommandSender(is_real, target_ids, host=target_host, port=target_port)
         else:
-            sender = CommandSender(is_real, online_ids)
+            sender = CommandSender(is_real, target_ids)
 
         logger.info("Roop started")
 
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
-            sim_cmds = SimCommands(is_team_yellow)
+            sim_cmds = SimCommands(observer.is_team_yellow)
 
+            # Recieve commands from the MW
             observer.main()
             role.main()
+
             # offense.main()
             keeper.main()
+
+            # update gui
+            gui.update()
 
             # sim_cmds.robot_commands += offense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
-
-            # update gui
-            gui.update()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
