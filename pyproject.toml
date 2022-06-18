@@ -10,9 +10,9 @@ python = "3.10.*"
 protobuf = "3.19.1"
 protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
-numpy = "^1.22.3"
-PyQt6 = {version = "^6.3.0", optional = true}
-pyqtgraph = {version = "^0.12.4", optional = true}
+numpy = "1.22.3"
+PyQt6 = {version = "6.3.0", optional = true}
+pyqtgraph = {version = "0.12.4", optional = true}
 pygame = {version = "^2.1.2", optional = true}
 
 [tool.poetry.dev-dependencies]
