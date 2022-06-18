@@ -433,7 +433,7 @@ pygame = ["pygame"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "850b6f41c965b0817f6e986652a9276d2c7a7e1827e904798d1f94cd62f17753"
+content-hash = "9249f43ceb32e91ed741cb427c6f349d602059046e59a8151963fe7e9e0617c0"
 
 [metadata.files]
 astroid = [
