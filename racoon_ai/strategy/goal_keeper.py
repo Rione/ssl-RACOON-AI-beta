@@ -70,6 +70,7 @@ class Keeper:
         )
 
         command = self.__controls.pid(target_pose, robot)
+        command.vel_fwd = 1
         command.dribble_pow = 0
         command.kickpow = 0
         return command

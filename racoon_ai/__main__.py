@@ -1,12 +1,17 @@
 #!/usr/bin/env python3.10
-
+# pylint: disable-all
 """
     This is the main script.
 """
+import signal
+import sys
 from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
-from typing import Tuple
+from typing import Any, Tuple
 
+from PyQt6.QtWidgets import QApplication  # type: ignore
+
+from .gui.view import Gui  # type: ignore
 from .models.robot import SimCommands
 from .movement import Controls
 from .networks.receiver import MWReceiver
@@ -15,6 +20,9 @@ from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
+
+# Enable gui keyboard interrupt
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
@@ -40,6 +48,10 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
     is_team_yellow: bool = conf.getboolean("commons", "isTeamYellow", fallback=False)
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
+    # Flag if view gui
+    is_gui_view: bool = False
+
+    app: Any = QApplication(sys.argv)
     try:
         observer: MWReceiver
         if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
@@ -62,6 +74,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
             controls = Controls(observer)
 
         role: Role = Role(observer)
+
+        gui = Gui(is_gui_view, observer, role)
 
         # offense: Offense = Offense(observer)
 
@@ -89,6 +103,10 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R
             # sim_cmds.robot_commands += offense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
+
+            # update gui
+            gui.update()
+            app.processEvents()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
