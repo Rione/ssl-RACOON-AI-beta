@@ -5,20 +5,16 @@
 """
 from configparser import ConfigParser
 from logging import Logger, shutdown
-from typing import Tuple
 
 from .gui import Gui
 from .models.robot import SimCommands
-from .movement import Controls
-from .networks.receiver import MWReceiver
-from .networks.sender import CommandSender
-from .strategy.goal_keeper import Keeper
-
-# from .strategy.offense import Offense
-from .strategy.role import Role
+from .movement import Controls, create_controls
+from .networks.receiver import MWReceiver, create_receiver
+from .networks.sender import CommandSender, create_sender
+from .strategy import Keeper, Role
 
 
-def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914,R0915
+def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
     """main
 
     This function is for the main function.
@@ -42,25 +38,9 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
     is_gui_view: bool = False
 
     try:
-        observer: MWReceiver
-        if conf.getboolean("mw_receiver", "use_custom_addr", fallback=False):
-            mw_host: str = conf.get("mw_receiver", "host") or "localhost"
-            mw_port: int = int(conf.get("mw_receiver", "port") or 30011)
-            logger.info("Using custom address for MW: %s:%d", mw_host, mw_port)
-            observer = MWReceiver(target_ids, is_team_yellow, host=mw_host, port=mw_port)
-        else:
-            observer = MWReceiver(target_ids, is_team_yellow)
+        observer: MWReceiver = create_receiver(conf, logger, target_ids, is_team_yellow)
 
-        controls: Controls
-        if conf.getboolean("pid_gains", "use_custom_gains", fallback=False):
-            kp: float = float(conf.get("pid_gains", "kp") or 1)
-            ki: float = float(conf.get("pid_gains", "ki") or 0)
-            kd: float = float(conf.get("pid_gains", "kd") or 0)
-            custom_gains: Tuple[float, float, float] = (kp, kd, ki)
-            logger.info("Using custom PID gains (kp, kd, ki): %s", custom_gains)
-            controls = Controls(observer, k_gain=custom_gains)
-        else:
-            controls = Controls(observer)
+        controls: Controls = create_controls(conf, logger, observer)
 
         role: Role = Role(observer)
 
@@ -70,16 +50,9 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
         keeper: Keeper = Keeper(observer, role, controls)
 
-        sender: CommandSender
-        if (not is_real) and conf.getboolean("command_sender", "use_custom_addr", fallback=False):
-            target_host: str = conf.get("command_sender", "host") or "localhost"
-            target_port: int = int(conf.get("command_sender", "port") or 20011)
-            sender = CommandSender(is_real, target_ids, host=target_host, port=target_port)
-        else:
-            sender = CommandSender(is_real, target_ids)
+        sender: CommandSender = create_sender(conf, logger, target_ids, is_real)
 
         logger.info("Roop started")
-
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
             sim_cmds = SimCommands(observer.is_team_yellow)
