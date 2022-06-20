@@ -313,7 +313,7 @@ class MWReceiver(IPNetAddr):
             - If the vision detect more than `len(self.__target_ids)`,
             it will be returned as `len(self.__target_ids)`.
         """
-        return min(self.num_of_our_robots, len(self.__target_ids))
+        return min(self.__num_of_our_robots, len(self.__target_ids))
 
     @property
     def num_of_our_vision_robots(self) -> int:
