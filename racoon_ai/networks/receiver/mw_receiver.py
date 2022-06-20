@@ -49,8 +49,8 @@ class MWReceiver(IPNetAddr):
         self.__target_ids: list[int] = target_ids
         self.__is_team_yellow: bool = is_team_yellow
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
-        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
+        self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
         self.__sec_per_frame: float
         self.__n_camras: int
