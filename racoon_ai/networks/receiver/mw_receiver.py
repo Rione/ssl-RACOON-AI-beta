@@ -46,7 +46,7 @@ class MWReceiver(IPNetAddr):
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
 
-        self.__target_ids: list[int] = target_ids
+        self.__target_ids: set[int] = set(target_ids)
         self.__is_team_yellow: bool = is_team_yellow
 
         self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
