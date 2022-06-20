@@ -46,11 +46,11 @@ class MWReceiver(IPNetAddr):
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
 
-        self.__target_ids: list[int] = target_ids
+        self.__target_ids: set[int] = set(target_ids)
         self.__is_team_yellow: bool = is_team_yellow
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(8)]
-        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(8)]
+        self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
         self.__sec_per_frame: float
         self.__n_camras: int
@@ -252,7 +252,7 @@ class MWReceiver(IPNetAddr):
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                self.__logger.warning("Robot id %d is invalid", mid)
+                self.__logger.warning("Robot id %d is offline", mid)
                 return None
             if only_visible and (not bot.is_visible):
                 self.__logger.warning("Robot id %d is not on stage", mid)
@@ -303,10 +303,29 @@ class MWReceiver(IPNetAddr):
     def num_of_our_robots(self) -> int:
         """num_of_our_robots
 
-        How many our robots visible
+        - How many our robots visible.
 
         Returns:
             int
+
+        NOTE:
+            - This is not the same as `len(our_robots)`
+            - If the vision detect more than `len(self.__target_ids)`,
+            it will be returned as `len(self.__target_ids)`.
+        """
+        return min(self.__num_of_our_robots, len(self.__target_ids))
+
+    @property
+    def num_of_our_vision_robots(self) -> int:
+        """num_of_our_vision_robots
+
+        How many our robots visible.
+
+        Returns:
+            int
+
+        NOTE:
+            - This returns the actual number of our robots detected by vision.
         """
         return self.__num_of_our_robots
 
@@ -328,7 +347,7 @@ class MWReceiver(IPNetAddr):
         How many all robots visible
 
         Returns:
-            int
+            int (num_of_our_robots + num_of_enemy_robots)
         """
         return self.__num_of_enemy_robots + self.__num_of_our_robots
 
