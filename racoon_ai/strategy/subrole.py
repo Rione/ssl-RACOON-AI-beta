@@ -9,7 +9,8 @@ from logging import getLogger
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.strategy.role import Role
+
+from .role import Role
 
 
 class SubRole:
@@ -87,7 +88,6 @@ class SubRole:
                 MU.distance(self.__observer.ball, enemy),
             )
             for enemy in self.__observer.enemy_robots
-            if enemy.robot_id != self.__role.keeper_id
         ]
         if attacker:
             attacker.sort(reverse=False, key=lambda x: x[1])

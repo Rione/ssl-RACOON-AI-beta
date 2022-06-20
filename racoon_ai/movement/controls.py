@@ -29,7 +29,7 @@ class Controls:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, k_gain: Tuple[float, float, float] = (8, 0.5, 1)) -> None:
+    def __init__(self, observer: MWReceiver, k_gain: Tuple[float, float, float] = (1, 0, 0)) -> None:
         self.__logger = getLogger(__name__)
         self.__observer = observer
         self.__dtaime: float = self.__observer.sec_per_frame
@@ -67,6 +67,7 @@ class Controls:
         )
 
         diff_pose: NDArray[float64] = subtract(target_pose, bot_pose, dtype=float64)
+        diff_pose[2] = MU.radian_normalize(diff_pose[2])
         diff_speed: NDArray[float64] = subtract(target_speed, bot_speed, dtype=float64)
 
         self.__pre_bot_pose[bot_id] = bot_pose
@@ -116,7 +117,7 @@ class Controls:
         e_target: float = target_theta - self.__pre_target_theta[bot_id]
         self.__theta_accumulation += (e_target - e_bot) * self.__dtaime
 
-        vel_angular += kp * (target_theta - bot.theta)
+        vel_angular += kp * (MU.radian_normalize(target_theta - bot.theta))
         vel_angular += kd * ((e_target / self.__dtaime) - (e_bot / self.__dtaime))
         vel_angular += ki * self.__theta_accumulation[bot_id]
 

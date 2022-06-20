@@ -19,6 +19,10 @@ class Ball(Point):
 
         z (float): z coordinate
 
+        diff_x (float): difference between x coordinate and last x coordinate
+
+        diff_y (float): difference between y coordinate and last y coordinate
+
         filtered (Point): filtered coordinate (x, y)
 
         filtered_x (float) : Kalman Filtered X
@@ -37,6 +41,8 @@ class Ball(Point):
     def __init__(self) -> None:
         super().__init__(0, 0)  # x, y, z
         self.__filtered: Point = Point(0, 0)
+        self.__diff_x: float = float(0)
+        self.__diff_y: float = float(0)
         self.__speed: float = float(0)
         self.__speed_slope: float = float(0)
         self.__speed_slope_radian: float = float(0)
@@ -80,6 +86,16 @@ class Ball(Point):
     def filtered_y(self) -> float:
         """filtered_y"""
         return self.filtered.y
+
+    @property
+    def diff_x(self) -> float:
+        """diff_x"""
+        return self.__diff_x
+
+    @property
+    def diff_y(self) -> float:
+        """diff_y"""
+        return self.__diff_y
 
     @property
     def speed(self) -> float:
@@ -133,6 +149,8 @@ class Ball(Point):
         """
         self.x = dball.x
         self.y = dball.y
+        self.__diff_x = dball.diff_x
+        self.__diff_y = dball.diff_y
         self.__filtered = Point(dball.filtered_x, dball.filtered_y)
         self.__speed = dball.speed
         self.__speed_slope = dball.slope
