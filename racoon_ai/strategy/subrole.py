@@ -9,7 +9,8 @@ from logging import getLogger
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.robot import Robot
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.strategy.role import Role
+
+from .role import Role
 
 
 class SubRole:
