@@ -41,7 +41,7 @@ class Gui:  # pylint: disable=R0903
         Vision(self.__main)
         Robot(self.__main)
         Back(self.__main)
-        self.__game = Game(self.__main)
+        Game(self.__main)
         self.__main.show()
 
     def update(self) -> None:
@@ -50,6 +50,3 @@ class Gui:  # pylint: disable=R0903
             return
         self.__main.update()
         self.__app.processEvents()  # type: ignore
-
-    def get_referee_command(self) -> str:
-        return self.__game.get_referee_command()
