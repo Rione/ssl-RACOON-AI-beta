@@ -8,12 +8,10 @@ from logging import Logger, shutdown
 
 from .gui import Gui
 from .models.robot import SimCommands
-
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-
-# from .strategy.defense import Defense
+from .strategy.defense import Defense
 from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
@@ -57,7 +55,7 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
         # offense: Offense = Offense(observer)
 
-        # defense = Defense(observer, controls)
+        defense = Defense(observer, role, controls)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
@@ -71,17 +69,22 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
             # Recieve commands from the MW
             observer.main()
+
             role.main()
+
             subrole.main()
+
             # offense.main()
-            # defense.main()
+
+            defense.main()
+
             keeper.main()
 
             # update gui
             gui.update()
 
             # sim_cmds.robot_commands += offense.send_cmds
-            # sim_cmds.robot_commands += defense.send_cmds
+            sim_cmds.robot_commands += defense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
