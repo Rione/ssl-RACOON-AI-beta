@@ -167,6 +167,17 @@ class MathUtils:
         val4 = cls.__substitution_fn(pt3, pt4, pt2)
         return (val1 * val2 < 0) and (val3 * val4 < 0)
 
+    @classmethod
+    def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
+        """radian
+        Args:
+            obj1 Point: object at least has x and y
+            obj2 Point: object at least has x and y
+        Returns:
+            float: radian value
+        """
+        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x) - center)
+
 
 if __name__ == "__main__":
     import doctest

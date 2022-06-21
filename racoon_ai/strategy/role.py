@@ -20,8 +20,8 @@ class Role:
 
     Attributes:
         keeper_id (int): Keeper robot id.
-        offense_ids (list[int]): Offensive robots id.
-        defense_ids (list[int]): Defensive robots id.
+        offense_id_list (list[int]): Offensive robots id.
+        defense_id_list (list[int]): Defensive robots id.
     """
 
     def __init__(self, observer: MWReceiver, *, keeper_id: int = 0) -> None:
@@ -142,10 +142,14 @@ class Role:
 
         offense: list[tuple[int, float, float]]
         offense = [
-            (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
+            (
+                robot.robot_id,
+                MU.distance(robot, self.__observer.geometry.their_goal),
+                MU.radian_neo(robot, self.__observer.geometry.their_goal, MU.PI),
+            )
             for robot in self.__observer.our_robots
             if (robot.robot_id != self.keeper_id)
-            and (robot.robot_id not in self.defense_ids)
+            and (robot.robot_id not in self.defense_id_list)
             and (robot.is_visible is True)
         ]
 

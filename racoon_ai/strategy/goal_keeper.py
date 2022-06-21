@@ -8,6 +8,7 @@
 from logging import getLogger
 from math import cos, sin
 from typing import Optional
+
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU
@@ -58,17 +59,15 @@ class Keeper:
             self.__send_cmds.append(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
-        """keep_goal
+        """keep_goal"""
+        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
+        radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
-        Args:
-            robot (Robot): Robot instance
-        """
-        radian_ball_goal: float = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
         if abs(radian_ball_goal) >= MU.PI / 2:
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
-            (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)),
-            (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)),
+            (self.__observer.geometry.goal.x + self.__radius * cos(radian_ball_goal)),
+            (self.__observer.geometry.goal.y + self.__radius * sin(radian_ball_goal)),
             radian_ball_robot,
         )
 
