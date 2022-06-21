@@ -10,7 +10,6 @@ from socket import AF_INET, IPPROTO_UDP, SO_REUSEADDR, SOCK_DGRAM, SOL_SOCKET, s
 from typing import Optional
 
 from racoon_ai.models.ball import Ball
-from racoon_ai.models.coordinate import Point
 from racoon_ai.models.geometry import Geometry
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
 from racoon_ai.models.referee import Referee
@@ -162,6 +161,15 @@ class MWReceiver(IPNetAddr):
         return self.__our_robots
 
     @property
+    def our_robots_available(self) -> set[Robot]:
+        """our_robot_available
+
+        Returns:
+            set[Robot]: Available robots (i.e. is_online and is_visible)
+        """
+        return {bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(len(self.our_robots))) if bot}
+
+    @property
     def enemy_robots(self) -> list[Robot]:
         """enemy_robots
 
@@ -264,17 +272,6 @@ class MWReceiver(IPNetAddr):
         if mid < target_id:
             return self.__binary_search(target_id, (mid + 1), maximum, search_enemy, only_online, only_visible)
         return self.__binary_search(target_id, minimum, (mid - 1), search_enemy, only_online, only_visible)
-
-    @property
-    def goal(self) -> Point:
-        """goal
-
-        Give goal point
-
-        Returns:
-            Point
-        """
-        return Point(self.__geometry.goal_x, self.__geometry.goal_y)
 
     @property
     def sec_per_frame(self) -> float:
