@@ -22,11 +22,20 @@ class MWReceiver(IPNetAddr):
     """VisionReceiver
 
     Args:
+        target_ids (list[int]): Target robot IDs
+        is_team_yellow (bool, optional): If true, the team is yellow (default: False)
         host (str): IP or hostname of the server
         port (int): Port number of the vision server
     """
 
-    def __init__(self, host: str = "127.0.0.1", port: int = 30011) -> None:
+    def __init__(
+        self,
+        target_ids: list[int],
+        is_team_yellow: bool = False,
+        *,
+        host: str = "127.0.0.1",
+        port: int = 30011,
+    ) -> None:
 
         super().__init__(host, port)
 
@@ -36,6 +45,9 @@ class MWReceiver(IPNetAddr):
         self.__ball: Ball = Ball()
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
+
+        self.__target_ids: list[int] = target_ids
+        self.__is_team_yellow: bool = is_team_yellow
 
         self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
@@ -86,7 +98,7 @@ class MWReceiver(IPNetAddr):
         bot: Optional[Robot]
         proto_bot: Robot_Infos
         for proto_bot in proto.our_robots:
-            bot = self.get_our_by_id(proto_bot.robot_id, only_online=False)
+            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
             if bot is not None:
                 bot.update(proto_bot)
                 self.__logger.debug(bot)
@@ -94,7 +106,7 @@ class MWReceiver(IPNetAddr):
                 self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
 
         for proto_bot in proto.enemy_robots:
-            bot = self.get_enemy_by_id(proto_bot.robot_id, only_online=False)
+            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
             if bot is not None:
                 bot.update(proto_bot)
                 self.__logger.debug(bot)
@@ -158,30 +170,41 @@ class MWReceiver(IPNetAddr):
         """
         return self.__enemy_robots
 
-    def get_our_by_id(self, robot_id: int, only_online: bool = False) -> Optional[Robot]:
+    def get_our_by_id(self, robot_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
         """get_our_by_id
 
         Args:
             robot_id (int): Robot ID
             only_online (bool, optional): If true, only return online robot (default: False)
-
-        Returns:
-            Optional[Robot]: None if not found
-        """
-        return self.__binary_search(robot_id, maximum=len(self.__our_robots), only_online=only_online)
-
-    def get_enemy_by_id(self, enemy_id: int, only_online: bool = False) -> Optional[Robot]:
-        """get_enemy_by_id
-
-        Args:
-            enemy_id (int): Enemy ID
-            only_online (bool, optional): If true, only return online robot (default: False)
+            only_visible (bool, optional): If true, only return visible robot (default: True)
 
         Returns:
             Optional[Robot]: None if not found
         """
         return self.__binary_search(
-            enemy_id, maximum=len(self.__enemy_robots), search_enemy=True, only_online=only_online
+            robot_id,
+            maximum=len(self.__our_robots),
+            only_online=only_online,
+            only_visible=only_visible,
+        )
+
+    def get_enemy_by_id(self, enemy_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
+        """get_enemy_by_id
+
+        Args:
+            enemy_id (int): Enemy ID
+            only_online (bool, optional): If true, only return online robot (default: False)
+            only_visible (bool, optional): If true, only return visible robot (default: True)
+
+        Returns:
+            Optional[Robot]: None if not found
+        """
+        return self.__binary_search(
+            enemy_id,
+            maximum=len(self.__enemy_robots),
+            search_enemy=True,
+            only_online=only_online,
+            only_visible=only_visible,
         )
 
     def __binary_search(
@@ -191,6 +214,7 @@ class MWReceiver(IPNetAddr):
         maximum: int = 12,
         search_enemy: bool = False,
         only_online: bool = False,
+        only_visible: bool = True,
     ) -> Optional[Robot]:
         """__binary_search
 
@@ -200,13 +224,16 @@ class MWReceiver(IPNetAddr):
             maximum (int): Maximum index (default: 12)
             search_enemy (bool, optional): If true, search enemy (default: False)
             only_online (bool, optional): If True, only online robots are returned (default: False)
+            only_visible (bool, optional): If True, only visible robots are returned (default: True)
 
         Returns:
             Optional[Robot]
         """
         self.__logger.debug(
-            "Search robot (only_online: %s): target=%d, min=%d, max=%d",
+            "Search robot (only_online: %s, only_visible: %s, search_enemy: %s): target=%d, min=%d, max=%d",
             only_online,
+            only_visible,
+            search_enemy,
             target_id,
             minimum,
             maximum,
@@ -215,19 +242,31 @@ class MWReceiver(IPNetAddr):
         if maximum < minimum:
             return None
 
-        bots: list[Robot] = self.our_robots if not search_enemy else self.enemy_robots
+        bots: list[Robot] = self.our_robots if (not search_enemy) else self.enemy_robots
         mid = (minimum + maximum) // 2
-        mid_bot = bots[mid]
 
-        if mid_bot.robot_id == target_id:
-            if only_online and (not mid_bot.is_online):
-                self.__logger.warning("Robot %d is not online", target_id)
+        if mid == target_id:
+            # NOTE: Equivalent to `(not search_enemy) and (not (mid in self.__target_ids))`
+            if not ((search_enemy) or (target_id in self.__target_ids)):
+                a = 0
+                #self.__logger.warning("Robot %d is not in our target ids", target_id)
+
+            bot: Robot = bots[mid]
+            if only_online and (not bot.is_online):
+                #self.__logger.warning("Robot id %d is invalid", mid)
+                a = 0
                 return None
-            return mid_bot
+            if only_visible and (not bot.is_visible):
+                a = 0
+                #self.__logger.warning("Robot id %d is not on stage", mid)
+                return None
 
-        if mid_bot.robot_id < target_id:
-            return self.__binary_search(target_id, (mid + 1), maximum, search_enemy, only_online)
-        return self.__binary_search(target_id, minimum, (mid - 1), search_enemy, only_online)
+            self.__logger.debug("Bot: %s", bot)
+            return bot
+
+        if mid < target_id:
+            return self.__binary_search(target_id, (mid + 1), maximum, search_enemy, only_online, only_visible)
+        return self.__binary_search(target_id, minimum, (mid - 1), search_enemy, only_online, only_visible)
 
     @property
     def goal(self) -> Point:
@@ -304,6 +343,15 @@ class MWReceiver(IPNetAddr):
             bool
         """
         return self.__is_vision_recv
+
+    @property
+    def is_team_yellow(self) -> bool:
+        """is_team_yellow
+
+        Returns:
+            bool
+        """
+        return self.__is_team_yellow
 
     @property
     def attack_direction(self) -> int:

@@ -1,19 +1,17 @@
 #!/usr/bin/env python3.10
-# flake8: ignore-errors
-# pylint: disable-all
-# type: ignore
+
 """background.py
 
     This module is for the Back class.
 """
 
-from PyQt6 import QtGui
-from PyQt6.QtWidgets import QLabel
+from PyQt6.QtGui import QFont  # pylint: disable=E0611
+from PyQt6.QtWidgets import QLabel  # pylint: disable=E0611
 
-from racoon_ai.gui.main import Main
+from .main import Main
 
 
-class Back:
+class Back:  # pylint: disable=R0903
     """Robot
     Args:
         None
@@ -22,15 +20,14 @@ class Back:
     """
 
     def __init__(self, main: Main) -> None:
-        super(Back, self).__init__()
+        self.__main: Main = main
+        self.__ai_text: QLabel
+        self.__set_text()
 
-        self.__main = main
-        self._set_text()
-
-    def _set_text(self) -> None:
+    def __set_text(self) -> None:
         self.__ai_text = QLabel("RACOON-AI", self.__main)
         self.__ai_text.setGeometry(0, 0, 150, 50)
-        self.__ai_text.setFont(QtGui.QFont("Arial", 16))
+        self.__ai_text.setFont(QFont("Arial", 16))
         self.__ai_text.setStyleSheet("background-color: white")
         self.__ai_text.setStyleSheet("QLabel { color : white; }")
         self.__ai_text.move(50, -5)
