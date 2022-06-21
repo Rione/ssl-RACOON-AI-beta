@@ -40,7 +40,6 @@ class Game:  # pylint: disable=R0903
         self.__set_button()
 
     def __set_texts(self) -> None:
-
         self.__gc_text = QLabel("Game Control", self.__main)
         self.__gc_text.setFont(QFont("Arial", 20))
         self.__gc_text.setStyleSheet("QLabel { color : white; }")
@@ -106,11 +105,27 @@ class Game:  # pylint: disable=R0903
         toggle_referee.move(1222, 68)
 
     def __set_combo(self) -> None:
-        combo = QComboBox(self.__main)
-        combo.addItem("NORMAL_START")
-        combo.addItem("STOP")
-        combo.resize(150, 140)
-        combo.move(1227, 92)
+        self.__combo = QComboBox(self.__main)
+        self.__combo.addItems(
+            ["NORMAL_START",
+             "STOP",
+             "HALT",
+             "FORCE_START",
+             "PRE_KICKOFF_OUR",
+             "PRE_KICKOFF_THEIR",
+             "PRE_PENALTY_OUR",
+             "PRE_PENALTY_THEIR",
+             "DIRECT_OUR",
+             "DIRECT_THEIR",
+             "INDIRECT_OUR",
+             "INDIRECT_THEIR",
+             "TIMEOUT_OUR",
+             "TIMEOUT_THEIR",
+             "GOAL_OUR",
+             "GOAL_THEIR",
+             "PLACEMENT_OUR",
+             "PRE_KICKOFF_THEIR"])
+        self.__combo.setGeometry(1225, 140, 150, 50)
 
     def __set_box(self) -> None:
         replace_x = QSpinBox(self.__main)
@@ -139,3 +154,6 @@ class Game:  # pylint: disable=R0903
         button = QPushButton("Send Replacement !", self.__main)
         button.resize(240, 32)
         button.move(1169, 254)
+
+    # def __get_referee_command(self) -> str:
+    #     return self.__combo.currentText()

@@ -5,7 +5,7 @@
     This module is for the Vision class.
 """
 
-from PyQt6.QtGui import QColor, QFont, QPainter, QPaintEvent  # pylint: disable=E0611
+from PyQt6.QtGui import QFont  # pylint: disable=E0611
 from PyQt6.QtWidgets import QComboBox, QLabel, QSpinBox  # pylint: disable=E0611
 
 from .animated_toggle import AnimatedToggle
@@ -22,7 +22,6 @@ class Vision:  # pylint: disable=R0903
 
     def __init__(self, main: Main) -> None:
         self.__main: Main = main
-        self.__ui = QPainter(self.__main)
         self.__role_text: QLabel
         self.__simu_text: QLabel
         self.__real_text: QLabel
@@ -33,11 +32,6 @@ class Vision:  # pylint: disable=R0903
         self.__set_texts()
         self.__set_box()
         self.__set_toggle()
-
-    def paintEvent(self, _: QPaintEvent) -> None:  # pylint: disable=C0103
-        """paintEvent"""
-        self.__ui.setBrush(QColor("orange"))
-        self.__ui.end()
 
     def __set_texts(self) -> None:
         self.__role_text = QLabel("Vision", self.__main)

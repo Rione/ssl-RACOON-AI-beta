@@ -3,6 +3,7 @@
 """
     This is the main script.
 """
+import signal
 from configparser import ConfigParser
 from logging import Logger, shutdown
 
@@ -12,6 +13,9 @@ from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
 from .strategy import Keeper, Offense, Role, SubRole
+
+# Enable gui keyboard interrupt
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
 def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
@@ -35,7 +39,7 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     # Flag if view gui
-    is_gui_view: bool = False
+    is_gui_view: bool = True
 
     try:
         observer: MWReceiver = create_receiver(conf, logger, target_ids, is_team_yellow)
@@ -73,6 +77,9 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
             sim_cmds.robot_commands += keeper.send_cmds
             sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
+
+            # update gui
+            gui.update()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)

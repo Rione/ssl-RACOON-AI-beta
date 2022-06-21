@@ -1,5 +1,4 @@
 #!/usr/bin/env python3.10
-
 """view.py
 
     This module is for the Gui class.
