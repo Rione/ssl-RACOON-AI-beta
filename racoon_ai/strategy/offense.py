@@ -83,9 +83,8 @@ class Offense:
         #    cmd = self.__straightball(bot)
 
         cmd = self.__ballaround(bot)
-        print(bot.x)
         if (
-            abs(MU.radian(self.__observer.goal, bot) - bot.theta) < 0.1
+            abs(MU.radian(self.__observer.geometry.goal, bot) - bot.theta) < 0.1
             and MU.distance(self.__observer.ball, bot) <= 105
         ):
             cmd.kickpow = 10
@@ -95,7 +94,7 @@ class Offense:
     def __ballaround(self, robot: Robot) -> RobotCommand:
         """ballaround"""
         radian_ball_robot = MU.radian_normalize(MU.radian(self.__observer.ball, robot) - robot.theta)
-        radian_goal_robot = MU.radian_normalize(MU.radian(self.__observer.goal, robot) - robot.theta)
+        radian_goal_robot = MU.radian_normalize(MU.radian(self.__observer.geometry.goal, robot) - robot.theta)
         distance_target_robot = MU.distance(self.__observer.ball, robot)
         adjustment = distance_target_robot / 900
 
@@ -105,7 +104,7 @@ class Offense:
         radian_around = MU.radian_normalize(MU.radian(self.__observer.ball, robot))
         discrimination = MU.radian_normalize(
             MU.radian_normalize(MU.radian(robot, self.__observer.ball))
-            - MU.radian_normalize(MU.radian(self.__observer.goal, self.__observer.ball))
+            - MU.radian_normalize(MU.radian(self.__observer.geometry.goal, self.__observer.ball))
         )
         radian_around -= discrimination / abs(discrimination) * math.pi / 2
         radian_around -= robot.theta
@@ -116,7 +115,7 @@ class Offense:
 
         discrimination = MU.radian_normalize(
             MU.radian_normalize(MU.radian(self.__observer.ball, robot))
-            - MU.radian_normalize(MU.radian(self.__observer.goal, robot))
+            - MU.radian_normalize(MU.radian(self.__observer.geometry.goal, robot))
         )
         adjustment = 0.1 / abs(discrimination)
 
@@ -131,6 +130,4 @@ class Offense:
         command.vel_fwd = vel_fwd / adjustment * speed
         command.vel_sway = vel_sway / adjustment * speed
         command.vel_angular = radian_goal_robot
-        command.dribble_pow = 0
-        command.kickpow = 0
         return command
