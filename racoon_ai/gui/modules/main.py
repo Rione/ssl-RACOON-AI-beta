@@ -216,8 +216,8 @@ class Main(QWidget):
         for i in range(3):
             self.__offense_num[i].setGeometry(20, 20, 645, 70)
             self.__offense_num[i].move(735 + (61 * i), 319)
-            self.__offense_num[i].setNum(self.__role.offense_ids[i])
+            self.__offense_num[i].setNum(self.__role.offense_id_list[i])
 
             self.__defense_num[i].setGeometry(20, 20, 645, 70)
             self.__defense_num[i].move(918 + (61 * i), 319)
-            self.__defense_num[i].setNum(self.__role.defense_ids[i])
+            self.__defense_num[i].setNum(self.__role.defense_id_list[i])

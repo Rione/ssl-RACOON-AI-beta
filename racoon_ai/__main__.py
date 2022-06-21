@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.10
-# pylint: disable-all
+
 """
     This is the main script.
 """
@@ -18,7 +18,7 @@ from .strategy.goal_keeper import Keeper
 
 # from .strategy.offense import Offense
 from .strategy.role import Role
-
+from .strategy.subrole import SubRole
 
 
 def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
@@ -53,6 +53,8 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
         gui = Gui(argv, is_gui_view, observer, role)
 
+        subrole: SubRole = SubRole(observer, role)
+
         # offense: Offense = Offense(observer)
 
         # defense = Defense(observer, controls)
@@ -62,6 +64,7 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
         sender: CommandSender = create_sender(conf, logger, target_ids, is_real)
 
         logger.info("Roop started")
+
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
             sim_cmds = SimCommands(observer.is_team_yellow)
@@ -69,7 +72,7 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
             # Recieve commands from the MW
             observer.main()
             role.main()
-
+            subrole.main()
             # offense.main()
             # defense.main()
             keeper.main()
