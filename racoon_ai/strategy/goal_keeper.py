@@ -8,7 +8,6 @@
 from logging import getLogger
 from math import cos, sin
 from typing import Optional
-
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU
@@ -34,7 +33,6 @@ class Keeper:
         self.__observer = observer
         self.__controls = controls
         self.__role = role
-        # self.__role = role
         self.__send_cmds: list[RobotCommand]
         self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
 
@@ -60,10 +58,12 @@ class Keeper:
             self.__send_cmds.append(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
-        """keep_goal"""
-        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.goal)
-        radian_ball_robot = MU.radian(self.__observer.ball, robot)
+        """keep_goal
 
+        Args:
+            robot (Robot): Robot instance
+        """
+        radian_ball_goal: float = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
         if abs(radian_ball_goal) >= MU.PI / 2:
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
@@ -72,7 +72,7 @@ class Keeper:
             radian_ball_robot,
         )
 
-        command = self.__controls.pid(target_pose, robot)
+        command: RobotCommand = self.__controls.pid(target_pose, robot)
         command.dribble_pow = 0
         command.kickpow = 0
         return command

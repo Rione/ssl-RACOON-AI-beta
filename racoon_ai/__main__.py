@@ -8,6 +8,7 @@ from logging import Logger, shutdown
 
 from .gui import Gui
 from .models.robot import SimCommands
+
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender

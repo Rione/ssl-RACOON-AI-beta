@@ -118,6 +118,9 @@ class Robot(Pose):
             return False
         return self.robot_id == obj.robot_id
 
+    def __hash__(self) -> int:
+        return hash(id(self))
+
     @property
     def distance_ball_robot(self) -> float:
         """distance_ball_robot"""
