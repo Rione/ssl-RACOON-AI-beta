@@ -89,12 +89,12 @@ class MathUtils:
         return angle - (MathUtils.TWO_PI * floor((angle + MathUtils.PI - center) / MathUtils.TWO_PI))
 
     @staticmethod
-    def radian_reduce(obj: (Pose | float), angle2: float, center: float = 0) -> float:
+    def radian_reduce(obj1: (Pose | float), obj2: (Pose | float), center: float = 0) -> float:
         """radian_reduce
 
         Args:
-            obj (Pose | float): angle 1
-            angle2 (float): angle 2
+            obj1 (Pose | float): angle 1
+            obj2 (float): angle 2
             center (float, optional): center angle value
 
         Returns:
@@ -117,9 +117,14 @@ class MathUtils:
                 >>> MathUtils.radian_reduce(pose.theta, pi, pi) == 3 * pi / 2
                 True
         """
-        if isinstance(obj, Pose):
-            return MathUtils.radian_normalize((obj.theta - angle2), center)
-        return MathUtils.radian_normalize((obj - angle2), center)
+        if isinstance(obj1, Pose):
+            if isinstance(obj2, Pose):
+                return MathUtils.radian_normalize((obj1.theta - obj2.theta), center)
+            return MathUtils.radian_normalize((obj1.theta - obj2), center)
+
+        if isinstance(obj2, Pose):
+            return MathUtils.radian_normalize((obj1 - obj2.theta), center)
+        return MathUtils.radian_normalize((obj1 - obj2), center)
 
     @staticmethod
     def __substitution_fn(pt1: Point, pt2: Point, pt3: Point) -> float:
@@ -165,11 +170,9 @@ class MathUtils:
     @classmethod
     def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
         """radian
-
         Args:
             obj1 Point: object at least has x and y
             obj2 Point: object at least has x and y
-
         Returns:
             float: radian value
         """

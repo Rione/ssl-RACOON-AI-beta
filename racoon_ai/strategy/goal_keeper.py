@@ -34,7 +34,6 @@ class Keeper:
         self.__observer = observer
         self.__controls = controls
         self.__role = role
-        # self.__role = role
         self.__send_cmds: list[RobotCommand]
         self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
 
@@ -61,18 +60,18 @@ class Keeper:
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
-        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.goal)
+        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
         radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
         if abs(radian_ball_goal) >= MU.PI / 2:
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
-            (self.__observer.goal.x + self.__radius * cos(radian_ball_goal)),
-            (self.__observer.goal.y + self.__radius * sin(radian_ball_goal)),
+            (self.__observer.geometry.goal.x + self.__radius * cos(radian_ball_goal)),
+            (self.__observer.geometry.goal.y + self.__radius * sin(radian_ball_goal)),
             radian_ball_robot,
         )
 
-        command = self.__controls.pid(target_pose, robot)
+        command: RobotCommand = self.__controls.pid(target_pose, robot)
         command.dribble_pow = 0
         command.kickpow = 0
         return command
