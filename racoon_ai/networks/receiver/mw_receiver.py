@@ -10,7 +10,6 @@ from socket import AF_INET, IPPROTO_UDP, SO_REUSEADDR, SOCK_DGRAM, SOL_SOCKET, s
 from typing import Optional
 
 from racoon_ai.models.ball import Ball
-from racoon_ai.models.coordinate import Point
 from racoon_ai.models.geometry import Geometry
 from racoon_ai.models.network import BUFFSIZE, IPNetAddr
 from racoon_ai.models.referee import Referee
@@ -46,11 +45,13 @@ class MWReceiver(IPNetAddr):
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
 
-        self.__target_ids: list[int] = target_ids
+        self.__target_ids: set[int] = set(target_ids)
         self.__is_team_yellow: bool = is_team_yellow
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(12)]
-        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(12)]
+        self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
+        self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
+
+        self.__our_robots_available: set[Robot] = set()
 
         self.__sec_per_frame: float
         self.__n_camras: int
@@ -125,6 +126,10 @@ class MWReceiver(IPNetAddr):
 
         self.__attack_direction = proto.info.attack_direction
 
+        self.__our_robots_available = set(
+            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
+        )
+
     @property
     def ball(self) -> Ball:
         """ball
@@ -160,6 +165,15 @@ class MWReceiver(IPNetAddr):
             list[Robot]
         """
         return self.__our_robots
+
+    @property
+    def our_robots_available(self) -> set[Robot]:
+        """our_robot_available
+
+        Returns:
+            set[Robot]: Available robots (i.e. is_online and is_visible)
+        """
+        return self.__our_robots_available
 
     @property
     def enemy_robots(self) -> list[Robot]:
@@ -248,17 +262,14 @@ class MWReceiver(IPNetAddr):
         if mid == target_id:
             # NOTE: Equivalent to `(not search_enemy) and (not (mid in self.__target_ids))`
             if not ((search_enemy) or (target_id in self.__target_ids)):
-                a = 0
-                # self.__logger.warning("Robot %d is not in our target ids", target_id)
+                self.__logger.warning("Robot %d is not in our target ids", target_id)
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                # self.__logger.warning("Robot id %d is invalid", mid)
-                a = 0
+                self.__logger.warning("Robot id %d is offline", mid)
                 return None
             if only_visible and (not bot.is_visible):
-                a = 0
-                # self.__logger.warning("Robot id %d is not on stage", mid)
+                self.__logger.warning("Robot id %d is not on stage", mid)
                 return None
 
             self.__logger.debug("Bot: %s", bot)
@@ -267,17 +278,6 @@ class MWReceiver(IPNetAddr):
         if mid < target_id:
             return self.__binary_search(target_id, (mid + 1), maximum, search_enemy, only_online, only_visible)
         return self.__binary_search(target_id, minimum, (mid - 1), search_enemy, only_online, only_visible)
-
-    @property
-    def goal(self) -> Point:
-        """goal
-
-        Give goal point
-
-        Returns:
-            Point
-        """
-        return Point(self.__geometry.goal_x, self.__geometry.goal_y)
 
     @property
     def sec_per_frame(self) -> float:
@@ -306,10 +306,29 @@ class MWReceiver(IPNetAddr):
     def num_of_our_robots(self) -> int:
         """num_of_our_robots
 
-        How many our robots visible
+        - How many our robots visible.
 
         Returns:
             int
+
+        NOTE:
+            - This is not the same as `len(our_robots)`
+            - If the vision detect more than `len(self.__target_ids)`,
+            it will be returned as `len(self.__target_ids)`.
+        """
+        return min(self.__num_of_our_robots, len(self.__target_ids))
+
+    @property
+    def num_of_our_vision_robots(self) -> int:
+        """num_of_our_vision_robots
+
+        How many our robots visible.
+
+        Returns:
+            int
+
+        NOTE:
+            - This returns the actual number of our robots detected by vision.
         """
         return self.__num_of_our_robots
 
@@ -331,7 +350,7 @@ class MWReceiver(IPNetAddr):
         How many all robots visible
 
         Returns:
-            int
+            int (num_of_our_robots + num_of_enemy_robots)
         """
         return self.__num_of_enemy_robots + self.__num_of_our_robots
 

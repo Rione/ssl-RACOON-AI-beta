@@ -9,7 +9,6 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.models.coordinate import Point
 from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 
 
@@ -17,20 +16,21 @@ class Role:
     """Role
     Args:
         observer (Observer): Observer instance.
+        keeper_id (int): Keeper ID.
 
     Attributes:
         keeper_id (int): Keeper robot id.
-        offense_ids (list[int]): Offensive robots id.
-        defense_ids (list[int]): Defensive robots id.
+        offense_id_list (list[int]): Offensive robots id.
+        defense_id_list (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, observer: MWReceiver, *, keeper_id: int = 0) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
-        self.__keeper: int = 0
+        self.__keeper: int = keeper_id
         self.__offense: list[int] = []
         self.__defense: list[int] = []
         # self.__keeper_quantity: int = 0
@@ -38,21 +38,20 @@ class Role:
         self.__defence_quantity: int = 0
         # self.__midfielder_quantity: int = 0
         self.__role_num: list[list[int]] = [
-            [0, 0, 0, 0],
-            [1, 0, 0, 0],
-            [1, 1, 0, 0],
-            [1, 1, 1, 0],
-            [1, 1, 2, 0],
-            [1, 2, 2, 0],
-            [1, 2, 3, 0],
-            [1, 3, 3, 0],
-            [1, 3, 3, 1],
+            [0, 0, 0, 0],  # 0
+            [1, 0, 0, 0],  # 1
+            [1, 1, 0, 0],  # 2
+            [1, 1, 1, 0],  # 3
+            [1, 1, 2, 0],  # 4
+            [1, 2, 2, 0],  # 5
+            [1, 2, 3, 0],  # 6
+            [1, 3, 3, 0],  # 7
+            [1, 3, 4, 0],  # 8
             [1, 3, 4, 1],
             [1, 3, 5, 1],
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
-        self.__their_goal: Point = Point(-self.__observer.goal.x, 0)
 
     @property
     def keeper_id(self) -> int:
@@ -60,14 +59,22 @@ class Role:
         return self.__keeper
 
     @property
-    def offense_ids(self) -> list[int]:
-        """offense_ids"""
+    def offense_id_list(self) -> list[int]:
+        """offense_id_list"""
         return self.__offense
 
     @property
-    def defense_ids(self) -> list[int]:
-        """defense_ids"""
+    def defense_id_list(self) -> list[int]:
+        """defense_id_list"""
         return self.__defense
+
+    def get_offense_id(self, offense_id: int) -> int:
+        """get_offense_id"""
+        return self.__defense[offense_id]
+
+    def get_defense_id(self, defense_id: int) -> int:
+        """get_defense_id"""
+        return self.__defense[defense_id]
 
     def main(self) -> None:
         """main"""
@@ -76,11 +83,11 @@ class Role:
         self.__decide_defense()
         self.__decide_offense()
         self.__logger.debug(self.keeper_id)
-        self.__logger.debug(self.offense_ids)
-        self.__logger.debug(self.defense_ids)
+        self.__logger.debug(self.offense_id_list)
+        self.__logger.debug(self.defense_id_list)
 
     def __decide_quantity(self) -> None:
-        robot_quantity = len(self.__observer.our_robots)
+        robot_quantity = self.__observer.num_of_our_robots
         # self.__keeper_quantity = self.__role_num[robot_quantity][0]
         self.__offense_quantity = self.__role_num[robot_quantity][1]
         self.__defence_quantity = self.__role_num[robot_quantity][2]
@@ -99,9 +106,9 @@ class Role:
             (
                 robot.robot_id,
                 self.__defence_basis_dis(robot.robot_id),
-                MU.radian(robot, self.__observer.goal),
+                MU.radian(robot, self.__observer.geometry.goal),
             )
-            for robot in self.__observer.our_robots
+            for robot in self.__observer.our_robots_available
             if robot.robot_id != self.keeper_id
         ]
 
@@ -111,7 +118,6 @@ class Role:
             defense.sort(reverse=True, key=lambda x: x[2])
         self.__defense = list(row[0] for row in defense)
 
-    # @staticmethod
     def __defence_basis_dis(self, robot_id: int) -> float:
         """defence_basis_dis"""
 
@@ -119,15 +125,12 @@ class Role:
         if robot is None:
             return float(1e6)
 
-        theta = MU.radian(robot, self.__observer.goal)
-        robot_dis = MU.distance(robot, self.__observer.goal)
+        theta = MU.radian(robot, self.__observer.geometry.goal)
+        robot_dis = MU.distance(robot, self.__observer.geometry.goal)
 
-        if abs(theta) < MU.PI / 4:
-            basis_dis = robot_dis - self.__observer.geometry.penalty_area_depth / cos(theta)
-        else:
-            basis_dis = robot_dis - self.__observer.geometry.penalty_area_width / sin(theta)
-
-        return basis_dis
+        if abs(theta) < (MU.PI / 4):
+            return robot_dis - (self.__observer.geometry.penalty_area_depth / cos(theta))
+        return robot_dis - (self.__observer.geometry.penalty_area_width / sin(theta))
 
     def __decide_offense(self) -> None:
         """decide_offense
@@ -139,9 +142,13 @@ class Role:
 
         offense: list[tuple[int, float, float]]
         offense = [
-            (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
-            for robot in self.__observer.our_robots
-            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
+            (
+                robot.robot_id,
+                MU.distance(robot, self.__observer.geometry.their_goal),
+                MU.radian_reduce(MU.radian(robot, self.__observer.geometry.their_goal), MU.PI),
+            )
+            for robot in self.__observer.our_robots_available
+            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_id_list)
         ]
 
         if offense:

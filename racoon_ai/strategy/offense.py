@@ -5,12 +5,10 @@
     This module is for the Offense class.
 """
 
-import math
 from logging import getLogger
+from math import cos, sin, sqrt
 
 from racoon_ai.common.math_utils import MathUtils as MU
-
-# from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.networks.receiver import MWReceiver
 
@@ -83,54 +81,45 @@ class Offense:
         #    cmd = self.__straightball(bot)
 
         cmd = self.__ballaround(bot)
-        print(bot.x)
-        if (
-            abs(MU.radian(self.__observer.goal, bot) - bot.theta) < 0.1
-            and MU.distance(self.__observer.ball, bot) <= 105
-        ):
+        if bot.distance_ball_robot <= 105 and abs(MU.radian(self.__observer.geometry.goal, bot) - bot.theta) < 0.1:
             cmd.kickpow = 10
-        # print(distance(self.__observer.ball, bot))
         self.__send_cmds.append(cmd)
 
     def __ballaround(self, robot: Robot) -> RobotCommand:
         """ballaround"""
-        radian_ball_robot = MU.radian_normalize(MU.radian(self.__observer.ball, robot) - robot.theta)
-        radian_goal_robot = MU.radian_normalize(MU.radian(self.__observer.goal, robot) - robot.theta)
-        distance_target_robot = MU.distance(self.__observer.ball, robot)
-        adjustment = distance_target_robot / 900
+        radian_goal_robot: float = MU.radian_reduce(MU.radian(self.__observer.geometry.goal, robot), robot.theta)
+        adjustment: float = robot.distance_ball_robot / 900
 
-        vel_fwd = math.cos(radian_ball_robot) * adjustment
-        vel_sway = math.sin(radian_ball_robot) * adjustment
+        vel_fwd: float = cos(robot.radian_ball_robot) * adjustment
+        vel_sway: float = sin(robot.radian_ball_robot) * adjustment
 
-        radian_around = MU.radian_normalize(MU.radian(self.__observer.ball, robot))
-        discrimination = MU.radian_normalize(
-            MU.radian_normalize(MU.radian(robot, self.__observer.ball))
-            - MU.radian_normalize(MU.radian(self.__observer.goal, self.__observer.ball))
+        radian_around: float = MU.radian(self.__observer.ball, robot)
+        discrimination: float = MU.radian_reduce(
+            MU.radian(robot, self.__observer.ball),
+            MU.radian(self.__observer.geometry.goal, self.__observer.ball),
         )
-        radian_around -= discrimination / abs(discrimination) * math.pi / 2
+        radian_around -= ((discrimination / MU.div_safe(abs(discrimination))) * MU.PI) / 2
         radian_around -= robot.theta
-        adjustment = 100 / distance_target_robot
+        adjustment = 100 / MU.div_safe(robot.distance_ball_robot)
 
-        vel_fwd += math.cos(radian_around) * adjustment
-        vel_sway += math.sin(radian_around) * adjustment
+        vel_fwd += cos(radian_around) * adjustment
+        vel_sway += sin(radian_around) * adjustment
 
-        discrimination = MU.radian_normalize(
-            MU.radian_normalize(MU.radian(self.__observer.ball, robot))
-            - MU.radian_normalize(MU.radian(self.__observer.goal, robot))
+        discrimination = MU.radian_reduce(
+            MU.radian(self.__observer.ball, robot),
+            MU.radian(self.__observer.geometry.goal, robot),
         )
-        adjustment = 0.1 / abs(discrimination)
+        adjustment = 0.1 / MU.div_safe(abs(discrimination))
 
-        vel_fwd += math.cos(radian_ball_robot) * adjustment
-        vel_sway += math.sin(radian_ball_robot) * adjustment
+        vel_fwd += cos(robot.radian_ball_robot) * adjustment
+        vel_sway += sin(robot.radian_ball_robot) * adjustment
 
-        adjustment = math.sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway)
-        speed = distance_target_robot / 1000.0
-        speed = min(speed, 0.3)
+        adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
+        speed = robot.distance_ball_robot / 1000.0
+        speed = min(speed, 0.8)
 
         command = RobotCommand(5)
-        command.vel_fwd = vel_fwd / adjustment * speed
-        command.vel_sway = vel_sway / adjustment * speed
+        command.vel_fwd = speed * vel_fwd / adjustment
+        command.vel_sway = speed * vel_sway / adjustment
         command.vel_angular = radian_goal_robot
-        command.dribble_pow = 0
-        command.kickpow = 0
         return command

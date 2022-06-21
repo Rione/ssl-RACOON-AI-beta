@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.10
-# pylint: disable-all
+
 """
     This is the main script.
 """
@@ -12,13 +12,13 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Keeper, Role
+from .strategy import Keeper, Offense, Role, SubRole
 
 # Enable gui keyboard interrupt
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
-def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
+def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     """main
 
     This function is for the main function.
@@ -48,15 +48,18 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
         role: Role = Role(observer)
 
-        gui = Gui(argv, is_gui_view, observer, role)
+        gui = Gui(args, is_gui_view, observer, role)
 
-        # offense: Offense = Offense(observer)
+        subrole: SubRole = SubRole(observer, role)
+
+        offense: Offense = Offense(observer)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
         sender: CommandSender = create_sender(conf, logger, target_ids, is_real)
 
         logger.info("Roop started")
+
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
             sim_cmds = SimCommands(observer.is_team_yellow)
@@ -64,12 +67,15 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
             # Recieve commands from the MW
             observer.main()
             role.main()
-
-            # offense.main()
+            subrole.main()
+            offense.main()
             keeper.main()
 
-            # sim_cmds.robot_commands += offense.send_cmds
+            # update gui
+            gui.update()
+
             sim_cmds.robot_commands += keeper.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
             # update gui
