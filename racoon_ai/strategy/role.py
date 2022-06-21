@@ -80,7 +80,7 @@ class Role:
         self.__logger.debug(self.defense_ids)
 
     def __decide_quantity(self) -> None:
-        robot_quantity = len(self.__observer.our_robots)
+        robot_quantity = self.__observer.num_of_our_robots
         # self.__keeper_quantity = self.__role_num[robot_quantity][0]
         self.__offense_quantity = self.__role_num[robot_quantity][1]
         self.__defence_quantity = self.__role_num[robot_quantity][2]
@@ -102,7 +102,7 @@ class Role:
                 MU.radian(robot, self.__observer.goal),
             )
             for robot in self.__observer.our_robots
-            if robot.robot_id != self.keeper_id
+            if robot.robot_id != self.keeper_id and robot.is_visible is True
         ]
 
         if defense:
@@ -141,7 +141,9 @@ class Role:
         offense = [
             (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
             for robot in self.__observer.our_robots
-            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
+            if (robot.robot_id != self.keeper_id)
+            and (robot.robot_id not in self.defense_ids)
+            and (robot.is_visible is True)
         ]
 
         if offense:

@@ -53,7 +53,7 @@ class SubRole:
                 MU.distance(self.__observer.ball, robot),
             )
             for robot in self.__observer.our_robots
-            if robot.robot_id != self.__role.keeper_id
+            if robot.robot_id != self.__role.keeper_id and robot.is_visible is True
         ]
         if attacker:
             attacker.sort(reverse=False, key=lambda x: x[1])
@@ -72,7 +72,7 @@ class SubRole:
                 MU.distance(self.__observer.ball, attacker),
             )
             for robot in self.__observer.our_robots
-            if robot.robot_id not in (self.__role.keeper_id, self.__attacker)
+            if robot.robot_id not in (self.__role.keeper_id, self.__attacker) and robot.is_visible is True
         ]
         if receiver:
             receiver.sort(reverse=False, key=lambda x: x[1])
