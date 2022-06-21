@@ -51,6 +51,8 @@ class MWReceiver(IPNetAddr):
         self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
+        self.__our_robots_available: set[Robot] = set()
+
         self.__sec_per_frame: float
         self.__n_camras: int
         self.__num_of_our_robots: int
@@ -124,6 +126,10 @@ class MWReceiver(IPNetAddr):
 
         self.__attack_direction = proto.info.attack_direction
 
+        self.__our_robots_available = set(
+            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
+        )
+
     @property
     def ball(self) -> Ball:
         """ball
@@ -167,7 +173,7 @@ class MWReceiver(IPNetAddr):
         Returns:
             set[Robot]: Available robots (i.e. is_online and is_visible)
         """
-        return {bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(len(self.our_robots))) if bot}
+        return self.__our_robots_available
 
     @property
     def enemy_robots(self) -> list[Robot]:
