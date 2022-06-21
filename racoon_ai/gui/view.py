@@ -50,6 +50,6 @@ class Gui:  # pylint: disable=R0903
             return
         self.__main.update()
         self.__app.processEvents()  # type: ignore
-        
+
     def get_referee_command(self) -> str:
         return self.__game.get_referee_command()

@@ -249,16 +249,16 @@ class MWReceiver(IPNetAddr):
             # NOTE: Equivalent to `(not search_enemy) and (not (mid in self.__target_ids))`
             if not ((search_enemy) or (target_id in self.__target_ids)):
                 a = 0
-                #self.__logger.warning("Robot %d is not in our target ids", target_id)
+                # self.__logger.warning("Robot %d is not in our target ids", target_id)
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                #self.__logger.warning("Robot id %d is invalid", mid)
+                # self.__logger.warning("Robot id %d is invalid", mid)
                 a = 0
                 return None
             if only_visible and (not bot.is_visible):
                 a = 0
-                #self.__logger.warning("Robot id %d is not on stage", mid)
+                # self.__logger.warning("Robot id %d is not on stage", mid)
                 return None
 
             self.__logger.debug("Bot: %s", bot)

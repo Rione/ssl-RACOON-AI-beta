@@ -4,7 +4,6 @@
     This is the main script.
 """
 import signal
-
 from configparser import ConfigParser
 from logging import Logger, shutdown
 

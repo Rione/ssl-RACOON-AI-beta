@@ -42,16 +42,18 @@ class Main(QWidget):
         self.__wall_corner: QPoint = QPoint(48, 43)
         self.__wall_to_line_length: int = 300
 
-        self.__shrink_length: float = (self.__field_length / self.__observer.geometry.field_length)
-        self.__shrink_width: float = (self.__field_width / self.__observer.geometry.field_width)
+        self.__shrink_length: float = self.__field_length / self.__observer.geometry.field_length
+        self.__shrink_width: float = self.__field_width / self.__observer.geometry.field_width
         self.__shrink_ratio: float = (self.__shrink_length + self.__shrink_width) / 2.0
 
-        self.__field_corner: QPoint = QPoint(int(self.__wall_corner.x() + self.__wall_to_line_length *
-                                             self.__shrink_width),
-                                             int(self.__wall_corner.y() + self.__wall_to_line_length *
-                                             self.__shrink_length))
-        self.__field_center: QPoint = QPoint(int(self.__field_width / 2.0 + self.__field_corner.x()),
-                                             int(self.__field_length / 2.0 + self.__field_corner.y()))
+        self.__field_corner: QPoint = QPoint(
+            int(self.__wall_corner.x() + self.__wall_to_line_length * self.__shrink_width),
+            int(self.__wall_corner.y() + self.__wall_to_line_length * self.__shrink_length),
+        )
+        self.__field_center: QPoint = QPoint(
+            int(self.__field_width / 2.0 + self.__field_corner.x()),
+            int(self.__field_length / 2.0 + self.__field_corner.y()),
+        )
 
         self.__center_circle_radius = int(500 * self.__shrink_ratio)
 
@@ -119,7 +121,7 @@ class Main(QWidget):
         self._draw_robots("blue")
         self._draw_robots("yellow")
         self._draw_role()
-       
+
         self.__fps_num.setNum(60)
 
         self.__ui.end()
@@ -136,25 +138,37 @@ class Main(QWidget):
             if robot.x != 0:
                 self.__ui.setPen(QColor("black"))
                 self.__ui.drawChord(
-                    int(robot.y * self.__shrink_width + self.__field_center.x() -
-                        (self.__robot_radius * self.__shrink_width)),
-                    int(robot.x * self.__shrink_length + self.__field_center.y() -
-                        (self.__robot_radius * self.__shrink_length)),
+                    int(
+                        robot.y * self.__shrink_width
+                        + self.__field_center.x()
+                        - (self.__robot_radius * self.__shrink_width)
+                    ),
+                    int(
+                        robot.x * self.__shrink_length
+                        + self.__field_center.y()
+                        - (self.__robot_radius * self.__shrink_length)
+                    ),
                     int(self.__robot_radius * self.__shrink_width * 2.5),
                     int(self.__robot_radius * self.__shrink_length * 2.5),
                     int(math.degrees(MU.radian_normalize(robot.theta - math.radians(45))) * 16),
-                    275 * 16
+                    275 * 16,
                 )
                 if color == "blue":
                     self.__ui.setPen(QColor("white"))
                 else:
                     self.__ui.setPen(QColor("black"))
-                robot_center_p1 = QPointF(robot.y * self.__shrink_width + self.__field_center.x(),
-                                          robot.x * self.__shrink_length + self.__field_center.y())
-                robot_center_p2 = QPointF(robot.y * self.__shrink_width + self.__field_center.x() -
-                                          4.0 * math.cos(MU.radian_normalize(-robot.theta - math.pi / 2)),
-                                          robot.x * self.__shrink_length + self.__field_center.y() -
-                                          4.0 * math.sin(MU.radian_normalize(-robot.theta - math.pi / 2)))
+                robot_center_p1 = QPointF(
+                    robot.y * self.__shrink_width + self.__field_center.x(),
+                    robot.x * self.__shrink_length + self.__field_center.y(),
+                )
+                robot_center_p2 = QPointF(
+                    robot.y * self.__shrink_width
+                    + self.__field_center.x()
+                    - 4.0 * math.cos(MU.radian_normalize(-robot.theta - math.pi / 2)),
+                    robot.x * self.__shrink_length
+                    + self.__field_center.y()
+                    - 4.0 * math.sin(MU.radian_normalize(-robot.theta - math.pi / 2)),
+                )
                 self.__ui.drawLine(robot_center_p1, robot_center_p2)
 
     def _draw_role(self) -> None:
@@ -201,78 +215,91 @@ class Main(QWidget):
         self.__ui.drawPixmap(4, 100, 35, 38, self.__pixmap_game)
         self.__ui.drawPixmap(2, 148, 42, 40, self.__pixmap_referee)
         self.__ui.drawPixmap(0, 198, 45, 45, self.__pixmap_gear)
-        
+
     def _draw_field(self) -> None:
         self.__ui.setPen(QColor("white"))
         self.__ui.setBrush(QColor("gray"))
 
-        self.__ui.drawRect(QRectF(
-                                  self.__field_corner.x() - self.__wall_to_line_length * self.__shrink_width,
-                                  self.__field_corner.y() - self.__wall_to_line_length * self.__shrink_length,
-                                  self.__field_width + self.__wall_to_line_length * self.__shrink_width * 2.0,
-                                  self.__field_length + self.__wall_to_line_length * self.__shrink_length * 2.0))
+        self.__ui.drawRect(
+            QRectF(
+                self.__field_corner.x() - self.__wall_to_line_length * self.__shrink_width,
+                self.__field_corner.y() - self.__wall_to_line_length * self.__shrink_length,
+                self.__field_width + self.__wall_to_line_length * self.__shrink_width * 2.0,
+                self.__field_length + self.__wall_to_line_length * self.__shrink_length * 2.0,
+            )
+        )
 
         # Feild line
         self.__ui.drawRect(self.__field_corner.x(), self.__field_corner.y(), self.__field_width, self.__field_length)
 
         # Center circle
-        
+
         self.__ui.drawEllipse(self.__field_center, self.__center_circle_radius, self.__center_circle_radius)
 
         # Up Goal line
-        self.__ui.drawRect(QRectF(
-                           self.__field_center.x() - self.__observer.geometry.goal_width * self.__shrink_width,
-                           self.__field_corner.y(),
-                           self.__observer.geometry.goal_width * 2.0 * self.__shrink_width,
-                           self.__observer.geometry.goal_width * self.__shrink_length))
+        self.__ui.drawRect(
+            QRectF(
+                self.__field_center.x() - self.__observer.geometry.goal_width * self.__shrink_width,
+                self.__field_corner.y(),
+                self.__observer.geometry.goal_width * 2.0 * self.__shrink_width,
+                self.__observer.geometry.goal_width * self.__shrink_length,
+            )
+        )
         # Down Goal line
-        self.__ui.drawRect(QRectF(
-                           self.__field_center.x() - self.__observer.geometry.goal_width * self.__shrink_width,
-                           self.__field_corner.y() +
-                           (self.__observer.geometry.field_length - self.__observer.geometry.goal_width) *
-                           self.__shrink_length,
-                           self.__observer.geometry.goal_width * 2.0 * self.__shrink_width,
-                           self.__observer.geometry.goal_width * self.__shrink_length))
+        self.__ui.drawRect(
+            QRectF(
+                self.__field_center.x() - self.__observer.geometry.goal_width * self.__shrink_width,
+                self.__field_corner.y()
+                + (self.__observer.geometry.field_length - self.__observer.geometry.goal_width) * self.__shrink_length,
+                self.__observer.geometry.goal_width * 2.0 * self.__shrink_width,
+                self.__observer.geometry.goal_width * self.__shrink_length,
+            )
+        )
         # # Up Goal
-        self.__ui.drawRect(QRectF(
-                           self.__field_center.x() - self.__observer.geometry.goal_width / 2.0 *
-                           self.__shrink_width,
-                           self.__field_corner.y() - self.__observer.geometry.goal_depth * self.__shrink_length,
-                           self.__observer.geometry.goal_width * self.__shrink_width,
-                           self.__observer.geometry.goal_depth * self.__shrink_length))
+        self.__ui.drawRect(
+            QRectF(
+                self.__field_center.x() - self.__observer.geometry.goal_width / 2.0 * self.__shrink_width,
+                self.__field_corner.y() - self.__observer.geometry.goal_depth * self.__shrink_length,
+                self.__observer.geometry.goal_width * self.__shrink_width,
+                self.__observer.geometry.goal_depth * self.__shrink_length,
+            )
+        )
         # Down Goal
-        self.__ui.drawRect(QRectF(
-                           self.__field_center.x() - self.__observer.geometry.goal_width / 2.0 *
-                           self.__shrink_width,
-                           self.__field_corner.y() + self.__observer.geometry.field_length * self.__shrink_length,
-                           self.__observer.geometry.goal_width * self.__shrink_width,
-                           self.__observer.geometry.goal_depth * self.__shrink_length))
+        self.__ui.drawRect(
+            QRectF(
+                self.__field_center.x() - self.__observer.geometry.goal_width / 2.0 * self.__shrink_width,
+                self.__field_corner.y() + self.__observer.geometry.field_length * self.__shrink_length,
+                self.__observer.geometry.goal_width * self.__shrink_width,
+                self.__observer.geometry.goal_depth * self.__shrink_length,
+            )
+        )
+
     def _draw_frame(self) -> None:
-        #draw ball speed frame
+        # draw ball speed frame
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor("white"))
-        self.__ui.drawRect(586, 425, 840, 350)  
+        self.__ui.drawRect(586, 425, 840, 350)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(600, 425, 705, 425)
 
-        #draw robot frame
+        # draw robot frame
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor("white"))
-        self.__ui.drawRect(822, 57, 310, 95)  
+        self.__ui.drawRect(822, 57, 310, 95)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(832, 57, 962, 57)
 
-        #draw control robot frame
+        # draw control robot frame
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor("white"))
-        self.__ui.drawRect(822, 167, 180, 115) 
+        self.__ui.drawRect(822, 167, 180, 115)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(832, 167, 944, 167)
 
-        #draw camera frame
+        # draw camera frame
         self.__ui.setBrush(QColor("#2E333A"))
         self.__ui.setPen(QColor("white"))
-        self.__ui.drawRect(1014, 167, 125, 115)  
+        self.__ui.drawRect(1014, 167, 125, 115)
         self.__ui.setPen(QColor("#2E333A"))
         self.__ui.drawLine(1019, 167, 1074, 167)
 
@@ -291,15 +318,22 @@ class Main(QWidget):
     def _draw_ball(self) -> None:
         self.__ui.setPen(QColor("red"))
         self.__ui.setBrush(QColor("gray"))
-        ball_center = QRectF(self.__observer.ball.y * self.__shrink_width + self.__field_center.x() -
-                             self.__ball_radius * self.__shrink_width / 2.0,
-                             self.__observer.ball.x * self.__shrink_length + self.__field_center.y() -
-                             self.__ball_radius * self.__shrink_length / 2.0,
-                             self.__ball_radius * self.__shrink_width,
-                             self.__ball_radius * self.__shrink_length)
-        ball_around = QRectF(self.__observer.ball.y * self.__shrink_width + self.__field_center.x() - 13,
-                             self.__observer.ball.x * self.__shrink_length + self.__field_center.y() - 13,
-                             26, 26)
+        ball_center = QRectF(
+            self.__observer.ball.y * self.__shrink_width
+            + self.__field_center.x()
+            - self.__ball_radius * self.__shrink_width / 2.0,
+            self.__observer.ball.x * self.__shrink_length
+            + self.__field_center.y()
+            - self.__ball_radius * self.__shrink_length / 2.0,
+            self.__ball_radius * self.__shrink_width,
+            self.__ball_radius * self.__shrink_length,
+        )
+        ball_around = QRectF(
+            self.__observer.ball.y * self.__shrink_width + self.__field_center.x() - 13,
+            self.__observer.ball.x * self.__shrink_length + self.__field_center.y() - 13,
+            26,
+            26,
+        )
         self.__ui.drawArc(ball_around, 0, 180 * 16)
         self.__ui.drawArc(ball_around, 0, 360 * 16)
 
