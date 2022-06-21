@@ -108,8 +108,8 @@ class Role:
                 self.__defence_basis_dis(robot.robot_id),
                 MU.radian(robot, self.__observer.geometry.goal),
             )
-            for robot in self.__observer.our_robots_available
-            if robot and robot.robot_id != self.keeper_id
+            for robot in self.__observer.our_robots
+            if robot.robot_id != self.keeper_id and robot.is_visible is True
         ]
 
         if defense:
@@ -144,7 +144,9 @@ class Role:
         offense = [
             (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
             for robot in self.__observer.our_robots
-            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_id_list)
+            if (robot.robot_id != self.keeper_id)
+            and (robot.robot_id not in self.defense_ids)
+            and (robot.is_visible is True)
         ]
 
         if offense:
