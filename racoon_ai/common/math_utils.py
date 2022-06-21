@@ -29,39 +29,61 @@ class MathUtils:
     PI_SQUARE: Final[float] = pow(PI, 2)
 
     @staticmethod
-    def distance(obj1: Point, obj2: Point) -> float:
+    def div_safe(val: float, designated: float = 1e-10) -> float:
+        """div_safe
+
+        judge if value is zero and return the designated
+
+        Args:
+            value (float): value to be judged
+            designated (float): designated value if value is zero
+
+        Returns:
+            float: value
+        """
+        if val == 0:
+            return designated
+        return val
+
+    @classmethod
+    def distance(cls, obj1: Point, obj2: Point, safe: bool = True) -> float:
         """distance
 
         Args:
             obj1 Point: object at least has x and y
             obj2 Point: object at least has x and y
+            safe (bool): if True, return non-zero value if value is zero
 
         Returns:
             float: distance value
         """
+        if safe:
+            return cls.div_safe(sqrt(pow(obj1.x - obj2.x, 2) + pow(obj1.y - obj2.y, 2)))
         return sqrt(pow(obj1.x - obj2.x, 2) + pow(obj1.y - obj2.y, 2))
 
     @classmethod
-    def radian(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
+    def radian(cls, obj1: Point, obj2: Point, center: float = 0, safe: bool = True) -> float:
         """radian
 
         Args:
-            obj1 Point: object at least has x and y
-            obj2 Point: object at least has x and y
+            obj1 (Point): object at least has x and y
+            obj2 (Point): object at least has x and y
+            center (float): center of radian
+            safe (bool): if True, return non-zero result if result is zero
 
         Returns:
             float: radian value
 
         Examples:
-            >>> MathUtils.radian(Point(0, 0), Point(1, 1)) == MathUtils.PI / 4
+            >>> MathUtils.radian(Point(0, 0), Point(1, 1)) == MathUtils.PI * (- 3 / 4)
             True
-            >>> MathUtils.radian(Point(0, 0), Point(0, 1)) == MathUtils.PI / 2
+            >>> MathUtils.radian(Point(0, 0), Point(0, 1)) == MathUtils.PI * ( - 1/ 2)
             True
         """
-        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x), center)
+        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x), center, safe)
 
-    @staticmethod
-    def radian_normalize(angle: float, center: float = 0) -> float:
+    @classmethod
+    def radian_normalize(cls, angle: float, center: float = 0, safe: bool = True) -> float:
         """radian_normalize
 
         Normalize angle in `2 * pi` wide interval around center
@@ -69,6 +91,7 @@ class MathUtils:
         Args:
             angle (float): angle
             center (float, optional): center angle
+            safe (bool, optional): if True, return non-zero value if result is zero
 
         Returns:
             float: normalized angle
@@ -85,16 +108,18 @@ class MathUtils:
         See Also:
             https://commons.apache.org/proper/commons-math/javadocs/api-3.1/org/apache/commons/math3/util/MathUtils.html#normalizeAngle(double,%20double)
         """
+        ret: float = angle - (cls.TWO_PI * floor((angle + cls.PI - center) / cls.TWO_PI))
+        if safe:
+            return cls.div_safe(ret)
+        return ret
 
-        return angle - (MathUtils.TWO_PI * floor((angle + MathUtils.PI - center) / MathUtils.TWO_PI))
-
-    @staticmethod
-    def radian_reduce(obj1: (Pose | float), obj2: (Pose | float), center: float = 0) -> float:
+    @classmethod
+    def radian_reduce(cls, obj1: (Pose | float), obj2: (Pose | float), center: float = 0) -> float:
         """radian_reduce
 
         Args:
             obj1 (Pose | float): angle 1
-            obj2 (float): angle 2
+            obj2 (Pose | float): angle 2
             center (float, optional): center angle value
 
         Returns:
@@ -119,12 +144,12 @@ class MathUtils:
         """
         if isinstance(obj1, Pose):
             if isinstance(obj2, Pose):
-                return MathUtils.radian_normalize((obj1.theta - obj2.theta), center)
-            return MathUtils.radian_normalize((obj1.theta - obj2), center)
+                return cls.radian_normalize((obj1.theta - obj2.theta), center, False)
+            return cls.radian_normalize((obj1.theta - obj2), center, False)
 
         if isinstance(obj2, Pose):
-            return MathUtils.radian_normalize((obj1 - obj2.theta), center)
-        return MathUtils.radian_normalize((obj1 - obj2), center)
+            return cls.radian_normalize((obj1 - obj2.theta), center, False)
+        return cls.radian_normalize((obj1 - obj2), center, False)
 
     @staticmethod
     def __substitution_fn(pt1: Point, pt2: Point, pt3: Point) -> float:
@@ -166,17 +191,6 @@ class MathUtils:
         val3 = cls.__substitution_fn(pt3, pt4, pt1)
         val4 = cls.__substitution_fn(pt3, pt4, pt2)
         return (val1 * val2 < 0) and (val3 * val4 < 0)
-
-    @classmethod
-    def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
-        """radian
-        Args:
-            obj1 Point: object at least has x and y
-            obj2 Point: object at least has x and y
-        Returns:
-            float: radian value
-        """
-        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x) - center)
 
 
 if __name__ == "__main__":

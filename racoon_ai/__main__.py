@@ -11,10 +11,10 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Keeper, Role, SubRole
+from .strategy import Keeper, Offense, Role, SubRole
 
 
-def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
+def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     """main
 
     This function is for the main function.
@@ -44,11 +44,11 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
         role: Role = Role(observer)
 
-        gui = Gui(argv, is_gui_view, observer, role)
+        gui = Gui(args, is_gui_view, observer, role)
 
         subrole: SubRole = SubRole(observer, role)
 
-        # offense: Offense = Offense(observer)
+        offense: Offense = Offense(observer)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
@@ -64,13 +64,14 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
             observer.main()
             role.main()
             subrole.main()
-            # offense.main()
+            offense.main()
             keeper.main()
 
             # update gui
             gui.update()
 
             sim_cmds.robot_commands += keeper.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
     except KeyboardInterrupt:

@@ -145,7 +145,7 @@ class Role:
             (
                 robot.robot_id,
                 MU.distance(robot, self.__observer.geometry.their_goal),
-                MU.radian_neo(robot, self.__observer.geometry.their_goal, MU.PI),
+                MU.radian_reduce(MU.radian(robot, self.__observer.geometry.their_goal), MU.PI),
             )
             for robot in self.__observer.our_robots_available
             if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_id_list)
