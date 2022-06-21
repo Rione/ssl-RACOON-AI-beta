@@ -11,15 +11,10 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy.defense import Defense
-from .strategy.goal_keeper import Keeper
-
-# from .strategy.offense import Offense
-from .strategy.role import Role
-from .strategy.subrole import SubRole
+from .strategy import Keeper, Defense, Role, SubRole
 
 
-def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
+def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     """main
 
     This function is for the main function.
@@ -49,7 +44,7 @@ def main(argv: list[str], conf: ConfigParser, logger: Logger) -> None:
 
         role: Role = Role(observer)
 
-        gui = Gui(argv, is_gui_view, observer, role)
+        gui = Gui(args, is_gui_view, observer, role)
 
         subrole: SubRole = SubRole(observer, role)
 
