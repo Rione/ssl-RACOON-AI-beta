@@ -8,6 +8,8 @@
 import math
 from logging import getLogger
 
+from numpy import sign
+
 from racoon_ai.common.math_utils import MathUtils as MU
 
 # from racoon_ai.models.coordinate import Point, Pose
@@ -106,7 +108,7 @@ class Offense:
             MU.radian_normalize(MU.radian(robot, self.__observer.ball))
             - MU.radian_normalize(MU.radian(self.__observer.geometry.goal, self.__observer.ball))
         )
-        radian_around -= discrimination / abs(discrimination) * math.pi / 2
+        radian_around -= sign(discrimination) * math.pi / 2
         radian_around -= robot.theta
         adjustment = 100 / distance_target_robot
 

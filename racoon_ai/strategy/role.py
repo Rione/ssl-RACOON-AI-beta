@@ -38,15 +38,15 @@ class Role:
         self.__defence_quantity: int = 0
         # self.__midfielder_quantity: int = 0
         self.__role_num: list[list[int]] = [
-            [0, 0, 0, 0],
-            [1, 0, 0, 0],
-            [1, 1, 0, 0],
-            [1, 1, 1, 0],
-            [1, 1, 2, 0],
-            [1, 2, 2, 0],
-            [1, 2, 3, 0],
-            [1, 3, 3, 0],
-            [1, 3, 3, 1],
+            [0, 0, 0, 0],  # 0
+            [1, 0, 0, 0],  # 1
+            [1, 1, 0, 0],  # 2
+            [1, 1, 1, 0],  # 3
+            [1, 1, 2, 0],  # 4
+            [1, 2, 2, 0],  # 5
+            [1, 2, 3, 0],  # 6
+            [1, 3, 3, 0],  # 7
+            [1, 3, 4, 0],  # 8
             [1, 3, 4, 1],
             [1, 3, 5, 1],
             [1, 4, 5, 1],
@@ -59,14 +59,22 @@ class Role:
         return self.__keeper
 
     @property
-    def offense_ids(self) -> list[int]:
-        """offense_ids"""
+    def offense_id_list(self) -> list[int]:
+        """offense_id_list"""
         return self.__offense
 
     @property
-    def defense_ids(self) -> list[int]:
-        """defense_ids"""
+    def defense_id_list(self) -> list[int]:
+        """defense_id_list"""
         return self.__defense
+
+    def get_offense_id(self, offense_id: int) -> int:
+        """get_offense_id"""
+        return self.__defense[offense_id]
+
+    def get_defense_id(self, defense_id: int) -> int:
+        """get_defense_id"""
+        return self.__defense[defense_id]
 
     def main(self) -> None:
         """main"""
@@ -75,8 +83,8 @@ class Role:
         self.__decide_defense()
         self.__decide_offense()
         self.__logger.debug(self.keeper_id)
-        self.__logger.debug(self.offense_ids)
-        self.__logger.debug(self.defense_ids)
+        self.__logger.debug(self.offense_id_list)
+        self.__logger.debug(self.defense_id_list)
 
     def __decide_quantity(self) -> None:
         robot_quantity = self.__observer.num_of_our_robots
@@ -134,13 +142,9 @@ class Role:
 
         offense: list[tuple[int, float, float]]
         offense = [
-            (
-                robot.robot_id,
-                MU.distance(robot, self.__observer.geometry.their_goal),
-                MU.radian_reduce(MU.radian(robot, self.__observer.geometry.their_goal), MU.PI),
-            )
-            for robot in self.__observer.our_robots_available
-            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_ids)
+            (robot.robot_id, MU.distance(robot, self.__their_goal), MU.radian_neo(robot, self.__their_goal, MU.PI))
+            for robot in self.__observer.our_robots
+            if (robot.robot_id != self.keeper_id) and (robot.robot_id not in self.defense_id_list)
         ]
 
         if offense:
