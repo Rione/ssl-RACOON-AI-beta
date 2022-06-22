@@ -88,6 +88,7 @@ class SubRole:
                 MU.distance(self.__observer.ball, enemy),
             )
             for enemy in self.__observer.enemy_robots
+            if enemy.is_visible is True
         ]
         if attacker:
             attacker.sort(reverse=False, key=lambda x: x[1])
