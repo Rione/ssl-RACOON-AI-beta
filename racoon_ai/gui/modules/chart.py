@@ -7,10 +7,10 @@
 
 from itertools import repeat
 
-from PyQt6.QtCore import QTimer  # pylint: disable=E0611
-from PyQt6.QtGui import QColor, QFont  # pylint: disable=E0611
-from PyQt6.QtWidgets import QLabel  # pylint: disable=E0611
 from pyqtgraph import PlotWidget, mkPen  # type: ignore
+from PySide6.QtCore import QTimer  # pylint: disable=E0611
+from PySide6.QtGui import QColor, QFont  # pylint: disable=E0611
+from PySide6.QtWidgets import QLabel  # pylint: disable=E0611
 
 from racoon_ai.networks.receiver import MWReceiver
 

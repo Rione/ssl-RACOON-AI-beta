@@ -5,8 +5,8 @@
     This module is for the Back class.
 """
 
-from PyQt6.QtGui import QFont  # pylint: disable=E0611
-from PyQt6.QtWidgets import QLabel  # pylint: disable=E0611
+from PySide6.QtGui import QFont  # pylint: disable=E0611
+from PySide6.QtWidgets import QLabel  # pylint: disable=E0611
 
 from .main import Main
 

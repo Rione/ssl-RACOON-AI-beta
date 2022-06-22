@@ -4,8 +4,8 @@
 
     This module is for the Game class.
 """
-from PyQt6.QtGui import QFont  # pylint: disable=E0611
-from PyQt6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox  # pylint: disable=E0611
+from PySide6.QtGui import QFont  # pylint: disable=E0611
+from PySide6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox  # pylint: disable=E0611
 
 from .animated_toggle import AnimatedToggle
 from .main import Main
@@ -107,24 +107,27 @@ class Game:  # pylint: disable=R0903
     def __set_combo(self) -> None:
         self.__combo = QComboBox(self.__main)
         self.__combo.addItems(
-            ["NORMAL_START",
-             "STOP",
-             "HALT",
-             "FORCE_START",
-             "PRE_KICKOFF_OUR",
-             "PRE_KICKOFF_THEIR",
-             "PRE_PENALTY_OUR",
-             "PRE_PENALTY_THEIR",
-             "DIRECT_OUR",
-             "DIRECT_THEIR",
-             "INDIRECT_OUR",
-             "INDIRECT_THEIR",
-             "TIMEOUT_OUR",
-             "TIMEOUT_THEIR",
-             "GOAL_OUR",
-             "GOAL_THEIR",
-             "PLACEMENT_OUR",
-             "PRE_KICKOFF_THEIR"])
+            [
+                "NORMAL_START",
+                "STOP",
+                "HALT",
+                "FORCE_START",
+                "PRE_KICKOFF_OUR",
+                "PRE_KICKOFF_THEIR",
+                "PRE_PENALTY_OUR",
+                "PRE_PENALTY_THEIR",
+                "DIRECT_OUR",
+                "DIRECT_THEIR",
+                "INDIRECT_OUR",
+                "INDIRECT_THEIR",
+                "TIMEOUT_OUR",
+                "TIMEOUT_THEIR",
+                "GOAL_OUR",
+                "GOAL_THEIR",
+                "PLACEMENT_OUR",
+                "PRE_KICKOFF_THEIR",
+            ]
+        )
         self.__combo.setGeometry(1225, 140, 150, 50)
 
     def __set_box(self) -> None:
