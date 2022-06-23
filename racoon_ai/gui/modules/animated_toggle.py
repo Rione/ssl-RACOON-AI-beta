@@ -8,8 +8,8 @@
 
 from typing import Optional
 
-from PyQt6.QtCore import pyqtProperty  # type: ignore # pylint: disable=E0611
-from PyQt6.QtCore import (  # pylint: disable=E0611
+from PySide6.QtCore import (  # pylint: disable=E0611
+    Property,
     QByteArray,
     QEasingCurve,
     QPoint,
@@ -19,10 +19,10 @@ from PyQt6.QtCore import (  # pylint: disable=E0611
     QSequentialAnimationGroup,
     QSize,
     Qt,
-    pyqtSlot,
+    Slot,
 )
-from PyQt6.QtGui import QBrush, QColor, QPainter, QPaintEvent, QPen  # pylint: disable=E0611
-from PyQt6.QtWidgets import QCheckBox, QWidget  # pylint: disable=E0611
+from PySide6.QtGui import QBrush, QColor, QPainter, QPaintEvent, QPen  # pylint: disable=E0611
+from PySide6.QtWidgets import QCheckBox, QWidget  # pylint: disable=E0611
 
 
 class AnimatedToggle(QCheckBox):
@@ -70,7 +70,7 @@ class AnimatedToggle(QCheckBox):
 
         self.animation: QPropertyAnimation = QPropertyAnimation(
             self,
-            QByteArray(b"handle_position"),  # type: ignore
+            QByteArray(b"handle_position"),
             self,
         )
         self.animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
@@ -78,7 +78,7 @@ class AnimatedToggle(QCheckBox):
 
         self.pulse_anim: QPropertyAnimation = QPropertyAnimation(
             self,
-            QByteArray(b"pulse_radius"),  # type: ignore
+            QByteArray(b"pulse_radius"),
             self,
         )
         self.pulse_anim.setDuration(350)  # time in ms
@@ -99,7 +99,7 @@ class AnimatedToggle(QCheckBox):
         """hitButton"""
         return self.contentsRect().contains(pos)
 
-    @pyqtSlot(int)  # type: ignore
+    @Slot(int, result=float)  # type: ignore
     def setup_animation(self, value: Optional[int]) -> None:
         """setup_animation"""
         self.animations_group.stop()
@@ -148,28 +148,39 @@ class AnimatedToggle(QCheckBox):
 
         p.end()
 
-    @pyqtProperty(float)
-    def handle_position(self) -> float:
-        """handle_position"""
+    # @Property(float)
+    # def handle_position(self) -> float:
+    #     """handle_position"""
+    #     return self.__handle_position
+
+    # @handle_position.setter
+    # def handle_position(self, pos: float) -> None:
+    #     """change the property
+    #     we need to trigger QWidget.update() method, either by:
+    #         1- calling it here [ what we doing ].
+    #         2- connecting the QPropertyAnimation.valueChanged() signal to it.
+    #     """
+    #     self.__handle_position = float(pos)
+    #     self.update()
+
+    def _handle_position_getter(self) -> float:
+        """handle_position_getter"""
         return self.__handle_position
 
-    @handle_position.setter
-    def handle_position(self, pos: float) -> None:
-        """change the property
-        we need to trigger QWidget.update() method, either by:
-            1- calling it here [ what we doing ].
-            2- connecting the QPropertyAnimation.valueChanged() signal to it.
-        """
+    def _handle_position_setter(self, pos: float) -> None:
+        """handle_position_setter"""
         self.__handle_position = float(pos)
-        self.update()
+        # self.update()
 
-    @pyqtProperty(float)
-    def pulse_radius(self) -> float:
-        """pulse_radius"""
+    handle_position = Property(float, _handle_position_getter, _handle_position_setter)
+
+    def _pulse_radius_getter(self) -> float:
+        """_pulse_radius_getter"""
         return self.__pulse_radius
 
-    @pulse_radius.setter
-    def pulse_radius(self, pos: float) -> None:
-        """pulse_radius"""
-        self.__pulse_radius = float(pos)
-        self.update()
+    def _pulse_radius_setter(self, radius: float) -> None:
+        """_pulse_radius_setter"""
+        self.__pulse_radius = float(radius)
+        # self.update()
+
+    pulse_radius = Property(float, _pulse_radius_getter, _pulse_radius_setter)

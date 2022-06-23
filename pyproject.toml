@@ -11,9 +11,9 @@ protobuf = "3.19.1"
 protoletariat = "^0.7.1"
 types-protobuf = "^3.18.2"
 numpy = "1.22.3"
+PySide6 = "6.3.0"
+pyqtgraph = "0.12.4"
 pygame = {version = "^2.1.2", optional = true}
-PyQt6 = "^6.3.1"
-pyqtgraph = "^0.12.4"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
@@ -25,7 +25,6 @@ pre-commit = "^2.16.0"
 pylint = "^2.12.2"
 
 [tool.poetry.extras]
-gui = ["PyQt6", "pyqtgraph"]
 pygame = ["pygame"]
 
 [tool.black]

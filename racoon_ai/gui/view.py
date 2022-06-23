@@ -1,13 +1,11 @@
 #!/usr/bin/env python3.10
-
 """view.py
 
     This module is for the Gui class.
 """
-
 from logging import getLogger
 
-from PyQt6.QtWidgets import QApplication  # pylint: disable=E0611
+from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
 from racoon_ai.networks.receiver import MWReceiver
 from racoon_ai.strategy.role import Role
@@ -25,11 +23,11 @@ class Gui:  # pylint: disable=R0903
         role: Role
     """
 
-    def __init__(self, argv: list[str], is_gui_view: bool, observer: MWReceiver, role: Role):
+    def __init__(self, is_gui_view: bool, observer: MWReceiver, role: Role):
         self.__logger = getLogger(__name__)
         self.__logger.debug("create logger")
 
-        self.__app = QApplication(argv)
+        self.__app = QApplication()
         self.__is_gui_view = is_gui_view
         self.__logger.info("GUI: %s", is_gui_view)
         if self.__is_gui_view:
@@ -38,7 +36,7 @@ class Gui:  # pylint: disable=R0903
     def __setup(self, observer: MWReceiver, role: Role) -> None:
         """setup"""
         self.__main = Main(observer, role)
-        self.__chart = Chart(self.__main, observer)  # pylint: disable=W0238
+        Chart(self.__main, observer)
         Vision(self.__main)
         Robot(self.__main)
         Back(self.__main)

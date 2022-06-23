@@ -11,10 +11,10 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Defense, Keeper, Role, SubRole
+from .strategy import Defense, Keeper, Role, SubRole  # , Offense
 
 
-def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
+def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     """main
 
     This function is for the main function.
@@ -44,7 +44,7 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
         role: Role = Role(observer)
 
-        gui = Gui(args, is_gui_view, observer, role)
+        gui = Gui(is_gui_view, observer, role)
 
         subrole: SubRole = SubRole(observer, role)
 
@@ -83,6 +83,9 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
+            # update gui
+            gui.update()
+
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
 
@@ -93,9 +96,11 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
 if __name__ == "__main__":
     from logging import INFO, Formatter, StreamHandler, getLogger
-    from sys import argv
+    from signal import SIG_DFL, SIGINT, signal
 
     from . import __version__
+
+    signal(SIGINT, SIG_DFL)
 
     logo: str = """
         ######     ###      ####    #####    #####   ##   ##             ###     ######
@@ -121,4 +126,4 @@ if __name__ == "__main__":
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
 
-    main(argv, parser, log)
+    main(parser, log)
