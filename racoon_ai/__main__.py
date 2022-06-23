@@ -88,11 +88,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
 if __name__ == "__main__":
     from logging import INFO, Formatter, StreamHandler, getLogger
-    from signal import SIG_DFL, SIGINT, signal
 
     from . import __version__
-
-    signal(SIGINT, SIG_DFL)
 
     logo: str = """
         ######     ###      ####    #####    #####   ##   ##             ###     ######
