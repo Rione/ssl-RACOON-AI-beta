@@ -6,11 +6,10 @@
 """
 
 from logging import getLogger
-from math import cos, sin
+from math import cos, sin, sqrt
 from typing import Tuple
 
 from numpy import array, divide, dot, float64, multiply, subtract, zeros
-from numpy.linalg import norm
 from numpy.typing import NDArray
 
 from racoon_ai.common import MathUtils as MU
@@ -88,15 +87,11 @@ class Controls:
         )
 
         vel: NDArray[float64] = dot(bvel, rot_theta)
-        vel_xy: NDArray[float64] = vel[:2]
 
-        abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
-        if abs_vel_xy > limiter >= 0:
-            vel_xy = multiply(divide(vel_xy, abs_vel_xy), limiter)
-
-        cmd.vel_fwd = float(vel_xy[0])
-        cmd.vel_sway = float(vel_xy[1])
+        cmd.vel_fwd = float(vel[0])
+        cmd.vel_sway = float(vel[1])
         cmd.vel_angular = float(vel[2])
+        cmd = self.speed_limiter(cmd, limiter)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
 
@@ -131,3 +126,15 @@ class Controls:
 
         self.__logger.debug("vel_angular: %s", vel_angular)
         return vel_angular
+
+    @staticmethod
+    def speed_limiter(cmd: RobotCommand, limiter: float = 1) -> RobotCommand:
+        """speed_limiter"""
+
+        adjustment: float = sqrt(cmd.vel_sway**2 + cmd.vel_fwd**2)
+
+        if adjustment > limiter >= 0:
+            cmd.vel_sway = cmd.vel_sway / adjustment * limiter
+            cmd.vel_fwd = cmd.vel_fwd / adjustment * limiter
+
+        return cmd
