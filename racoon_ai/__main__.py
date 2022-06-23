@@ -11,7 +11,7 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Keeper, Defense, Role, SubRole
+from .strategy import Defense, Keeper, Role, SubRole
 
 
 def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
@@ -50,7 +50,7 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
         # offense: Offense = Offense(observer)
 
-        defense = Defense(observer, role, controls)
+        defense = Defense(observer, role, subrole, controls)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
