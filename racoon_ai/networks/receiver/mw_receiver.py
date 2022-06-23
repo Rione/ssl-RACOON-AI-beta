@@ -17,19 +17,21 @@ from racoon_ai.models.robot import Robot
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class MWReceiver(IPNetAddr):
+class MWReceiver(IPNetAddr):  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
         target_ids (list[int]): Target robot IDs
+        is_real (bool): True if the receiver is for real robot (default: False)
         is_team_yellow (bool, optional): If true, the team is yellow (default: False)
-        host (str): IP or hostname of the server
-        port (int): Port number of the vision server
+        host (str, optional): IP or hostname of the server
+        port (int, optional): Port number of the vision server
     """
 
     def __init__(
         self,
-        target_ids: list[int],
+        target_ids: set[int],
+        is_real: bool = False,
         is_team_yellow: bool = False,
         *,
         host: str = "127.0.0.1",
@@ -45,7 +47,8 @@ class MWReceiver(IPNetAddr):
         self.__geometry: Geometry = Geometry()
         self.__referee: Referee = Referee()
 
-        self.__target_ids: set[int] = set(target_ids)
+        self.__target_ids: set[int] = target_ids
+        self.__is_real: bool = is_real
         self.__is_team_yellow: bool = is_team_yellow
 
         self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
@@ -158,6 +161,33 @@ class MWReceiver(IPNetAddr):
         return self.__referee
 
     @property
+    def target_ids(self) -> set[int]:
+        """target_ids
+
+        Returns:
+            set[int]
+        """
+        return self.__target_ids
+
+    @property
+    def is_real(self) -> bool:
+        """is_real
+
+        Returns:
+            bool True if the running real mode
+        """
+        return self.__is_real
+
+    @property
+    def is_team_yellow(self) -> bool:
+        """is_team_yellow
+
+        Returns:
+            bool
+        """
+        return self.__is_team_yellow
+
+    @property
     def our_robots(self) -> list[Robot]:
         """our_robot
 
@@ -262,14 +292,14 @@ class MWReceiver(IPNetAddr):
         if mid == target_id:
             # NOTE: Equivalent to `(not search_enemy) and (not (mid in self.__target_ids))`
             if not ((search_enemy) or (target_id in self.__target_ids)):
-                self.__logger.warning("Robot %d is not in our target ids", target_id)
+                self.__logger.error("Robot %d is not in our target ids", target_id)
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                self.__logger.warning("Robot id %d is offline", mid)
+                self.__logger.error("Robot id %d is offline", mid)
                 return None
             if only_visible and (not bot.is_visible):
-                self.__logger.warning("Robot id %d is not on stage", mid)
+                self.__logger.error("Robot id %d is not on stage", mid)
                 return None
 
             self.__logger.debug("Bot: %s", bot)
@@ -362,15 +392,6 @@ class MWReceiver(IPNetAddr):
             bool
         """
         return self.__is_vision_recv
-
-    @property
-    def is_team_yellow(self) -> bool:
-        """is_team_yellow
-
-        Returns:
-            bool
-        """
-        return self.__is_team_yellow
 
     @property
     def attack_direction(self) -> int:

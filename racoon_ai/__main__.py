@@ -22,29 +22,16 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     Returns:
         None
     """
-    # List of target robot ids
-    target_ids: list[int] = [int(i) for i in conf.get("commons", "onlineIds", fallback="").split(",")]
-    logger.info("Target robot ids: %s", target_ids)
-
-    # Flag if run for a real robot
-    is_real: bool = conf.getboolean("commons", "isReal", fallback=False)
-    logger.info("Mode: %s", ("Real" if is_real else "Simulation"))
-
-    # Flag if our team is yellow
-    is_team_yellow: bool = conf.getboolean("commons", "isTeamYellow", fallback=False)
-    logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
-
-    # Flag if view gui
-    is_gui_view: bool = False
+    with_gui_view: bool = False  # Flag if view gui
 
     try:
-        observer: MWReceiver = create_receiver(conf, logger, target_ids, is_team_yellow)
+        observer: MWReceiver = create_receiver(conf, logger)
 
         controls: Controls = create_controls(conf, logger, observer)
 
         role: Role = Role(observer)
 
-        gui = Gui(is_gui_view, observer, role)
+        gui = Gui(with_gui_view, observer, role)
 
         subrole: SubRole = SubRole(observer, role)
 
@@ -52,7 +39,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
         keeper: Keeper = Keeper(observer, role, controls)
 
-        sender: CommandSender = create_sender(conf, logger, target_ids, is_real)
+        sender: CommandSender = create_sender(conf, logger, observer)
 
         logger.info("Roop started")
 
@@ -65,8 +52,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             role.main()
             subrole.main()
 
-            # offense.main()
             keeper.main()
+            # offense.main()
 
             # update gui
             gui.update()
@@ -80,6 +67,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
+        del gui
 
     finally:
         logger.info("Cleaning up...")
