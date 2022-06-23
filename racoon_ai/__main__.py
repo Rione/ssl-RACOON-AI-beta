@@ -3,7 +3,6 @@
 """
     This is the main script.
 """
-import signal
 from configparser import ConfigParser
 from logging import Logger, shutdown
 
@@ -12,13 +11,10 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Keeper, Offense, Role, SubRole
-
-# Enable gui keyboard interrupt
-signal.signal(signal.SIGINT, signal.SIG_DFL)
+from .strategy import Keeper, Role, SubRole  # , Offense
 
 
-def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
+def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     """main
 
     This function is for the main function.
@@ -39,7 +35,7 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     # Flag if view gui
-    is_gui_view: bool = True
+    is_gui_view: bool = False
 
     try:
         observer: MWReceiver = create_receiver(conf, logger, target_ids, is_team_yellow)
@@ -48,11 +44,11 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
         role: Role = Role(observer)
 
-        gui = Gui(args, is_gui_view, observer, role)
+        gui = Gui(is_gui_view, observer, role)
 
         subrole: SubRole = SubRole(observer, role)
 
-        offense: Offense = Offense(observer)
+        # offense: Offense = Offense(observer)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
@@ -68,14 +64,15 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
             observer.main()
             role.main()
             subrole.main()
-            offense.main()
+
+            # offense.main()
             keeper.main()
 
             # update gui
             gui.update()
 
             sim_cmds.robot_commands += keeper.send_cmds
-            sim_cmds.robot_commands += offense.send_cmds
+            # sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
             # update gui
@@ -91,9 +88,11 @@ def main(args: list[str], conf: ConfigParser, logger: Logger) -> None:  # pylint
 
 if __name__ == "__main__":
     from logging import INFO, Formatter, StreamHandler, getLogger
-    from sys import argv
+    from signal import SIG_DFL, SIGINT, signal
 
     from . import __version__
+
+    signal(SIGINT, SIG_DFL)
 
     logo: str = """
         ######     ###      ####    #####    #####   ##   ##             ###     ######
@@ -119,4 +118,4 @@ if __name__ == "__main__":
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
 
-    main(argv, parser, log)
+    main(parser, log)

@@ -5,8 +5,8 @@
     This module is for the Vision class.
 """
 
-from PyQt6.QtGui import QFont  # pylint: disable=E0611
-from PyQt6.QtWidgets import QComboBox, QLabel, QSpinBox  # pylint: disable=E0611
+from PySide6.QtGui import QFont  # pylint: disable=E0611
+from PySide6.QtWidgets import QComboBox, QLabel, QSpinBox  # pylint: disable=E0611
 
 from .animated_toggle import AnimatedToggle
 from .main import Main

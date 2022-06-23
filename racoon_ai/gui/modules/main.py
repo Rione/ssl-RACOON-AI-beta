@@ -1,21 +1,21 @@
 #!/usr/bin/env python3.10
-# pylint: disable-all
 
 """main.py
     This module is for the Main class.
 """
-import math
 
-from PyQt6.QtCore import QPoint, QPointF, QRectF
-from PyQt6.QtGui import QColor, QFont, QPainter, QPaintEvent, QPixmap
-from PyQt6.QtWidgets import QLabel, QWidget
+from math import cos, degrees, radians, sin
+
+from PySide6.QtCore import QPoint, QPointF, QRectF  # pylint: disable=E0611
+from PySide6.QtGui import QColor, QFont, QPainter, QPaintEvent, QPixmap  # pylint: disable=E0611
+from PySide6.QtWidgets import QLabel, QMainWindow  # pylint: disable=E0611
 
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.networks.receiver import MWReceiver
-from racoon_ai.strategy.role import Role
+from racoon_ai.strategy import Role
 
 
-class Main(QWidget):
+class Main(QMainWindow):
     """Main
     Args:
         None
@@ -30,7 +30,7 @@ class Main(QWidget):
         self.__role: Role = role
 
         self.__ui: QPainter
-        self.__geometry_width: int = 650
+        self.__geometry_width: int = 1450
         self.__geometry_height: int = 850
 
         self.__field_length: int = 687
@@ -108,9 +108,11 @@ class Main(QWidget):
         self.__fps_num.move(707, 160)
 
     def active(self) -> None:
+        """active"""
         self.update()
 
-    def paintEvent(self, _: QPaintEvent) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # pylint: disable=C0103
+        """paintEvent"""
         self.__ui = QPainter(self)
 
         self._draw_background()
@@ -120,7 +122,7 @@ class Main(QWidget):
         self._draw_ball()
         self._draw_robots("blue")
         self._draw_robots("yellow")
-        self._draw_role()
+        # self._draw_role()
 
         self.__fps_num.setNum(60)
 
@@ -150,7 +152,7 @@ class Main(QWidget):
                     ),
                     int(self.__robot_radius * self.__shrink_width * 2.5),
                     int(self.__robot_radius * self.__shrink_length * 2.5),
-                    int(math.degrees(MU.radian_normalize(robot.theta - math.radians(45))) * 16),
+                    int(degrees(MU.radian_normalize(robot.theta - radians(45))) * 16),
                     275 * 16,
                 )
                 if color == "blue":
@@ -164,10 +166,10 @@ class Main(QWidget):
                 robot_center_p2 = QPointF(
                     robot.y * self.__shrink_width
                     + self.__field_center.x()
-                    - 4.0 * math.cos(MU.radian_normalize(-robot.theta - math.pi / 2)),
+                    - 4.0 * cos(MU.radian_normalize(-robot.theta - MU.PI / 2)),
                     robot.x * self.__shrink_length
                     + self.__field_center.y()
-                    - 4.0 * math.sin(MU.radian_normalize(-robot.theta - math.pi / 2)),
+                    - 4.0 * sin(MU.radian_normalize(-robot.theta - MU.PI / 2)),
                 )
                 self.__ui.drawLine(robot_center_p1, robot_center_p2)
 
