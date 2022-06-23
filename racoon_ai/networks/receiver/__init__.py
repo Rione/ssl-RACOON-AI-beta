@@ -7,7 +7,7 @@ from logging import Logger
 from .mw_receiver import MWReceiver
 
 
-def create_receiver(config: ConfigParser, logger: Logger, target_ids: list[int], is_team_yellow: bool) -> MWReceiver:
+def create_receiver(config: ConfigParser, logger: Logger) -> MWReceiver:
     """create_receiver
 
     This function is for creating a MWReceiver.
@@ -21,6 +21,18 @@ def create_receiver(config: ConfigParser, logger: Logger, target_ids: list[int],
     Returns:
         MWReceiver
     """
+    # List of target robot ids
+    target_ids: set[int] = {int(i) for i in config.get("commons", "targetIds", fallback="").split(",")}
+    logger.info("Target robot ids: %s", target_ids)
+
+    # Flag if run for a real robot
+    is_real: bool = config.getboolean("commons", "isReal", fallback=False)
+    logger.info("Mode: %s", ("Real" if is_real else "Simulation"))
+
+    # Flag if our team is yellow
+    is_team_yellow: bool = config.getboolean("commons", "isTeamYellow", fallback=False)
+    logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
+
     if not config.getboolean("mw_receiver", "use_custom_addr", fallback=False):
         return MWReceiver(target_ids, is_team_yellow)
 
