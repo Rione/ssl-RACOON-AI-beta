@@ -8,33 +8,29 @@
 import math
 from logging import getLogger
 
-# from racoon_ai.common import distance, radian, radian_normalize
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
-from racoon_ai.networks.receiver import MWReceiver
-
-# from racoon_ai.observer import Observer
-# from racoon_ai.strategy.role import Role
-
-# import sympy
+from racoon_ai.observer import Observer
 
 
 class Defense:
     """Defense
     Args:
+        controls (Controls): Controls instance
         observer (Observer): Observer instance
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, controls: Controls, observer: MWReceiver) -> None:
+    def __init__(self, controls: Controls, observer: Observer) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-        self.__observer = observer
-        # self.__role = role
+        self.__observer: Observer = observer
+        self.__controls: Controls = controls
+        # self.__role: Role = role
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
@@ -60,7 +56,7 @@ class Defense:
 
     def main(self) -> None:
         """main"""
-        self.__observer.referee.command
+        # self.__observer.referee.command
 
         # commandの情報を格納するリスト
         self.__send_cmds = []
@@ -95,10 +91,10 @@ class Defense:
             yd = self.__observer.ball.y
             X = 0
             Y = 0
-            a = xd ** 2 + yd ** 2
+            a = xd**2 + yd**2
             b = xd * X + yd * Y
-            c = X ** 2 + Y ** 2 - 3050 ** 2
-            D = b ** 2 - a * c
+            c = X**2 + Y**2 - 3050**2
+            D = b**2 - a * c
             s1 = (-b + math.sqrt(D)) / a
             # s2 = (-b - math.sqrt(D)) / a
             target_position = Pose(self.__our_goal.x + xd * s1, yd * s1)
@@ -205,10 +201,10 @@ class Defense:
             yd = self.__observer.ball.y
             X = 0
             Y = 0
-            a = xd ** 2 + yd ** 2
+            a = xd**2 + yd**2
             b = xd * X + yd * Y
-            c = X ** 2 + Y ** 2 - 6000 ** 2
-            D = b ** 2 - a * c
+            c = X**2 + Y**2 - 6000**2
+            D = b**2 - a * c
             s1 = (-b + math.sqrt(D)) / a
             # s2 = (-b - math.sqrt(D)) / a
             target_position = Pose(self.__our_goal.x + xd * s1, yd * s1)
@@ -281,10 +277,10 @@ class Defense:
             yd = self.__observer.ball.y
             X = 0
             Y = 0
-            a = xd ** 2 + yd ** 2
+            a = xd**2 + yd**2
             b = xd * X + yd * Y
-            c = X ** 2 + Y ** 2 - 6000 ** 2
-            D = b ** 2 - a * c
+            c = X**2 + Y**2 - 6000**2
+            D = b**2 - a * c
             s1 = (-b + math.sqrt(D)) / a
             # s2 = (-b - math.sqrt(D)) / a
             target_position = Pose(self.__our_goal.x + xd * s1, yd * s1)

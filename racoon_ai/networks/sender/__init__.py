@@ -4,12 +4,12 @@
 from configparser import ConfigParser
 from logging import Logger
 
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 from .command_sender import CommandSender
 
 
-def create_sender(config: ConfigParser, logger: Logger, observer: MWReceiver) -> CommandSender:
+def create_sender(config: ConfigParser, logger: Logger, observer: Observer) -> CommandSender:
     """create_sender
 
     This function is for creating a CommandSender.

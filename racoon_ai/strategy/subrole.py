@@ -8,7 +8,7 @@ from logging import getLogger
 
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.robot import Robot
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 from .role import Role
 
@@ -16,7 +16,8 @@ from .role import Role
 class SubRole:
     """SubRole
     Args:
-        vision (VisionReceiver): VisionReceiver instance.
+        observer (Observer): Observer instance
+        role (Role): Role instance
     Attributes:
         vision (VisionReceiver): VisionReceiver instance.
         send_cmds (list[RobotCommand]): RobotCommand list.
@@ -24,12 +25,12 @@ class SubRole:
         balls (list[SSL_DetectionBall]): Balls.
     """
 
-    def __init__(self, observer: MWReceiver, role: Role) -> None:
+    def __init__(self, observer: Observer, role: Role) -> None:
         self.__logger = getLogger(__name__)
         self.__our_attacker: int = -1
         self.__enemy_attacker: int = -1
         self.__receiver: int = -1
-        self.__observer = observer
+        self.__observer: Observer = observer
         self.__role = role
 
     @property

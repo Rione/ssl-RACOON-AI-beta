@@ -9,8 +9,8 @@ from logging import Logger, shutdown
 from .gui import Gui
 from .models.robot import SimCommands
 from .movement import Controls, create_controls
-from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
+from .observer import Observer, create_observer
 from .strategy import Keeper, Role, SubRole  # , Offense
 
 
@@ -25,7 +25,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
     with_gui_view: bool = False  # Flag if view gui
 
     try:
-        observer: MWReceiver = create_receiver(conf, logger)
+        observer: Observer = create_observer(conf, logger)
 
         controls: Controls = create_controls(conf, logger, observer)
 

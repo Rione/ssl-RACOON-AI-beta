@@ -10,7 +10,7 @@ from math import cos, sin, sqrt
 
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 # from racoon_ai.strategy.role import Role
 
@@ -24,10 +24,10 @@ class Offense:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, observer: Observer) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-        self.__observer = observer
+        self.__observer: Observer = observer
         # self.__role = role
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False

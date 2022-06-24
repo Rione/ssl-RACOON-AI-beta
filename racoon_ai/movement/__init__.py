@@ -4,13 +4,19 @@
 from configparser import ConfigParser
 from logging import Logger
 
-from racoon_ai.networks.receiver.mw_receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 from .controls import Controls
 
 
-def create_controls(config: ConfigParser, logger: Logger, observer: MWReceiver) -> Controls:
-    """create_controls"""
+def create_controls(config: ConfigParser, logger: Logger, observer: Observer) -> Controls:
+    """create_controls
+
+    Args:
+        config: ConfigParser
+        logger: Logger
+        observer: Observer
+    """
     if not config.getboolean("pid_gains", "use_custom_gains", fallback=False):
         return Controls(observer)
 
