@@ -29,7 +29,7 @@ class Offense:
         self.__logger.info("Initializing...")
         self.__observer: Observer = observer
         # self.__role = role
-        self.__send_cmds: list[RobotCommand]
+        self.__send_cmds: list[RobotCommand] = []
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
 
