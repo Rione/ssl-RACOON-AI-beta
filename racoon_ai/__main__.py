@@ -11,10 +11,10 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.sender import CommandSender, create_sender
 from .observer import Observer, create_observer
-from .strategy import Keeper, Role, SubRole  # , Offense
+from .strategy import Keeper, Offense, Role, SubRole
 
 
-def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
+def main(conf: ConfigParser, logger: Logger) -> None:
     """main
 
     This function is for the main function.
@@ -35,7 +35,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
         subrole: SubRole = SubRole(observer, role)
 
-        # offense: Offense = Offense(observer)
+        offense: Offense = Offense(observer)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
@@ -65,7 +65,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
             gui.update()
 
             sim_cmds.robot_commands += keeper.send_cmds
-            # sim_cmds.robot_commands += offense.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
             sender.send(sim_cmds)
 
             # update gui
