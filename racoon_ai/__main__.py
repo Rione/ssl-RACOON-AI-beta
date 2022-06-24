@@ -11,7 +11,7 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.receiver import MWReceiver, create_receiver
 from .networks.sender import CommandSender, create_sender
-from .strategy import Defense, Keeper, Role, SubRole  # , Offense
+from .strategy import Keeper, Offense, Role, SubRole
 
 
 def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
@@ -48,9 +48,9 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
         subrole: SubRole = SubRole(observer, role)
 
-        # offense: Offense = Offense(observer)
+        offense: Offense = Offense(observer, controls)
 
-        defense = Defense(observer, role, subrole, controls)
+        # defense = Defense(observer, role, subrole, controls)
 
         keeper: Keeper = Keeper(observer, role, controls)
 
@@ -69,17 +69,14 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
             subrole.main()
 
-            # offense.main()
+            offense.main()
 
-            defense.main()
+            # defense.main()
 
             keeper.main()
 
-            # update gui
-            gui.update()
-
-            # sim_cmds.robot_commands += offense.send_cmds
-            sim_cmds.robot_commands += defense.send_cmds
+            sim_cmds.robot_commands += offense.send_cmds
+            # sim_cmds.robot_commands += defense.send_cmds
             sim_cmds.robot_commands += keeper.send_cmds
             sender.send(sim_cmds)
 
@@ -88,6 +85,7 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received", exc_info=False)
+        del sender
 
     finally:
         logger.info("Cleaning up...")
@@ -96,11 +94,8 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
 if __name__ == "__main__":
     from logging import INFO, Formatter, StreamHandler, getLogger
-    from signal import SIG_DFL, SIGINT, signal
 
     from . import __version__
-
-    signal(SIGINT, SIG_DFL)
 
     logo: str = """
         ######     ###      ####    #####    #####   ##   ##             ###     ######

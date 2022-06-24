@@ -54,6 +54,7 @@ class Keeper:
         cmd: RobotCommand
 
         bot = self.__observer.get_our_by_id(self.__role.keeper_id)
+
         if bot:
             cmd = self.__keep_goal(bot)
             self.__send_cmds.append(cmd)

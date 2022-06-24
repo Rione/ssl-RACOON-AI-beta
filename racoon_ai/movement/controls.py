@@ -9,7 +9,7 @@ from logging import getLogger
 from math import cos, sin, sqrt
 from typing import Tuple
 
-from numpy import array, divide, dot, float64, multiply, subtract, zeros
+from numpy import array, divide, dot, float64, multiply, sign, subtract, zeros
 from numpy.typing import NDArray
 
 from racoon_ai.common import MathUtils as MU
@@ -39,6 +39,7 @@ class Controls:
         self.__pre_target_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__pre_bot_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__theta_accumulation: NDArray[float64] = zeros((11,), dtype=float64)
+        self.__standard_distance: float = 500**2
 
     def pid(self, target: Pose, bot: Robot, limiter: float = 1) -> RobotCommand:  # pylint: disable=R0914
         """pid
@@ -90,8 +91,12 @@ class Controls:
 
         cmd.vel_fwd = float(vel[0])
         cmd.vel_sway = float(vel[1])
-        cmd.vel_angular = float(vel[2])
+        cmd.vel_angular = float(vel[2]) / 2
         cmd = self.speed_limiter(cmd, limiter)
+        if cmd.vel_angular > MU.PI:
+            cmd.vel_angular = min(cmd.vel_angular, MU.HALF_PI / 2)
+        elif cmd.vel_angular < -MU.PI:
+            cmd.vel_angular = max(cmd.vel_angular, -MU.HALF_PI / 2)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
 
@@ -136,5 +141,46 @@ class Controls:
         if adjustment > limiter >= 0:
             cmd.vel_sway = cmd.vel_sway / adjustment * limiter
             cmd.vel_fwd = cmd.vel_fwd / adjustment * limiter
+
+        return cmd
+
+    def avoid_enemy(self, cmd: RobotCommand, bot: Robot, target_pose: Pose) -> RobotCommand:
+        """avoid_enemy"""
+
+        radian_target_robot = MU.radian(target_pose, bot)
+        distance_target_robot = MU.distance(target_pose, bot)
+
+        rot_theta: NDArray[float64] = array(
+            [
+                [cos(bot.theta), -sin(bot.theta)],
+                [sin(bot.theta), cos(bot.theta)],
+            ],
+            dtype=float64,
+        )
+
+        for enemy in self.__observer.enemy_robots:
+            distance_enemy_robot = MU.distance(enemy, bot)
+            if enemy.is_visible is True and distance_enemy_robot < distance_target_robot:
+                radian_enemy_robot = MU.radian(enemy, bot)
+                bvel: NDArray[float64] = array(
+                    [
+                        self.__standard_distance
+                        * cos(
+                            radian_enemy_robot
+                            - (MU.HALF_PI * sign(MU.radian_reduce(radian_enemy_robot, radian_target_robot)))
+                        )
+                        / (distance_enemy_robot**2),
+                        self.__standard_distance
+                        * sin(
+                            radian_enemy_robot
+                            - (MU.HALF_PI * sign(MU.radian_reduce(radian_enemy_robot, radian_target_robot)))
+                        )
+                        / (distance_enemy_robot**2),
+                    ],
+                    dtype=float64,
+                )
+                vel: NDArray[float64] = dot(bvel, rot_theta)
+                cmd.vel_fwd += vel[0]
+                cmd.vel_sway += vel[1]
 
         return cmd

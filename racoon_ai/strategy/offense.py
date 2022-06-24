@@ -9,10 +9,10 @@ from logging import getLogger
 from math import cos, sin, sqrt
 
 from racoon_ai.common.math_utils import MathUtils as MU
+from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
+from racoon_ai.movement.controls import Controls
 from racoon_ai.networks.receiver import MWReceiver
-
-# from racoon_ai.strategy.role import Role
 
 
 class Offense:
@@ -24,11 +24,12 @@ class Offense:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver) -> None:
+    def __init__(self, observer: MWReceiver, controls: Controls) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
         # self.__role = role
+        self.__controls = controls
         self.__send_cmds: list[RobotCommand]
         self.__kick_flag: bool = False
         # self.__arrive_flag: bool = False
@@ -83,6 +84,10 @@ class Offense:
         cmd = self.__ballaround(bot)
         if bot.distance_ball_robot <= 105 and abs(MU.radian(self.__observer.geometry.goal, bot) - bot.theta) < 0.1:
             cmd.kickpow = 10
+
+        cmd = self.__controls.avoid_enemy(cmd, bot, Pose(self.__observer.ball.x, self.__observer.ball.y))
+        cmd = self.__controls.speed_limiter(cmd)
+
         self.__send_cmds.append(cmd)
 
     def __ballaround(self, robot: Robot) -> RobotCommand:
@@ -115,8 +120,7 @@ class Offense:
         vel_sway += sin(robot.radian_ball_robot) * adjustment
 
         adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
-        speed = robot.distance_ball_robot / 1000.0
-        speed = min(speed, 0.8)
+        speed = robot.distance_ball_robot / 500
 
         command = RobotCommand(5)
         command.vel_fwd = speed * vel_fwd / adjustment

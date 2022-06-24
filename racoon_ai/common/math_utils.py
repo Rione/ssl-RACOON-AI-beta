@@ -26,12 +26,13 @@ class MathUtils:
 
     TWO_PI: Final[float] = 2 * PI
 
+    HALF_PI: Final[float] = PI / 2
+
     PI_SQUARE: Final[float] = pow(PI, 2)
 
     @staticmethod
     def div_safe(val: float, designated: float = 1e-10) -> float:
         """div_safe
-
         judge if value is zero and return the designated
 
         Args:
