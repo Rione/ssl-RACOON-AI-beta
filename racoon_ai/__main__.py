@@ -39,7 +39,13 @@ def main(conf: ConfigParser, logger: Logger) -> None:  # pylint: disable=R0914
 
         keeper: Keeper = Keeper(observer, role, controls)
 
-        sender: CommandSender = create_sender(conf, logger, observer)
+        sender: CommandSender = create_sender(
+            conf,
+            logger,
+            observer.target_ids,
+            observer.is_real,
+            observer.is_team_yellow,
+        )
 
         logger.info("Roop started")
 

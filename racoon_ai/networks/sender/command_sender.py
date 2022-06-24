@@ -5,12 +5,12 @@
     This module is for the CommandSender class.
 """
 
-from logging import getLogger
+from logging import Logger, getLogger
 from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRAM, socket
+from time import perf_counter
 
 from racoon_ai.models.network import IPNetAddr
 from racoon_ai.models.robot import RobotCommand, SimCommands
-from racoon_ai.observer import Observer
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
 
@@ -19,7 +19,9 @@ class CommandSender:
     """CommandSender
 
     Args:
-        observer (Observer): Observer instance.
+        target_ids (set[int]): Target robot IDs.
+        is_real (bool, optional): True if this is a real robot. Defaults to False.
+        is_team_yellow (bool, optional): True if this is our team is yellow. Defaults to False.
         host (str, optional): IP address of the target.
             Defaults to `224.5.23.2`.
         port (int, optional): Port number of the target.
@@ -31,22 +33,28 @@ class CommandSender:
 
     def __init__(
         self,
-        observer: Observer,
+        target_ids: set[int],
+        is_real: bool = False,
+        is_team_yellow: bool = False,
         *,
         host: str = "224.5.23.2",
         port: int = 20011,
     ) -> None:
 
-        self.__logger = getLogger(__name__)
+        self.__logger: Logger = getLogger(__name__)
 
-        self.__observer: Observer = observer
+        self.__is_real: bool = is_real
+
+        self.__is_team_yellow: bool = is_team_yellow
+
+        self.__target_ids: set[int] = target_ids
 
         self.__sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
 
         self.__dists: set[IPNetAddr]
 
-        if self.__observer.is_real and self.__observer.target_ids:
-            host_ips: set[str] = {f"192.168.100.1{robot_id:02d}" for robot_id in self.__observer.target_ids}
+        if self.__is_real and self.__target_ids:
+            host_ips: set[str] = {f"192.168.100.1{robot_id:02d}" for robot_id in self.__target_ids}
             self.__dists = {IPNetAddr(host, port, mod_name=__name__) for host in host_ips}
             return
 
@@ -90,7 +98,7 @@ class CommandSender:
                 "Sending to %s:%d (%s)",
                 dist.host,
                 dist.port,
-                ("real" if self.__observer.is_real else "sim"),
+                ("real" if self.__is_real else "sim"),
             )
             self.__sock.sendto(packet, (dist.host, dist.port))
 
@@ -101,21 +109,10 @@ class CommandSender:
         """
         self.__logger.info("Stopping robots...")
         commands: SimCommands = SimCommands(
-            isteamyellow=self.__observer.is_team_yellow,
-            robot_commands=[
-                RobotCommand(i)
-                for i in set(
-                    self.__observer.target_ids
-                    or (
-                        bot.robot_id
-                        for bot in set(
-                            self.__observer.get_our_by_id(bid)
-                            for bid in range(self.__observer.num_of_our_vision_robots)
-                        )
-                        if bot
-                    )
-                )
-            ],
+            isteamyellow=self.__is_team_yellow,
+            robot_commands=[RobotCommand(i) for i in set(self.__target_ids)],
         )
+        start: float = perf_counter()
         for _ in range(count):
             self.send(commands)
+        self.__logger.info("Stopped robots in %.3f seconds", perf_counter() - start)
