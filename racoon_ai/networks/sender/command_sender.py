@@ -10,7 +10,7 @@ from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRA
 
 from racoon_ai.models.network import IPNetAddr
 from racoon_ai.models.robot import RobotCommand, SimCommands
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Commands
 from racoon_ai.proto.pb_gen.grSim_Packet_pb2 import grSim_Packet
 
@@ -19,8 +19,7 @@ class CommandSender:
     """CommandSender
 
     Args:
-        is_real (bool): If true, send commands to real robot.
-        target_ids (list[int]): List of online robot ids.
+        observer (Observer): Observer instance.
         host (str, optional): IP address of the target.
             Defaults to `224.5.23.2`.
         port (int, optional): Port number of the target.
@@ -32,7 +31,7 @@ class CommandSender:
 
     def __init__(
         self,
-        observer: MWReceiver,
+        observer: Observer,
         *,
         host: str = "224.5.23.2",
         port: int = 20011,
@@ -40,7 +39,7 @@ class CommandSender:
 
         self.__logger = getLogger(__name__)
 
-        self.__observer: MWReceiver = observer
+        self.__observer: Observer = observer
 
         self.__sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
 

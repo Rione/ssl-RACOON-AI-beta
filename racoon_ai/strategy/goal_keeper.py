@@ -15,7 +15,7 @@ from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.strategy.role import Role
 
 
@@ -28,12 +28,12 @@ class Keeper:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, role: Role, controls: Controls) -> None:
+    def __init__(self, observer: Observer, role: Role, controls: Controls) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
-        self.__observer = observer
-        self.__controls = controls
-        self.__role = role
+        self.__observer: Observer = observer
+        self.__controls: Controls = controls
+        self.__role: Role = role
         self.__send_cmds: list[RobotCommand]
         self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
 

@@ -11,7 +11,7 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPaintEvent, QPixmap  # pylin
 from PySide6.QtWidgets import QLabel, QMainWindow  # pylint: disable=E0611
 
 from racoon_ai.common.math_utils import MathUtils as MU
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.strategy import Role
 
 
@@ -23,10 +23,10 @@ class Main(QMainWindow):
         None
     """
 
-    def __init__(self, observer: MWReceiver, role: Role) -> None:
+    def __init__(self, observer: Observer, role: Role) -> None:
         super().__init__()
 
-        self.__observer: MWReceiver = observer
+        self.__observer: Observer = observer
         self.__role: Role = role
 
         self.__ui: QPainter

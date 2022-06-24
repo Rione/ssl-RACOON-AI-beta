@@ -7,7 +7,7 @@ from logging import getLogger
 
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.strategy.role import Role
 
 from .modules import Back, Chart, Game, Main, Robot, Vision
@@ -19,11 +19,11 @@ class Gui:  # pylint: disable=R0903
     Args:
         argv: list[str]
         is_gui_view: bool
-        observer: MWReceiver
+        observer: Observer
         role: Role
     """
 
-    def __init__(self, is_gui_view: bool, observer: MWReceiver, role: Role):
+    def __init__(self, is_gui_view: bool, observer: Observer, role: Role):
         self.__logger = getLogger(__name__)
         self.__logger.debug("create logger")
 
@@ -33,7 +33,7 @@ class Gui:  # pylint: disable=R0903
         if self.__is_gui_view:
             self.__setup(observer, role)
 
-    def __setup(self, observer: MWReceiver, role: Role) -> None:
+    def __setup(self, observer: Observer, role: Role) -> None:
         """setup"""
         self.__main = Main(observer, role)
         Chart(self.__main, observer)
