@@ -33,6 +33,10 @@ class Gui:  # pylint: disable=R0903
         if self.__is_gui_view:
             self.__setup(observer, role)
 
+    def __del__(self) -> None:
+        """__del__"""
+        self.__app.exit(0)
+
     def __setup(self, observer: Observer, role: Role) -> None:
         """setup"""
         self.__main = Main(observer, role)

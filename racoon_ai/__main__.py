@@ -5,9 +5,7 @@
 """
 from configparser import ConfigParser
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
-from signal import SIGINT, signal
 from subprocess import Popen
-from sys import exit as sys_exit
 from typing import Callable, Optional
 
 from .gui import Gui
@@ -51,6 +49,21 @@ class RacoonMain:
         self.__sender: CommandSender
 
         self.__init_mods()
+
+    def __del__(self) -> None:
+        """exit"""
+        self.__kill_mw()
+        shutdown()
+        del self.__conf
+        del self.__racoon_mw
+        del self.__observer
+        del self.__controls
+        del self.__role
+        del self.__gui
+        del self.__subrole
+        del self.__offense
+        del self.__keeper
+        del self.__sender
 
     def main(self) -> None:
         """main
@@ -101,23 +114,6 @@ class RacoonMain:
         self.__logger.info("Executing: %s", cmds)
         return Popen(cmds.split(), stdin=None)
 
-    def exit(self, signum: int) -> None:
-        """exit"""
-        self.__logger.info("Received signal %d", signum)
-        self.__kill_mw()
-        shutdown()
-        del self.__conf
-        del self.__racoon_mw
-        del self.__observer
-        del self.__controls
-        del self.__role
-        del self.__gui
-        del self.__subrole
-        del self.__offense
-        del self.__keeper
-        del self.__sender
-        sys_exit(0)
-
     def __kill_mw(self) -> None:
         if self.__racoon_mw:
             self.__logger.info("Killing MW...")
@@ -154,6 +150,7 @@ class RacoonMain:
 
 
 if __name__ == "__main__":
+    from sys import exit as sys_exit
 
     from . import __version__
 
@@ -182,5 +179,5 @@ if __name__ == "__main__":
     parser.read("racoon_ai/config.ini")
 
     racoon: RacoonMain = RacoonMain(parser, log, parser.getboolean("commons", "withMW"))
-    signal(SIGINT, lambda signum, _: racoon.exit(signum))
     racoon.main()
+    sys_exit(0)
