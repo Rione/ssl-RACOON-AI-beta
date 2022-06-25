@@ -31,7 +31,7 @@ PY_SRCS         = $(ROOT)/$(PKG) $(ROOT)/cmd
 PY_LOCKFILE     = $(ROOT)/$(PKG)/poetry.lock
 
 PROTOC          = protoc
-RACOON_MW       = $(BIN_DIR)/RACOON-MW
+RACOON_MW       = $(BIN_DIR)/RACOON-MW.exe
 VERCHEW         = $(BIN_DIR)/verchew
 
 PROTOC_GEN_MYPY = $(VENV_DIR)/bin/protoc-gen-mypy
@@ -45,11 +45,11 @@ ISORT           = $(VENV_DIR)/bin/isort
 all: clean build
 
 .PHONY: build
-build: $(WHEEL)
+build: doctor $(WHEEL)
 
 $(TGZ):
 	@echo ""
-	$(error [ERROR] Please compile with `make build`, or use just `make` (compile and run at the same time))
+	$(error [ERROR] Please compile with `make` to cleanup and build, or use just `make build`)
 
 $(WHEEL): $(PROJECT_DIR) $(PROTO_GENDIR)/%.pyi
 	@echo ""
@@ -77,20 +77,20 @@ $(PROTO_GENDIR)/%.py: $(PROTO_SRCS) $(PROTOC_GEN_MYPY)
 	  --mypy_out=$(@D) \
 		$(PROTO_SRCS)
 
-$(PROTOL): $(VENV_DIR)
+$(PROTOL):
 $(PROTOC_GEN_MYPY): $(VENV_DIR)
 	@echo ""
 	$(info ----------------------------------------------)
 	$(info Installing dependencies and project...)
 	@poetry install
 
-$(VENV_DIR): doctor poetry.lock clean-deps $(BIN_DIR)/RACOON-MW
+$(VENV_DIR): poetry.lock clean-deps $(BIN_DIR)/%
 
-$(BIN_DIR)/RACOON-MW: $(MW_OUT_DIR)/%
+$(BIN_DIR)/%: $(MW_OUT_DIR)/%
 	@echo ""
 	$(info ----------------------------------------------)
 	$(info Linking RACOON-MW...)
-	@ln -sf $(<D)/ssl-RACOON-MW $@
+	@ln -sf $(<D)/ssl-RACOON-MW $(RACOON_MW)
 
 $(MW_OUT_DIR)/%:
 	@echo ""
@@ -103,7 +103,7 @@ $(MW_OUT_DIR)/%:
 	$(info ----------------------------------------------)
 	$(info Extracting RACOON-MW...)
 	@mkdir -p $(@D)
-	@tar -xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
+	@tar xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
 
 # *************************************************************************** #
 

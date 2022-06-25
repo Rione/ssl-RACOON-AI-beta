@@ -4,7 +4,11 @@
     This is the main script.
 """
 from configparser import ConfigParser
-from logging import Logger, shutdown
+from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
+from signal import SIGINT, signal
+from subprocess import Popen
+from sys import exit as sys_exit
+from typing import Callable, Optional
 
 from .gui import Gui
 from .models.robot import SimCommands
@@ -14,74 +18,142 @@ from .observer import Observer, create_observer
 from .strategy import Keeper, Offense, Role, SubRole
 
 
-def main(conf: ConfigParser, logger: Logger) -> None:
-    """main
+class RacoonMain:
+    """RacoonMain
 
-    This function is for the main function.
-
-    Returns:
-        None
+    Args:
+        conf: ConfigParser
+        logger: Logger
     """
-    with_gui_view: bool = False  # Flag if view gui
 
-    try:
-        observer: Observer = create_observer(conf, logger)
+    def __init__(self, conf: ConfigParser, logger: Logger, with_mw: bool = True) -> None:
 
-        controls: Controls = create_controls(conf, logger, observer)
+        self.__conf: ConfigParser = conf
 
-        role: Role = Role(observer)
+        self.__logger: Logger = logger
 
-        gui = Gui(with_gui_view, observer, role)
+        self.__racoon_mw: Optional[Popen[bytes]] = self.exec_mw() if with_mw else None
 
-        subrole: SubRole = SubRole(observer, role)
+        self.__observer: Observer
 
-        offense: Offense = Offense(observer)
+        self.__controls: Controls
 
-        keeper: Keeper = Keeper(observer, role, controls)
+        self.__role: Role
 
-        sender: CommandSender = create_sender(
-            conf,
-            logger,
-            observer.target_ids,
-            observer.is_real,
-            observer.is_team_yellow,
-        )
+        self.__gui: Gui
 
-        logger.info("Roop started")
+        self.__subrole: SubRole
+
+        self.__offense: Offense
+
+        self.__keeper: Keeper
+
+        self.__sender: CommandSender
+
+        self.__init_mods()
+
+    def main(self) -> None:
+        """main
+
+        This function is for the main function.
+
+        Returns:
+            None
+        """
+        self.__logger.info("Roop started")
 
         while True:
             # Create a list of commands (Timestamp is set at this initialization)
-            sim_cmds = SimCommands(observer.is_team_yellow)
+            sim_cmds = SimCommands(self.__observer.is_team_yellow)
 
             # Recieve commands from the MW
-            observer.main()
-            role.main()
-            subrole.main()
+            self.__observer.main()
+            self.__role.main()
+            self.__subrole.main()
 
-            keeper.main()
-            # offense.main()
-
-            # update gui
-            gui.update()
-
-            sim_cmds.robot_commands += keeper.send_cmds
-            sim_cmds.robot_commands += offense.send_cmds
-            sender.send(sim_cmds)
+            self.__keeper.main()
+            # self.__offense.main()
 
             # update gui
-            gui.update()
+            self.__gui.update()
 
-    except KeyboardInterrupt:
-        logger.info("KeyboardInterrupt received", exc_info=False)
-        del gui
+            sim_cmds.robot_commands += self.__keeper.send_cmds
+            sim_cmds.robot_commands += self.__offense.send_cmds
+            self.__sender.send(sim_cmds)
 
-    finally:
-        logger.info("Cleaning up...")
+            # update gui
+            self.__gui.update()
+
+    def exec_mw(self) -> Popen[bytes]:
+        """exec_mw"""
+        self.__logger.info("Starting MW...")
+        vision_host: str = self.__conf.get("racoon_mw", "vision_host") or "224.5.23.2"
+        vision_port: str = self.__conf.get("racoon_mw", "vision_port") or str(10006)
+        self.__logger.info("Vision host: %s, port: %s", vision_host, vision_port)
+
+        get_sim_flag: Callable[[bool], str] = lambda is_real: "" if is_real else "-s"
+        sim_flag: str = get_sim_flag(self.__conf.getboolean("commons", "isReal"))
+
+        get_team_flag: Callable[[bool], str] = lambda is_yellow: "yellow" if is_yellow else "blue"
+        team_flag: str = get_team_flag(self.__conf.getboolean("commons", "isTeamYellow"))
+
+        cmds: str = f"bin/RACOON-MW.exe -p {vision_port:s} {sim_flag:s} -t {team_flag:s} &"
+        self.__logger.info("Executing: %s", cmds)
+        return Popen(cmds.split(), stdin=None)
+
+    def exit(self, signum: int) -> None:
+        """exit"""
+        self.__logger.info("Received signal %d", signum)
+        self.__kill_mw()
         shutdown()
+        del self.__conf
+        del self.__racoon_mw
+        del self.__observer
+        del self.__controls
+        del self.__role
+        del self.__gui
+        del self.__subrole
+        del self.__offense
+        del self.__keeper
+        del self.__sender
+        sys_exit(0)
+
+    def __kill_mw(self) -> None:
+        if self.__racoon_mw:
+            self.__logger.info("Killing MW...")
+            self.__racoon_mw.kill()
+
+    def __init_mods(self) -> None:
+        try:
+            self.__observer = create_observer(self.__conf, self.__logger)
+
+            self.__controls = create_controls(self.__conf, self.__logger, self.__observer)
+
+            self.__role = Role(self.__observer)
+
+            self.__gui = Gui(self.__conf.getboolean("commons", "showGui"), self.__observer, self.__role)
+
+            self.__subrole = SubRole(self.__observer, self.__role)
+
+            self.__offense = Offense(self.__observer)
+
+            self.__keeper = Keeper(self.__observer, self.__role, self.__controls)
+
+            self.__sender = create_sender(
+                self.__conf,
+                self.__logger,
+                self.__observer.target_ids,
+                self.__observer.is_real,
+                self.__observer.is_team_yellow,
+            )
+
+        except Exception as err:  # pylint: disable=W0703
+            self.__logger.error("Error while initializing\n %s", err, exc_info=True)
+            self.__kill_mw()
+            shutdown()
 
 
 if __name__ == "__main__":
-    from logging import INFO, Formatter, StreamHandler, getLogger
 
     from . import __version__
 
@@ -109,4 +181,6 @@ if __name__ == "__main__":
     parser = ConfigParser()
     parser.read("racoon_ai/config.ini")
 
-    main(parser, log)
+    racoon: RacoonMain = RacoonMain(parser, log, parser.getboolean("commons", "withMW"))
+    signal(SIGINT, lambda signum, _: racoon.exit(signum))
+    racoon.main()
