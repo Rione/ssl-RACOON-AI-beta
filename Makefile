@@ -1,8 +1,18 @@
 ROOT     = $(shell git rev-parse --show-toplevel)
-OS       = $(shell uname -s)
-ARCH     = $(shell uname -m | sed -e 's/i.86/i386/' -e 's/aarch64/arm64/' -e 's/amd64/x86_64/')
 PKG      = $(shell sed -n 's/^ *name.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
 VERSION  = $(shell sed -n 's/^ *version.*=.*"\([^"]*\)".*/\1/p' pyproject.toml)
+
+RM              = rm -f
+TAR             = tar
+ifeq ($(OS),Windows_NT)
+	OS_S     = Windows
+	ARCH     = $(shell echo $Env:PROCESSOR_ARCHITECTURE | sed -e 's/AMD64/x86_64/' -e 's/Arm/arm64/' -e 's/X86$/i386/')
+	RM       = cmd.exe /C del /F
+	TAR      = tar.exe
+else
+	OS_S     = $(shell uname -s)
+	ARCH     = $(shell uname -m | sed -e 's/i.86/i386/' -e 's/aarch64/arm64/' -e 's/amd64/x86_64/')
+endif
 
 DIST_DIR		    = $(ROOT)/dist
 CACHE_DIR		    = $(ROOT)/.cache
@@ -12,8 +22,7 @@ PROJECT_DIR     = $(ROOT)/$(PKG)
 
 MW_TMP_DIR      = $(CACHE_DIR)/racoon-mw
 MW_OUT_DIR      = $(MW_TMP_DIR)/out
-MW_FILENAME     = ssl-RACOON-MW_*_$(OS)_$(ARCH).tar.gz
-MW_DOWNLOADED   = $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME))
+MW_FILENAME     = ssl-RACOON-MW_*_$(OS_S)_$(ARCH).tar.gz
 
 PROTO_SRCDIR    = $(PROJECT_DIR)/proto/pb_src
 PROTO_GENDIR    = $(PROJECT_DIR)/proto/pb_gen
@@ -90,7 +99,11 @@ $(BIN_DIR)/%: $(MW_OUT_DIR)/%
 	@echo ""
 	$(info ----------------------------------------------)
 	$(info Linking RACOON-MW...)
+ifeq ($(OS_S),Windows)
+	@New-Item -ItemType SymbolicLink -Force -Value $(MW_OUT_DIR)/$(@F) -Path $(@D)
+else
 	@ln -sf $(<D)/ssl-RACOON-MW $(RACOON_MW)
+endif
 
 $(MW_OUT_DIR)/%:
 	@echo ""
@@ -102,8 +115,12 @@ $(MW_OUT_DIR)/%:
 		--pattern $(MW_FILENAME)
 	$(info ----------------------------------------------)
 	$(info Extracting RACOON-MW...)
+ifeq ($(OS_S),Windows)
+	@New-Item -ItemType Directory -Force -Value $(MW_OUT_DIR) -Path $(@D)
+else
 	@mkdir -p $(@D)
-	@tar xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
+endif
+	@$(TAR) -xzvf $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME)) -C $(@D)
 
 # *************************************************************************** #
 
@@ -133,7 +150,7 @@ clean-dirs:
 	@echo ""
 	$(info ----------------------------------------------)
 	$(info Cleaning up...)
-	@rm -f $(TARGETS) $(PROTO_PYS) $(PROTO_STUBS) $(RACOON_MW) $(MW_OUT_DIR)/* $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME))
+	@$(RM) -f $(TARGETS) $(PROTO_PYS) $(PROTO_STUBS) $(RACOON_MW) $(MW_OUT_DIR)/* $(wildcard $(MW_TMP_DIR)/$(MW_FILENAME))
 	@find . -name '*~' -exec rm -f {} +
 	@find . -name '__pycache__' -exec rm -fr {} +
 
