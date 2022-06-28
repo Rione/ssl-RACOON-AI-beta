@@ -8,14 +8,13 @@
 from logging import getLogger
 from math import tan
 from typing import Optional
-
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement.controls import Controls
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 from racoon_ai.strategy.role import Role
 from racoon_ai.strategy.subrole import SubRole
 
@@ -23,13 +22,14 @@ from racoon_ai.strategy.subrole import SubRole
 class Defense:
     """Defense
     Args:
+        controls (Controls): Controls instance
         observer (Observer): Observer instance
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, role: Role, subrole: SubRole, controls: Controls) -> None:
+    def __init__(self, observer: Observer, role: Role, subrole: SubRole, controls: Controls) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
         self.__observer = observer
@@ -57,7 +57,6 @@ class Defense:
     def main(self) -> None:
         """main"""
 
-        # commandの情報を格納するリスト
         self.__send_cmds = []
         self.__defense_quantity = self.__role.get_defense_quantity
         self.__enemy_quantity = self.__observer.num_of_enemy_robots

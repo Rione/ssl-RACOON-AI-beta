@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 
 class Controls:
@@ -28,9 +28,9 @@ class Controls:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
-    def __init__(self, observer: MWReceiver, k_gain: Tuple[float, float, float] = (1, 0, 0)) -> None:
+    def __init__(self, observer: Observer, k_gain: Tuple[float, float, float] = (1, 0, 0)) -> None:
         self.__logger = getLogger(__name__)
-        self.__observer = observer
+        self.__observer: Observer = observer
         self.__dtaime: float = self.__observer.sec_per_frame
         self.__k_gain: NDArray[float64] = array(k_gain, dtype=float64)
         self.__pre_target_pose: NDArray[float64] = zeros((11, 3), dtype=float64)
@@ -148,7 +148,7 @@ class Controls:
         """avoid_enemy"""
 
         radian_target_robot = MU.radian(target_pose, bot)
-        distance_target_robot = MU.distance(target_pose, bot)
+        distance_robot_target = MU.distance(bot, target_pose)
 
         rot_theta: NDArray[float64] = array(
             [
@@ -159,9 +159,10 @@ class Controls:
         )
 
         for enemy in self.__observer.enemy_robots:
-            distance_enemy_robot = MU.distance(enemy, bot)
-            if enemy.is_visible is True and distance_enemy_robot < distance_target_robot:
+            distance_enemy_target = MU.distance(enemy, target_pose)
+            if enemy.is_visible is True and distance_enemy_target < distance_robot_target:
                 radian_enemy_robot = MU.radian(enemy, bot)
+                distance_enemy_robot = MU.distance(enemy, bot)
                 bvel: NDArray[float64] = array(
                     [
                         self.__standard_distance

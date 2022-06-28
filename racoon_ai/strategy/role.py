@@ -7,9 +7,8 @@
 
 from logging import getLogger
 from math import cos, sin
-
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.networks.receiver.mw_receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 
 class Role:
@@ -24,10 +23,10 @@ class Role:
         defense_id_list (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: MWReceiver, *, keeper_id: int = 0) -> None:
+    def __init__(self, observer: Observer, *, keeper_id: int = 0) -> None:
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-        self.__observer = observer
+        self.__observer: Observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = keeper_id
@@ -80,7 +79,7 @@ class Role:
 
     def get_offense_id(self, offense_id: int) -> int:
         """get_offense_id"""
-        return self.__defense[offense_id]
+        return self.__offense[offense_id]
 
     def get_defense_id(self, defense_id: int) -> int:
         """get_defense_id"""
