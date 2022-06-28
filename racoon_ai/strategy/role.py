@@ -35,7 +35,7 @@ class Role:
         self.__defense: list[int] = []
         # self.__keeper_quantity: int = 0
         self.__offense_quantity: int = 0
-        self.__defence_quantity: int = 0
+        self.__defense_quantity: int = 0
         # self.__midfielder_quantity: int = 0
         self.__role_num: list[list[int]] = [
             [0, 0, 0, 0],  # 0
@@ -68,9 +68,19 @@ class Role:
         """defense_id_list"""
         return self.__defense
 
+    @property
+    def get_offense_quantity(self) -> int:
+        """offense_id_list"""
+        return self.__offense_quantity
+
+    @property
+    def get_defense_quantity(self) -> int:
+        """defense_id_list"""
+        return self.__defense_quantity
+
     def get_offense_id(self, offense_id: int) -> int:
         """get_offense_id"""
-        return self.__defense[offense_id]
+        return self.__offense[offense_id]
 
     def get_defense_id(self, defense_id: int) -> int:
         """get_defense_id"""
@@ -90,7 +100,7 @@ class Role:
         robot_quantity = self.__observer.num_of_our_robots
         # self.__keeper_quantity = self.__role_num[robot_quantity][0]
         self.__offense_quantity = self.__role_num[robot_quantity][1]
-        self.__defence_quantity = self.__role_num[robot_quantity][2]
+        self.__defense_quantity = self.__role_num[robot_quantity][2]
         # self.__midfielder_quantity = self.__role_num[robot_quantity][3]
 
     def __decide_keeper(self) -> None:
@@ -114,7 +124,7 @@ class Role:
 
         if defense:
             defense.sort(reverse=False, key=lambda x: x[1])
-            del defense[self.__defence_quantity :]
+            del defense[self.__defense_quantity :]
             defense.sort(reverse=True, key=lambda x: x[2])
         self.__defense = list(row[0] for row in defense)
 

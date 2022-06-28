@@ -6,11 +6,10 @@
 """
 
 from logging import getLogger
-from math import cos, sin
+from math import cos, sin, sqrt
 from typing import Tuple
 
-from numpy import array, divide, dot, float64, multiply, subtract, zeros
-from numpy.linalg import norm
+from numpy import array, divide, dot, float64, multiply, sign, subtract, zeros
 from numpy.typing import NDArray
 
 from racoon_ai.common import MathUtils as MU
@@ -40,6 +39,7 @@ class Controls:
         self.__pre_target_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__pre_bot_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__theta_accumulation: NDArray[float64] = zeros((11,), dtype=float64)
+        self.__standard_distance: float = 500**2
 
     def pid(self, target: Pose, bot: Robot, limiter: float = 1) -> RobotCommand:  # pylint: disable=R0914
         """pid
@@ -88,15 +88,11 @@ class Controls:
         )
 
         vel: NDArray[float64] = dot(bvel, rot_theta)
-        vel_xy: NDArray[float64] = vel[:2]
 
-        abs_vel_xy = norm(vel_xy, ord=2)  # Get the norm
-        if abs_vel_xy > limiter >= 0:
-            vel_xy = multiply(divide(vel_xy, abs_vel_xy), limiter)
-
-        cmd.vel_fwd = float(vel_xy[0])
-        cmd.vel_sway = float(vel_xy[1])
-        cmd.vel_angular = float(vel[2])
+        cmd.vel_fwd = float(vel[0])
+        cmd.vel_sway = float(vel[1])
+        cmd.vel_angular = self.pid_radian(target.theta, bot)
+        cmd = self.speed_limiter(cmd, limiter)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
 
@@ -107,6 +103,10 @@ class Controls:
             target_theta (float): Target theta
             bot (Robot): Robot instance
         """
+
+        if self.__observer.is_real:
+            return target_theta
+
         vel_angular: float = float(0)
         kp: float = float(self.__k_gain[0])
         kd: float = float(self.__k_gain[1])
@@ -131,3 +131,57 @@ class Controls:
 
         self.__logger.debug("vel_angular: %s", vel_angular)
         return vel_angular
+
+    @staticmethod
+    def speed_limiter(cmd: RobotCommand, limiter: float = 1) -> RobotCommand:
+        """speed_limiter"""
+
+        adjustment: float = sqrt(cmd.vel_sway**2 + cmd.vel_fwd**2)
+
+        if adjustment > limiter >= 0:
+            cmd.vel_sway = cmd.vel_sway / adjustment * limiter
+            cmd.vel_fwd = cmd.vel_fwd / adjustment * limiter
+
+        return cmd
+
+    def avoid_enemy(self, cmd: RobotCommand, bot: Robot, target_pose: Pose) -> RobotCommand:
+        """avoid_enemy"""
+
+        radian_target_robot = MU.radian(target_pose, bot)
+        distance_robot_target = MU.distance(bot, target_pose)
+
+        rot_theta: NDArray[float64] = array(
+            [
+                [cos(bot.theta), -sin(bot.theta)],
+                [sin(bot.theta), cos(bot.theta)],
+            ],
+            dtype=float64,
+        )
+
+        for enemy in self.__observer.enemy_robots:
+            distance_enemy_target = MU.distance(enemy, target_pose)
+            if enemy.is_visible is True and distance_enemy_target < distance_robot_target:
+                radian_enemy_robot = MU.radian(enemy, bot)
+                distance_enemy_robot = MU.distance(enemy, bot)
+                bvel: NDArray[float64] = array(
+                    [
+                        self.__standard_distance
+                        * cos(
+                            radian_enemy_robot
+                            - (MU.HALF_PI * sign(MU.radian_reduce(radian_enemy_robot, radian_target_robot)))
+                        )
+                        / (distance_enemy_robot**2),
+                        self.__standard_distance
+                        * sin(
+                            radian_enemy_robot
+                            - (MU.HALF_PI * sign(MU.radian_reduce(radian_enemy_robot, radian_target_robot)))
+                        )
+                        / (distance_enemy_robot**2),
+                    ],
+                    dtype=float64,
+                )
+                vel: NDArray[float64] = dot(bvel, rot_theta)
+                cmd.vel_fwd += vel[0]
+                cmd.vel_sway += vel[1]
+
+        return cmd

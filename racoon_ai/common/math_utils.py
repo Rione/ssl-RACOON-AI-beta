@@ -26,12 +26,13 @@ class MathUtils:
 
     TWO_PI: Final[float] = 2 * PI
 
+    HALF_PI: Final[float] = PI / 2
+
     PI_SQUARE: Final[float] = pow(PI, 2)
 
     @staticmethod
     def div_safe(val: float, designated: float = 1e-10) -> float:
         """div_safe
-
         judge if value is zero and return the designated
 
         Args:
@@ -191,6 +192,17 @@ class MathUtils:
         val3 = cls.__substitution_fn(pt3, pt4, pt1)
         val4 = cls.__substitution_fn(pt3, pt4, pt2)
         return (val1 * val2 < 0) and (val3 * val4 < 0)
+
+    @classmethod
+    def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
+        """radian
+        Args:
+            obj1 Point: object at least has x and y
+            obj2 Point: object at least has x and y
+        Returns:
+            float: radian value
+        """
+        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x) - center)
 
 
 if __name__ == "__main__":
