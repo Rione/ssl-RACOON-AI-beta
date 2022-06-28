@@ -8,6 +8,7 @@
 from logging import getLogger
 from math import tan
 from typing import Optional
+
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU

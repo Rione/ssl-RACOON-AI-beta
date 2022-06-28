@@ -7,6 +7,7 @@
 
 from logging import getLogger
 from math import cos, sin
+
 from racoon_ai.common import MathUtils as MU
 from racoon_ai.observer import Observer
 
