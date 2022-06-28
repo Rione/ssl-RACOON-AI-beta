@@ -91,12 +91,8 @@ class Controls:
 
         cmd.vel_fwd = float(vel[0])
         cmd.vel_sway = float(vel[1])
-        cmd.vel_angular = float(vel[2]) / 2
+        cmd.vel_angular = self.pid_radian(target.theta, bot)
         cmd = self.speed_limiter(cmd, limiter)
-        if cmd.vel_angular > MU.PI:
-            cmd.vel_angular = min(cmd.vel_angular, MU.HALF_PI / 2)
-        elif cmd.vel_angular < -MU.PI:
-            cmd.vel_angular = max(cmd.vel_angular, -MU.HALF_PI / 2)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
 
@@ -107,6 +103,10 @@ class Controls:
             target_theta (float): Target theta
             bot (Robot): Robot instance
         """
+
+        if self.__observer.is_real:
+            return target_theta
+
         vel_angular: float = float(0)
         kp: float = float(self.__k_gain[0])
         kd: float = float(self.__k_gain[1])
