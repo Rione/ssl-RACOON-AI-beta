@@ -10,7 +10,7 @@ from math import cos, sin, sqrt
 from typing import Optional
 
 from racoon_ai.common.math_utils import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+# from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement.controls import Controls
 from racoon_ai.observer import Observer
@@ -62,7 +62,8 @@ class Offense:
                         and abs(MU.radian(self.__observer.geometry.their_goal, bot) - bot.theta) < 0.1
                     ):
                         cmd.kickpow = 10
-                    cmd = self.__controls.avoid_enemy(cmd, bot, Pose(self.__observer.ball.x, self.__observer.ball.y))
+                    # cmd = self.__controls.avoid_enemy(cmd, bot, Pose(self.__observer.ball.x, self.__observer.ball.y))
+                    cmd = self.__controls.avoid_penalty_erie(cmd, bot)
                     cmd = self.__controls.speed_limiter(cmd)
                     self.__send_cmds.append(cmd)
                 else:
