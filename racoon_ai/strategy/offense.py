@@ -10,6 +10,7 @@ from math import cos, sin, sqrt
 from typing import Optional
 
 from racoon_ai.common.math_utils import MathUtils as MU
+
 # from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement.controls import Controls
