@@ -9,6 +9,7 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
+from racoon_ai.models.robot import Robot
 from racoon_ai.observer import Observer
 
 
@@ -115,7 +116,7 @@ class Role:
         defense = [
             (
                 robot.robot_id,
-                self.__defence_basis_dis(robot.robot_id),
+                self.__defence_basis_dis(robot),
                 MU.radian(robot, self.__observer.geometry.goal),
             )
             for robot in self.__observer.our_robots_available
@@ -128,19 +129,19 @@ class Role:
             defense.sort(reverse=True, key=lambda x: x[2])
         self.__defense = list(row[0] for row in defense)
 
-    def __defence_basis_dis(self, robot_id: int) -> float:
+    def __defence_basis_dis(self, bot: Robot) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.get_our_by_id(robot_id)
-        if robot is None:
-            return float(1e6)
+        if not bot:
+            return 1e-6
 
-        theta = MU.radian(robot, self.__observer.geometry.goal)
-        robot_dis = MU.distance(robot, self.__observer.geometry.goal)
+        theta = MU.radian(bot, self.__observer.geometry.goal)
+        robot_dis = MU.distance(bot, self.__observer.geometry.goal)
 
         if abs(theta) < (MU.PI / 4):
             return robot_dis - (self.__observer.geometry.penalty_area_depth / cos(theta))
-        return robot_dis - (self.__observer.geometry.penalty_area_width / sin(theta))
+        return robot_dis - abs(self.__observer.geometry.penalty_area_width_half / sin(theta))
+        # 上記の値が帰ってくるようになったらデバック
 
     def __decide_offense(self) -> None:
         """decide_offense

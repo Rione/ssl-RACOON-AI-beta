@@ -64,7 +64,7 @@ class Offense:
                     ):
                         cmd.kickpow = 10
                     # cmd = self.__controls.avoid_enemy(cmd, bot, Pose(self.__observer.ball.x, self.__observer.ball.y))
-                    cmd = self.__controls.avoid_penalty_erie(cmd, bot)
+                    cmd = self.__controls.avoid_penalty_area(cmd, bot)
                     cmd = self.__controls.speed_limiter(cmd)
                     self.__send_cmds.append(cmd)
                 else:
