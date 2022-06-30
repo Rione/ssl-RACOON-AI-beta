@@ -170,7 +170,7 @@ if __name__ == "__main__":
     print(logo)
 
     # Settings for logger
-    fmt = Formatter("[%(levelname)s] %(asctime)s %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    fmt = Formatter("[%(levelname)s] %(asctime)s %(pathname)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     hdlr = StreamHandler()
     hdlr.setFormatter(fmt)
     log = getLogger("racoon_ai")
