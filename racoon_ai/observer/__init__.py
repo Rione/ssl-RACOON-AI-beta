@@ -35,12 +35,12 @@ def create_observer(config: ConfigParser, logger: Logger) -> Observer:
     logger.info("Team: %s", ("Yellow" if is_team_yellow else "Blue"))
 
     if not config.getboolean("mw_receiver", "use_custom_addr", fallback=False):
-        return Observer(target_ids, is_team_yellow)
+        return Observer(target_ids, is_real, is_team_yellow)
 
     mw_host: str = config.get("mw_receiver", "host") or "localhost"
     mw_port: int = int(config.get("mw_receiver", "port") or 30011)
     logger.info("Using custom address for MW: %s:%d", mw_host, mw_port)
-    return Observer(target_ids, is_team_yellow, host=mw_host, port=mw_port)
+    return Observer(target_ids, is_real, is_team_yellow, host=mw_host, port=mw_port)
 
 
 __all__ = [
