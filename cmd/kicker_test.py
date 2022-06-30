@@ -7,6 +7,8 @@
     This is the kicker_test script.
 """
 
+import time
+
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.networks.sender import CommandSender
 
@@ -22,7 +24,7 @@ def main() -> None:
 
     robot_id: str = input("テストするロボットIDを入力してください: ")
 
-    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
+    sender = CommandSender(is_real=True, target_ids={int(robot_id)})
 
     kick_pow: str = input("キッカーに送信する強度を入力してください(0.0-1.0) ")
     sim_cmds = SimCommands(isteamyellow=False)
@@ -42,6 +44,8 @@ def main() -> None:
         sender.send(sim_cmds)
 
         print("キッカー信号を送信しました.")
+
+        time.sleep(0.5)
     finally:
         print("終了します")
         del sender

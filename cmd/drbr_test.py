@@ -22,25 +22,27 @@ def main() -> None:
     """
 
     robot_id: str = input("テストするロボットIDを入力してください: ")
-    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
+    sender = CommandSender(is_real=True, target_ids={int(robot_id)})
     drr_sec: str = input("ドリブラーに送信する秒数を入力してください: ")
     sim_cmds = SimCommands(isteamyellow=False)
 
     try:
-        # Simulation又はRobotに送信
         command = RobotCommand(int(robot_id))
         command.vel_fwd = 0
         command.vel_sway = 0
-        command.vel_angular = 0
-        command.dribble_pow = True
+        command.vel_angular = -1.0
+        command.dribble_pow = False
         command.kickpow = 0
 
         sim_cmds.robot_commands.append(command)
 
-        sender.send(sim_cmds)
+        while True:
+            # Simulation又はRobotに送信
+            
+            sender.send(sim_cmds)
 
-        print("ドリブラー信号を送信しています.")
-        time.sleep(float(drr_sec))
+            print("ドリブラー信号を送信しています.")
+            time.sleep(float(drr_sec))
     finally:
         print("終了します")
         del sender
