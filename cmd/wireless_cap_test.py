@@ -23,17 +23,17 @@ def main() -> None:
 
     robot_id: str = input("テストするロボットIDを入力してください: ")
 
-    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
+    sender = CommandSender(is_real=True, target_ids={int(robot_id)})
 
     try:
         while True:
-            for i in range(0, 20, 1):
+            for i in range(0, 160, 3):
                 # Simulation又はRobotに送信
                 sim_cmds = SimCommands(isteamyellow=False)
                 command = RobotCommand(int(robot_id))
-                command.vel_fwd = i * 0.01
+                command.vel_fwd = 0
                 command.vel_sway = 0
-                command.vel_angular = 0
+                command.vel_angular = i / 180 * 3.14
                 command.dribble_pow = 0
                 command.kickpow = 0
 
@@ -43,13 +43,14 @@ def main() -> None:
 
                 time.sleep(0.016)
 
-            for i in range(20, 0, -1):
+            for i in range(160, 160, -3):
                 # Simulation又はRobotに送信
                 sim_cmds = SimCommands(isteamyellow=False)
                 command = RobotCommand(int(robot_id))
-                command.vel_fwd = i * 0.01
+                command.vel_fwd = 0
                 command.vel_sway = 0
-                command.vel_angular = 0
+                # radian to degree
+                command.vel_angular = i / 180 * 3.14
                 command.dribble_pow = 0
                 command.kickpow = 0
 
@@ -58,6 +59,23 @@ def main() -> None:
                 sender.send(sim_cmds)
 
                 time.sleep(0.016)
+            
+            for i in range(-160, 0, 3):
+                # Simulation又はRobotに送信
+                sim_cmds = SimCommands(isteamyellow=False)
+                command = RobotCommand(int(robot_id))
+                command.vel_fwd = 0
+                command.vel_sway = 0
+                command.vel_angular = i / 180 * 3.14
+                command.dribble_pow = 0
+                command.kickpow = 0
+
+                sim_cmds.robot_commands.append(command)
+
+                sender.send(sim_cmds)
+
+                time.sleep(0.016)
+            
 
     finally:
         print("終了します")
