@@ -108,11 +108,16 @@ class CommandSender:
         Send stop command to all robots.
         """
         self.__logger.info("Stopping robots...")
+
+        id_set: set[int] = {255} if self.__is_real else self.__target_ids
+        self.__logger.info("Robot IDs: %s", id_set)
+
         commands: SimCommands = SimCommands(
             isteamyellow=self.__is_team_yellow,
-            robot_commands=[RobotCommand(i) for i in set(self.__target_ids)],
+            robot_commands=[RobotCommand(i) for i in id_set],
         )
+
         start: float = perf_counter()
         for _ in range(count):
             self.send(commands)
-        self.__logger.info("Stopped robots in %.3f seconds", perf_counter() - start)
+        self.__logger.info("Sent stop for %.3f seconds", perf_counter() - start)
