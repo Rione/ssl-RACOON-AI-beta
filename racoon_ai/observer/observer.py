@@ -18,7 +18,7 @@ from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class Observer(MWReceiver):
+class Observer(MWReceiver):  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
@@ -32,6 +32,7 @@ class Observer(MWReceiver):
     def __init__(
         self,
         target_ids: set[int],
+        imu_enabled_ids: set[int],
         is_real: bool = False,
         is_team_yellow: bool = False,
         *,
@@ -49,10 +50,14 @@ class Observer(MWReceiver):
         self.__referee: Referee = Referee()
 
         self.__target_ids: set[int] = target_ids
+        self.__imu_enabled_ids: set[int] = imu_enabled_ids
+
         self.__is_real: bool = is_real
         self.__is_team_yellow: bool = is_team_yellow
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
+        self.__our_robots: list[Robot] = [
+            Robot(i, is_imu_enabled=(self.is_real and (i in self.imu_enabled_ids))) for i in range(16)
+        ]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
         self.__our_robots_available: set[Robot] = set()
@@ -151,6 +156,15 @@ class Observer(MWReceiver):
             set[int]
         """
         return self.__target_ids
+
+    @property
+    def imu_enabled_ids(self) -> set[int]:
+        """imu_enabled_ids
+
+        Returns:
+            set[int]
+        """
+        return self.__imu_enabled_ids
 
     @property
     def is_real(self) -> bool:
