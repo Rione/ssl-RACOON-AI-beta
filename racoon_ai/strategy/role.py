@@ -133,14 +133,14 @@ class Role:
         """defence_basis_dis"""
 
         if not bot:
-            return 1e-6
+            return 1e6
 
         theta = MU.radian(bot, self.__observer.geometry.goal)
         robot_dis = MU.distance(bot, self.__observer.geometry.goal)
 
         if abs(theta) < (MU.PI / 4):
-            return robot_dis - (self.__observer.geometry.penalty_area_depth / cos(theta))
-        return robot_dis - abs(self.__observer.geometry.penalty_area_width_half / sin(theta))
+            return robot_dis - (self.__observer.geometry.goal_width / cos(theta))
+        return robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
         # 上記の値が帰ってくるようになったらデバック
 
     def __decide_offense(self) -> None:
