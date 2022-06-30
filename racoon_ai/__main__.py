@@ -13,7 +13,7 @@ from .models.robot import SimCommands
 from .movement import Controls, create_controls
 from .networks.sender import CommandSender, create_sender
 from .observer import Observer, create_observer
-from .strategy import Defense, Keeper, Offense, Role, SubRole
+from .strategy import Defense, Keeper, Role, SubRole  # Offense
 
 
 class RacoonMain:
@@ -42,7 +42,7 @@ class RacoonMain:
 
         self.__subrole: SubRole
 
-        self.__offense: Offense
+        # self.__offense: Offense
 
         self.__keeper: Keeper
 
@@ -61,7 +61,7 @@ class RacoonMain:
         del self.__role
         del self.__gui
         del self.__subrole
-        del self.__offense
+        # del self.__offense
         del self.__keeper
         del self.__sender
 
@@ -85,14 +85,14 @@ class RacoonMain:
             self.__subrole.main()
 
             self.__keeper.main()
-            self.__offense.main()
+            # self.__offense.main()
             self.__defense.main()
 
             # update gui
             self.__gui.update()
 
             sim_cmds.robot_commands += self.__keeper.send_cmds
-            sim_cmds.robot_commands += self.__offense.send_cmds
+            # sim_cmds.robot_commands += self.__offense.send_cmds
             sim_cmds.robot_commands += self.__defense.send_cmds
             self.__sender.send(sim_cmds)
 
@@ -133,7 +133,7 @@ class RacoonMain:
 
             self.__subrole = SubRole(self.__observer, self.__role)
 
-            self.__offense = Offense(self.__observer, self.__role, self.__subrole, self.__controls)
+            # self.__offense = Offense(self.__observer, self.__role, self.__subrole, self.__controls)
 
             self.__defense = Defense(self.__observer, self.__role, self.__subrole, self.__controls)
 

@@ -12,7 +12,7 @@ from typing import Optional
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
@@ -36,6 +36,9 @@ class Keeper:
         self.__role: Role = role
         self.__send_cmds: list[RobotCommand]
         self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
+        self.__goal: Point = self.__observer.geometry.their_goal
+        self.__their_goal: Point = self.__observer.geometry.goal
+        self.__attack_direction: float = -1
 
     @property
     def send_cmds(self) -> list[RobotCommand]:
@@ -61,14 +64,16 @@ class Keeper:
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
-        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
+        radian_ball_goal = MU.radian_reduce(
+            MU.radian(self.__observer.ball, self.__goal), MU.radian(self.__their_goal, self.__goal)
+        )
         radian_ball_robot = MU.radian(self.__observer.ball, robot)
 
         if abs(radian_ball_goal) >= MU.PI / 2:
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
-            (self.__observer.geometry.goal.x + self.__radius * cos(radian_ball_goal)),
-            (self.__observer.geometry.goal.y + self.__radius * sin(radian_ball_goal)),
+            (self.__goal.x + self.__radius * cos(radian_ball_goal) * self.__attack_direction),
+            (self.__goal.y + self.__radius * sin(radian_ball_goal) * self.__attack_direction),
             radian_ball_robot,
         )
 
