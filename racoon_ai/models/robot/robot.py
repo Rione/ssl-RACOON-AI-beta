@@ -19,6 +19,8 @@ class Robot(Pose):
     Args:
         robot_id (int): robot id
 
+        is_imu_enabled (bool): is imu enabled
+
     Attributes:
         robot_id (int): robot id
 
@@ -57,9 +59,10 @@ class Robot(Pose):
         battery_voltage (float, optional) : battery voltage
     """
 
-    def __init__(self, robot_id: int) -> None:
+    def __init__(self, robot_id: int, is_imu_enabled: bool = False) -> None:
         super().__init__(0, 0)  # x, y, theta, z
         self.__robot_id: int = robot_id
+        self.__is_imu_enabled: bool = is_imu_enabled
         self.__diff_x: float = float(0)
         self.__diff_y: float = float(0)
         self.__diff_theta: float = float(0)
@@ -75,40 +78,22 @@ class Robot(Pose):
         self.__battery_voltage: Optional[float] = None
 
     def __str__(self) -> str:
-        if self.__battery_voltage is None:
-            return (
-                "("
-                f"id={self.robot_id:2d}, "
-                f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
-                f"rad_ball_robot={self.radian_ball_robot:.1f}, "
-                f"dist_ball_robot={self.distance_ball_robot:.1f}, "
-                f"speed={self.speed:.1f}, "
-                f"speed_slope={self.speed_slope:.1f}, "
-                f"speed_intercept={self.speed_intercept:.1f}, "
-                f"vel_angular={self.vel_angular:.1f}, "
-                f"ball_catched={self.is_ball_catched:b}, "
-                f"is_online={self.is_online:b}, "
-                f"is_visible={self.is_visible:b},"
-                f"battery_vol={None}"
-                ")"
-            )
-
-        return (
-            "("
-            f"id={self.robot_id:2d}, "
-            f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
-            f"radian_ball={self.radian_ball_robot:.1f}, "
-            f"distance_ball={self.distance_ball_robot:.1f}, "
-            f"speed={self.speed:.1f}, "
-            f"speed_slope={self.speed_slope:.1f}, "
-            f"speed_intercept={self.speed_intercept:.1f}, "
-            f"vel_angular={self.vel_angular:.1f}, "
-            f"ball_catched={self.is_ball_catched:b}, "
-            f"is_online={self.is_online:b}, "
-            f"is_visible={self.is_visible:b},"
-            f"battery_voltage={self.battery_voltage:3.1%}"
-            ")"
-        )
+        msg: str = "("
+        msg += f"id={self.robot_id:2d}, "
+        msg += f"imu_enabled={self.is_imu_enabled!s}, "
+        msg += f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
+        msg += f"rad_ball_robot={self.radian_ball_robot:.1f}, "
+        msg += f"dist_ball_robot={self.distance_ball_robot:.1f}, "
+        msg += f"speed={self.speed:.1f}, "
+        msg += f"speed_slope={self.speed_slope:.1f}, "
+        msg += f"speed_intercept={self.speed_intercept:.1f}, "
+        msg += f"vel_angular={self.vel_angular:.1f}, "
+        msg += f"ball_catched={self.is_ball_catched!s}, "
+        msg += f"is_online={self.is_online!s}, "
+        msg += f"is_visible={self.is_visible!s}, "
+        msg += f"battery_vol={self.battery_voltage:3.1%}" if self.battery_voltage is not None else "battery_vol=#N/A"
+        msg += ")"
+        return msg
 
     def __repr__(self) -> str:
         raise NotImplementedError
@@ -135,6 +120,11 @@ class Robot(Pose):
     def robot_id(self) -> int:
         """robot id"""
         return self.__robot_id
+
+    @property
+    def is_imu_enabled(self) -> bool:
+        """is_imu_enabled"""
+        return self.__is_imu_enabled
 
     # pylint: disable=R0801
     @property
