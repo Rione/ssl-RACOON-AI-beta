@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from time import time
 from typing import Optional
 
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Robot_Command
 
@@ -90,7 +91,7 @@ class RobotCommand:
         proto.kickspeedz = self.kickpow_z if self.chip_enabled else float(0)
         proto.veltangent = self.vel_fwd
         proto.velnormal = self.vel_sway
-        proto.velangular = self.vel_angular if (not self.use_imu) else self.target_pose.theta
+        proto.velangular = self.vel_angular if (not self.use_imu) else MU.radian_normalize(self.target_pose.theta)
         proto.spinner = bool(self.dribble_pow)
         proto.wheelsspeed = self.use_wheels_speed
 
