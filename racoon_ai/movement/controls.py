@@ -57,7 +57,7 @@ class Controls:
             RobotCommand: RobotCommand instance
         """
         bot_id: int = int(bot.robot_id)
-        cmd: RobotCommand = RobotCommand(bot_id)
+        cmd: RobotCommand = RobotCommand(bot_id, use_imu=bot.is_imu_enabled)
         bot_pose: NDArray[float64] = array([bot.x / 1000, bot.y / 1000, bot.theta], dtype=float64)
         target_pose: NDArray[float64] = array([target.x / 1000, target.y / 1000, target.theta], dtype=float64)
 
@@ -93,7 +93,10 @@ class Controls:
 
         cmd.vel_fwd = float(vel[0])
         cmd.vel_sway = float(vel[1])
-        cmd.vel_angular = self.pid_radian(target.theta, bot)
+        cmd.target_pose = target
+
+        if not cmd.use_imu:
+            cmd.vel_angular = self.pid_radian(target.theta, bot)
         cmd = self.speed_limiter(cmd, limiter)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
@@ -105,9 +108,6 @@ class Controls:
             target_theta (float): Target theta
             bot (Robot): Robot instance
         """
-
-        if self.__observer.is_real:
-            return target_theta
 
         vel_angular: float = float(0)
         kp: float = float(self.__k_gain[0])
@@ -205,16 +205,16 @@ class Controls:
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-        bvel_our: NDArray[float64] = array(
+        bvel: NDArray[float64] = array(
             [
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * cos(theta),
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * sin(theta),
             ],
             dtype=float64,
         )
-        vel_our: NDArray[float64] = dot(bvel_our, rot_theta)
-        cmd.vel_fwd += vel_our[0]
-        cmd.vel_sway += vel_our[1]
+        vel: NDArray[float64] = dot(bvel, rot_theta)
+        cmd.vel_fwd += vel[0]
+        cmd.vel_sway += vel[1]
 
         theta = MU.radian_reduce(MU.radian(bot, self.__observer.geometry.their_goal), MU.PI)
         robot_dis = MU.distance(bot, self.__observer.geometry.their_goal)
@@ -222,15 +222,15 @@ class Controls:
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-        bvel_their: NDArray[float64] = array(
+        bvel: NDArray[float64] = array(
             [
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * -1 * cos(theta),
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * -1 * sin(theta),
             ],
             dtype=float64,
         )
-        vel_their: NDArray[float64] = dot(bvel_their, rot_theta)
-        cmd.vel_fwd += vel_their[0]
-        cmd.vel_sway += vel_their[1]
+        vel: NDArray[float64] = dot(bvel, rot_theta)
+        cmd.vel_fwd += vel[0]
+        cmd.vel_sway += vel[1]
 
         return cmd

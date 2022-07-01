@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from time import time
 from typing import Optional
 
+from racoon_ai.models.coordinate import Pose
 from racoon_ai.proto.pb_gen.grSim_Commands_pb2 import grSim_Robot_Command
 
 
@@ -25,6 +26,7 @@ class RobotCommand:
         robot_id (int): ID of the robot
         chip_enabled (bool): Whether chip-kick is enabled or not
         use_wheels_speed (bool): Whether control by the each wheels or not
+        use_imu (bool): Whether control by the IMU or not
         vel_fwd (float): Velocity in the forward direction
         vel_sway (float): Velocity in the sideways direction
         vel_angular (float): Velocity in the angular direction
@@ -40,6 +42,8 @@ class RobotCommand:
 
     use_wheels_speed: bool = field(default=False, kw_only=True)
 
+    use_imu: bool = field(default=False, kw_only=True)
+
     vel_fwd: float = field(default_factory=float, init=False)
 
     vel_sway: float = field(default_factory=float, init=False)
@@ -54,13 +58,17 @@ class RobotCommand:
 
     wheels: tuple[float, float, float, float] = field(default=(float(0), float(0), float(0), float(0)), init=False)
 
+    target_pose: Pose = field(default=Pose(0, 0), init=False)
+
     def __str__(self) -> str:
         msg: str = "("
         msg += f"id={self.robot_id:02d} "
-        msg += "(chip_disabled), " if not self.chip_enabled else ""
+        msg += "(chip_eabled), " if self.chip_enabled else ""
+        msg += "(imu_enabled), " if self.use_imu else ""
         msg += f"vel_fwd={self.vel_fwd:.2E}, " if not self.use_wheels_speed else ""
         msg += f"vel_sway={self.vel_sway:.2E}, " if not self.use_wheels_speed else ""
-        msg += f"vel_angular={self.vel_angular:.2E}, " if not self.use_wheels_speed else ""
+        msg += f"vel_angular={self.vel_angular:.2E}, " if not (self.use_wheels_speed or self.use_imu) else ""
+        msg += f"target_pose={self.target_pose!s}, " if self.use_imu else ""
         msg += f"dribble_pow={self.dribble_pow:.2E}, "
         msg += f"kickpow={self.kickpow:.2E}, "
         msg += f"kickpow_z={self.kickpow_z:.2E}, " if self.chip_enabled else ""
@@ -82,7 +90,7 @@ class RobotCommand:
         proto.kickspeedz = self.kickpow_z if self.chip_enabled else float(0)
         proto.veltangent = self.vel_fwd
         proto.velnormal = self.vel_sway
-        proto.velangular = self.vel_angular
+        proto.velangular = self.vel_angular if (not self.use_imu) else self.target_pose.theta
         proto.spinner = bool(self.dribble_pow)
         proto.wheelsspeed = self.use_wheels_speed
 

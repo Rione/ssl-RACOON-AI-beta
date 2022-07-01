@@ -56,14 +56,18 @@ class Keeper:
         bot: Optional[Robot]
         cmd: RobotCommand
 
-        bot = self.__observer.get_our_by_id(self.__role.keeper_id)
+        bot = self.__observer.get_our_by_id(0, only_visible=False)
 
         if bot:
             cmd = self.__keep_goal(bot)
             self.__send_cmds.append(cmd)
+        print(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
+        self.__goal.x = 1150
+        self.__goal.y = 0
+        self.__radius = 500
         radian_ball_goal = MU.radian_reduce(
             MU.radian(self.__observer.ball, self.__goal), MU.radian(self.__their_goal, self.__goal)
         )
