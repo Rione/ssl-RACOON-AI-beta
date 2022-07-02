@@ -16,59 +16,58 @@ from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
-from racoon_ai.strategy.role import Role
+
+from .base import StrategyBase
+from .role import Role
 
 
-class Keeper:
-    """Keeper
+class Keeper(StrategyBase):
+    """Keeper(StrategyBase)
+
     Args:
         observer (Observer): Observer instance
+        role (Role): Role instance
+        controls (Controls): Controls instance
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.
     """
 
     def __init__(self, observer: Observer, role: Role, controls: Controls) -> None:
+        super().__init__(observer, controls, role)
+
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
-        self.__observer: Observer = observer
-        self.__controls: Controls = controls
+
         self.__role: Role = role
-        self.__send_cmds: list[RobotCommand]
-        self.__radius: float = self.__observer.geometry.goal_width_half + self.__observer.geometry.max_robot_radius
+        self.__controls: Controls = controls
 
-    @property
-    def send_cmds(self) -> list[RobotCommand]:
-        """send_cmds
-
-        Returns:
-            list[RobotCommand]: send_cmds
-        """
-        return self.__send_cmds
+        self.__radius: float = self.observer.geometry.goal_width_half + self.observer.geometry.max_robot_radius
 
     def main(self) -> None:
         """main"""
         # commandの情報を格納するリスト
-        self.__send_cmds = []
+        self.send_cmds = []
         bot: Optional[Robot]
         cmd: RobotCommand
 
-        bot = self.__observer.get_our_by_id(self.__role.keeper_id)
+        bot = self.observer.get_our_by_id(self.__role.keeper_id)
 
         if bot:
+            self.__logger.debug(bot)
             cmd = self.__keep_goal(bot)
-            self.__send_cmds.append(cmd)
+            self.send_cmds.append(cmd)
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
-        radian_ball_goal = MU.radian(self.__observer.ball, self.__observer.geometry.goal)
-        radian_ball_robot = MU.radian(self.__observer.ball, robot)
+        radian_ball_goal = MU.radian(self.observer.ball, self.observer.geometry.goal)
+        radian_ball_robot = MU.radian(self.observer.ball, robot)
 
         if abs(radian_ball_goal) >= MU.PI / 2:
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
-            (self.__observer.geometry.goal.x + self.__radius * cos(radian_ball_goal)),
-            (self.__observer.geometry.goal.y + self.__radius * sin(radian_ball_goal)),
+            (self.observer.geometry.goal.x + self.__radius * cos(radian_ball_goal)),
+            (self.observer.geometry.goal.y + self.__radius * sin(radian_ball_goal)),
             radian_ball_robot,
         )
 
