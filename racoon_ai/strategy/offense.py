@@ -37,7 +37,6 @@ class Offense(StrategyBase):
         self.__logger.info("Initializing...")
 
         self.__subrole: SubRole = subrole
-        self.__controls: Controls = controls
 
     def main(self) -> None:
         """main"""
@@ -57,8 +56,8 @@ class Offense(StrategyBase):
                     ):
                         cmd.kickpow = 10
                     # cmd = self.__controls.avoid_enemy(cmd, bot, Pose(self.__observer.ball.x, self.__observer.ball.y))
-                    cmd = self.__controls.avoid_penalty_area(cmd, bot)
-                    cmd = self.__controls.speed_limiter(cmd)
+                    cmd = self.controls.avoid_penalty_area(cmd, bot)
+                    cmd = self.controls.speed_limiter(cmd)
                     self.send_cmds.append(cmd)
                 else:
                     cmd = RobotCommand(bot.robot_id)
