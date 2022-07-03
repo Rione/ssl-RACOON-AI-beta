@@ -2,7 +2,7 @@
 # pylint: disable=C0111
 
 from logging import Logger
-from typing import Callable, TypeAlias
+from typing import Callable, Optional, TypeAlias
 
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.observer import Observer
@@ -11,13 +11,13 @@ from racoon_ai.strategy import StrategyBase
 from .on_default import on_default_cbf
 from .on_halt import on_halt_cbf
 
-RULE_ARG_TYPE: TypeAlias = tuple[StrategyBase, ...] | Observer
+RULE_ARG_TYPE: TypeAlias = Optional[tuple[StrategyBase, ...] | Observer]
 
 
 def rule_handler(
     func: Callable[[Logger, RULE_ARG_TYPE], list[RobotCommand]],
     logger: Logger,
-    args: RULE_ARG_TYPE,
+    args: RULE_ARG_TYPE = None,
 ) -> list[RobotCommand]:
     """rule_handler
 
