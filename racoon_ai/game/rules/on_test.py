@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.10
 
-"""on_default.py
+"""on_test.py
 
     This module contains:
-        - on_default_cbf
+        - on_test_cbf
 """
 
 from logging import Logger
@@ -12,7 +12,7 @@ from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Defense, Keeper, Offense
 
 
-def on_default_cbf(logger: Logger, strategies: tuple[Defense, Keeper, Offense]) -> list[RobotCommand]:
+def test_cbf(logger: Logger, strategies: tuple[Defense, Keeper, Offense]) -> list[RobotCommand]:
     """on_default_cbf
 
     This function is called when the game is running normally.
