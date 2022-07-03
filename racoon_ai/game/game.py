@@ -16,7 +16,10 @@ from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
-from .rules import RULE_ARG_TYPE, on_halt_cbf, on_stop_cbf, rule_handler, test_cbf
+from .rules import RULE_ARG_TYPE, rule_handler
+from .rules.on_halt import on_halt_cbf
+from .rules.on_stop import on_stop_cbf
+from .rules.on_test import test_cbf
 
 
 class Game:
