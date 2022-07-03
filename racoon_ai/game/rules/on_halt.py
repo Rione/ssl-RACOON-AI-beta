@@ -1,5 +1,10 @@
 #!/usr/bin/env python3.10
-# pylint: disable=C0111
+
+"""on_halt.py
+
+    This module contains:
+        - on_halt_cbf
+"""
 
 from logging import Logger
 
