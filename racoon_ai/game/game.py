@@ -19,6 +19,7 @@ from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_halt import on_halt_cbf
 from .rules.on_normal_start import on_default_cbf
+from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
 from .rules.on_stop import on_stop_cbf
 from .rules.on_test import test_cbf
 
@@ -101,4 +102,34 @@ class Game:
         if self.__observer.referee.command is (REF_COMMAND.NORMAL_START or REF_COMMAND.FORCE_START):
             return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
+        if self.__is_our_kickoff(self.__observer.referee.command):
+            return (on_prep_kickoff_our_cbf, self.__observer)
+
+        if self.__is_their_kickoff(self.__observer.referee.command):
+            return (on_prep_kickoff_their_cbf, self.__observer)
+
         return (on_stop_cbf, None)
+
+    def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_kickoff
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our kickoff.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_BLUE)
+        )
+
+    def __is_their_kickoff(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_kickoff
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their kickoff.
+        """
+        return not self.__is_our_kickoff(command)
