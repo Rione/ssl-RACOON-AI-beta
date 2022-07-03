@@ -17,6 +17,7 @@ from racoon_ai.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
 from .rules import RULE_ARG_TYPE, rule_handler
+from .rules.on_direct import on_direct_our_cbf, on_direct_their_cbf
 from .rules.on_force_start import on_force_start_cbf
 from .rules.on_halt import on_halt_cbf
 from .rules.on_normal_start import on_default_cbf
@@ -120,6 +121,12 @@ class Game:
         if self.__is_their_penalty(cmd):
             return (on_prep_penalty_their_cbf, self.__observer)
 
+        if self.__is_our_direct_free(cmd):
+            return (on_direct_our_cbf, (self.__defense, self.__keeper, self.__offense))
+
+        if self.__is_their_direct_free(cmd):
+            return (on_direct_their_cbf, self.__observer)
+
         return (on_stop_cbf, self.__observer)
 
     def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
@@ -172,4 +179,30 @@ class Game:
         """
         return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_BLUE)) or (
             not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_YELLOW)
+        )
+
+    def __is_our_direct_free(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_direct_free
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our direct.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_BLUE)
+        )
+
+    def __is_their_direct_free(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_direct_free
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their direct.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_YELLOW)
         )
