@@ -4,7 +4,7 @@
     This is the main script.
 """
 from configparser import ConfigParser
-from logging import INFO, Formatter, Logger, StreamHandler, getLogger, shutdown
+from logging import DEBUG, INFO, FileHandler, Formatter, Logger, StreamHandler, getLogger, shutdown
 from subprocess import Popen
 from typing import Callable, Optional
 
@@ -103,11 +103,19 @@ if __name__ == "__main__":
 
     # Settings for logger
     fmt = Formatter("[%(levelname)s] %(asctime)s %(pathname)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    log = getLogger("racoon_ai")
+    log.setLevel(DEBUG)
+
     hdlr = StreamHandler()
     hdlr.setFormatter(fmt)
-    log = getLogger("racoon_ai")
-    log.setLevel(INFO)
+    hdlr.setLevel(INFO)
     log.addHandler(hdlr)
+
+    hdlr_1 = FileHandler(".cache/racoon-ai.log", mode="w", delay=True)
+    hdlr_1.setFormatter(fmt)
+    hdlr_1.setLevel(DEBUG)
+    # log.addHandler(hdlr_1)
+
     log.debug("Logger initialized")
     log.info("Running v%s", __version__)
 

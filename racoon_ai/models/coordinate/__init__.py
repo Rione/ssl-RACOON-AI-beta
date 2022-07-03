@@ -35,7 +35,7 @@ class Point:
         self.__z: float = float(z)
 
     def __str__(self) -> str:
-        return f"(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f})"
+        return f"(x={self.x:.1E}, y={self.y:.1E}, z={self.z:.1E})"
 
     def __repr__(self) -> str:
         return f"Point({self.x}, {self.y}, {self.z})"
@@ -73,7 +73,7 @@ class Point:
 
     @x.setter
     def x(self, x: float) -> None:
-        self.__x = x
+        self.__x = float(x)
 
     @property
     def y(self) -> float:
@@ -82,7 +82,7 @@ class Point:
 
     @y.setter
     def y(self, y: float) -> None:
-        self.__y = y
+        self.__y = float(y)
 
     @property
     def z(self) -> float:
@@ -91,7 +91,7 @@ class Point:
 
     @z.setter
     def z(self, z: float) -> None:
-        self.__z = z
+        self.__z = float(z)
 
     @staticmethod
     def from_vector3f(obj: "Vector3f") -> "Point":
@@ -138,7 +138,7 @@ class Pose(Point):
         self.__theta: float = float(theta)
 
     def __str__(self) -> str:
-        return f"(x={self.x:.1f}, y={self.y:.1f}, theta={self.theta:.1f}, z={self.z:.1f})"
+        return f"(x={self.x:.1E}, y={self.y:.1E}, theta={self.theta:.1E}, z={self.z:.1E})"
 
     def __repr__(self) -> str:
         return f"Pose({self.x}, {self.y}, {self.theta}, {self.z})"
@@ -155,7 +155,7 @@ class Pose(Point):
 
     @theta.setter
     def theta(self, theta: float) -> None:
-        self.__theta = theta
+        self.__theta = float(theta)
 
     @staticmethod
     def from_vector3f(obj: "Vector3f") -> "Pose":
@@ -189,7 +189,7 @@ class Vector3f:
         self.__z: float = float(z)
 
     def __str__(self) -> str:
-        return f"({self.x:.1f}, {self.y:.1f}, {self.z:.1f})"
+        return f"({self.x:.1E}, {self.y:.1E}, {self.z:.1E})"
 
     def __repr__(self) -> str:
         return f"Vector3f({self.x}, {self.y}, {self.z})"
@@ -222,7 +222,7 @@ class Vector3f:
 
     @x.setter
     def x(self, x: float) -> None:
-        self.__x = x
+        self.__x = float(x)
 
     @property
     def y(self) -> float:
@@ -231,7 +231,7 @@ class Vector3f:
 
     @y.setter
     def y(self, y: float) -> None:
-        self.__y = y
+        self.__y = float(y)
 
     @property
     def z(self) -> float:
@@ -240,7 +240,7 @@ class Vector3f:
 
     @z.setter
     def z(self, z: float) -> None:
-        self.__z = z
+        self.__z = float(z)
 
     @staticmethod
     def from_point(obj: "Point") -> "Vector3f":
