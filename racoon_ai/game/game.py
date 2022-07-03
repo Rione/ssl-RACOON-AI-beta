@@ -16,7 +16,7 @@ from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
-from .rules import RULE_ARG_TYPE, on_default_cbf, on_halt_cbf, rule_handler
+from .rules import RULE_ARG_TYPE, on_default_cbf, on_halt_cbf, on_stop_cbf, rule_handler
 
 
 class Game:
@@ -68,6 +68,7 @@ class Game:
             self.__observer.main()
             self.__role.main()
             self.__subrole.main()
+            self.__gui.update()
 
             args: tuple[
                 Callable[[Logger, RULE_ARG_TYPE], list[RobotCommand]],
@@ -77,15 +78,18 @@ class Game:
                 self.__observer.is_team_yellow,
                 rule_handler(args[0], self.__logger, args[1]),
             )
-            self.__logger.debug(sim_cmds)
 
-            self.__gui.update()
+            self.__logger.debug(sim_cmds)
             self.__send(sim_cmds)
 
     def handle_ref_command(self) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
-        if self.__observer.referee.command == REF_COMMAND.HALT:
+        if self.__observer.referee.command is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
+
+        if self.__observer.referee.command is REF_COMMAND.STOP:
+            return (on_stop_cbf, None)
+
         return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))

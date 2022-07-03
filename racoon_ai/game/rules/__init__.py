@@ -10,6 +10,7 @@ from racoon_ai.strategy import StrategyBase
 
 from .on_default import on_default_cbf
 from .on_halt import on_halt_cbf
+from .on_stop import on_stop_cbf
 
 RULE_ARG_TYPE: TypeAlias = Optional[tuple[StrategyBase, ...] | Observer]
 
@@ -37,4 +38,5 @@ __all__ = [
     "rule_handler",
     "on_default_cbf",
     "on_halt_cbf",
+    "on_stop_cbf",
 ]
