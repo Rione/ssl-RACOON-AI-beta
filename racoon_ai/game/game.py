@@ -20,6 +20,7 @@ from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_direct import on_direct_our_cbf, on_direct_their_cbf
 from .rules.on_force_start import on_force_start_cbf
 from .rules.on_halt import on_halt_cbf
+from .rules.on_indirect import on_indirect_our_cbf, on_indirect_their_cbf
 from .rules.on_normal_start import on_default_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
 from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
@@ -127,6 +128,12 @@ class Game:
         if self.__is_their_direct_free(cmd):
             return (on_direct_their_cbf, self.__observer)
 
+        if self.__is_our_indirect_free(cmd):
+            return (on_indirect_our_cbf, self.__observer)
+
+        if self.__is_their_indirect_free(cmd):
+            return (on_indirect_their_cbf, self.__observer)
+
         return (on_stop_cbf, self.__observer)
 
     def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
@@ -205,4 +212,30 @@ class Game:
         """
         return (self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_BLUE)) or (
             not self.__observer.is_team_yellow and (command is REF_COMMAND.DIRECT_FREE_YELLOW)
+        )
+
+    def __is_our_indirect_free(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_indirect_free
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our indirect.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_BLUE)
+        )
+
+    def __is_their_indirect_free(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_indirect_free
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their indirect.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_YELLOW)
         )
