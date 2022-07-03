@@ -78,32 +78,6 @@ class Observer(MWReceiver):  # pylint: disable=R0904
     def main(self) -> None:
         """main"""
         proto: RacoonMW_Packet = super().recv()
-        self.ball.update(proto.ball)
-        self.__logger.debug("Ball: %s", self.ball)
-
-        self.geometry.update(proto.geometry)
-        self.__logger.debug("Geometry: %s", self.geometry)
-
-        self.referee.update(proto.referee)
-        self.__logger.debug("Referee: %s", self.referee)
-
-        bot: Optional[Robot]
-        proto_bot: Robot_Infos
-        for proto_bot in proto.our_robots:
-            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
-
-        for proto_bot in proto.enemy_robots:
-            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
 
         self.__sec_per_frame = proto.info.secperframe
 
@@ -116,6 +90,35 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         self.__is_vision_recv = proto.info.is_vision_recv
 
         self.__attack_direction = proto.info.attack_direction
+
+        self.ball.update(proto.ball, self.sec_per_frame)
+        self.__logger.debug("Ball: %s", self.ball)
+
+        self.geometry.update(proto.geometry)
+        self.__logger.debug("Geometry: %s", self.geometry)
+
+        self.referee.update(proto.referee)
+        self.__logger.debug("Referee: %s", self.referee)
+
+        bot: Optional[Robot]
+        proto_bot: Robot_Infos
+        for proto_bot in proto.our_robots:
+            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
+            if not bot:
+                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
+
+        for proto_bot in proto.enemy_robots:
+            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
+            if not bot:
+                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
 
         self.__our_robots_available = set(
             bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
