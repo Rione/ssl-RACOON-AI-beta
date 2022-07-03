@@ -96,16 +96,17 @@ class Game:
             return (test_cbf, (self.__defense, self.__keeper, self.__offense))
             # return (test_cbf, self.__observer)
 
-        if self.__observer.referee.command is REF_COMMAND.HALT:
+        cmd: "REF_COMMAND.V" = self.__observer.referee.command
+        if cmd is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
 
-        if self.__observer.referee.command is (REF_COMMAND.NORMAL_START or REF_COMMAND.FORCE_START):
+        if cmd is (REF_COMMAND.NORMAL_START or REF_COMMAND.FORCE_START):
             return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
-        if self.__is_our_kickoff(self.__observer.referee.command):
+        if self.__is_our_kickoff(cmd):
             return (on_prep_kickoff_our_cbf, self.__observer)
 
-        if self.__is_their_kickoff(self.__observer.referee.command):
+        if self.__is_their_kickoff(cmd):
             return (on_prep_kickoff_their_cbf, self.__observer)
 
         return (on_stop_cbf, None)
