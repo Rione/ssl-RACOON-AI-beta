@@ -143,6 +143,9 @@ class Game:
         if self.__is_their_timeout(cmd):
             return (on_timeout_their_cbf, self.__observer)
 
+        if cmd is (REF_COMMAND.GOAL_BLUE or REF_COMMAND.GOAL_YELLOW):
+            pass
+
         return (on_stop_cbf, self.__observer)
 
     def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
