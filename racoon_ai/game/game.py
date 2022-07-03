@@ -17,6 +17,7 @@ from racoon_ai.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
 from .rules import RULE_ARG_TYPE, rule_handler
+from .rules.on_force_start import on_force_start_cbf
 from .rules.on_halt import on_halt_cbf
 from .rules.on_normal_start import on_default_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
@@ -101,8 +102,11 @@ class Game:
         if cmd is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
 
-        if cmd is (REF_COMMAND.NORMAL_START or REF_COMMAND.FORCE_START):
+        if cmd is REF_COMMAND.NORMAL_START:
             return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+
+        if cmd is REF_COMMAND.FORCE_START:
+            return (on_force_start_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if self.__is_our_kickoff(cmd):
             return (on_prep_kickoff_our_cbf, self.__observer)
