@@ -125,7 +125,6 @@ class Referee:
             proto (Referee_Info): Referee_Info
         """
         self.__from_proto(proto)
-        print(self)
 
     def __from_proto(self, proto: Referee_Info) -> None:
         """from_proto
