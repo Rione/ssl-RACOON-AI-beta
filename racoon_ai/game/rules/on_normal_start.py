@@ -69,3 +69,31 @@ def on_kickoff_their_cbf(logger: Logger, observer: Observer) -> list[RobotComman
     send_cmds: list[RobotCommand] = on_stop_cbf(logger, observer)
     logger.debug(send_cmds)
     return send_cmds
+
+
+def on_penalty_our_cbf(logger: Logger, observer: Observer) -> list[RobotCommand]:
+    """on_penalty_our_cbf
+
+    This function is called on our penalty.
+
+    Args:
+        logger (Logger): Logger instance.
+        observer (Observer): Observer instance.
+    """
+    send_cmds: list[RobotCommand] = on_stop_cbf(logger, observer)
+    logger.debug(send_cmds)
+    return send_cmds
+
+
+def on_penalty_their_cbf(logger: Logger, observer: Observer) -> list[RobotCommand]:
+    """on_penalty_their_cbf
+
+    This function is called on enemy penalty.
+
+    Args:
+        logger (Logger): Logger instance.
+        observer (Observer): Observer instance.
+    """
+    send_cmds: list[RobotCommand] = on_stop_cbf(logger, observer)
+    logger.debug(send_cmds)
+    return send_cmds
