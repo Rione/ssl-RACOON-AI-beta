@@ -109,7 +109,7 @@ class Game:
         if self.__is_their_kickoff(cmd):
             return (on_prep_kickoff_their_cbf, self.__observer)
 
-        return (on_stop_cbf, None)
+        return (on_stop_cbf, self.__observer)
 
     def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
         """is_our_kickoff
@@ -133,4 +133,6 @@ class Game:
         Returns:
             bool: True if command is their kickoff.
         """
-        return not self.__is_our_kickoff(command)
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_YELLOW)
+        )
