@@ -22,6 +22,7 @@ from .rules.on_force_start import on_force_start_cbf
 from .rules.on_halt import on_halt_cbf
 from .rules.on_indirect import on_indirect_our_cbf, on_indirect_their_cbf
 from .rules.on_normal_start import on_default_cbf
+from .rules.on_placement import on_placement_our_cbf, on_placement_their_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
 from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
 from .rules.on_stop import on_stop_cbf
@@ -145,6 +146,12 @@ class Game:
 
         if cmd is (REF_COMMAND.GOAL_BLUE or REF_COMMAND.GOAL_YELLOW):
             pass
+
+        if self.__is_our_placement(cmd):
+            return (on_placement_our_cbf, self.__observer)
+
+        if self.__is_their_placement(cmd):
+            return (on_placement_their_cbf, self.__observer)
 
         return (on_stop_cbf, self.__observer)
 
@@ -276,4 +283,30 @@ class Game:
         """
         return (self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_BLUE)) or (
             not self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_YELLOW)
+        )
+
+    def __is_our_placement(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_placement
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our placement.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.BALL_PLACEMENT_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.BALL_PLACEMENT_BLUE)
+        )
+
+    def __is_their_placement(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_placement
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their placement.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.BALL_PLACEMENT_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.BALL_PLACEMENT_YELLOW)
         )
