@@ -31,7 +31,10 @@ def on_default_cbf(logger: Logger, strategies: tuple[Defense, Keeper, Offense]) 
     # Offense
     strategies[2].main()
 
-    send_cmds: list[RobotCommand] = list(strategies[0].send_cmds + strategies[1].send_cmds + strategies[2].send_cmds)
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategies[0].send_cmds
+    send_cmds += strategies[1].send_cmds
+    send_cmds += strategies[2].send_cmds
+    logger.debug(send_cmds)
 
-    logger.debug("on_default_cbf: %s", send_cmds)
     return send_cmds
