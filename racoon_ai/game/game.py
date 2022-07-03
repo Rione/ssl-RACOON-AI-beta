@@ -98,7 +98,7 @@ class Game:
         if self.__observer.referee.command is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
 
-        if self.__observer.referee.command is REF_COMMAND.NORMAL_START:
+        if self.__observer.referee.command is (REF_COMMAND.NORMAL_START or REF_COMMAND.FORCE_START):
             return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         return (on_stop_cbf, None)
