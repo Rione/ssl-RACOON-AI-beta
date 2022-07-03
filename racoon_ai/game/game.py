@@ -21,7 +21,7 @@ from .rules.on_direct import on_direct_our_cbf, on_direct_their_cbf
 from .rules.on_force_start import on_force_start_cbf
 from .rules.on_halt import on_halt_cbf
 from .rules.on_indirect import on_indirect_our_cbf, on_indirect_their_cbf
-from .rules.on_normal_start import on_default_cbf
+from .rules.on_normal_start import on_default_cbf, on_kickoff_our_cbf, on_kickoff_their_cbf
 from .rules.on_placement import on_placement_our_cbf, on_placement_their_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
 from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
@@ -109,6 +109,13 @@ class Game:
             return (on_halt_cbf, self.__observer)
 
         if cmd is REF_COMMAND.NORMAL_START:
+            if prev_cmd := self.__observer.referee.pre_command:
+                if self.__is_our_kickoff(prev_cmd):
+                    return (on_kickoff_our_cbf, self.__observer)
+
+                if self.__is_their_kickoff(prev_cmd):
+                    return (on_kickoff_their_cbf, self.__observer)
+
             return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if cmd is REF_COMMAND.FORCE_START:

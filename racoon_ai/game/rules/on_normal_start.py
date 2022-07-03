@@ -9,7 +9,10 @@
 from logging import Logger
 
 from racoon_ai.models.robot import RobotCommand
+from racoon_ai.observer.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense
+
+from .on_stop import on_stop_cbf
 
 
 def on_default_cbf(logger: Logger, strategies: tuple[Defense, Keeper, Offense]) -> list[RobotCommand]:
@@ -37,4 +40,32 @@ def on_default_cbf(logger: Logger, strategies: tuple[Defense, Keeper, Offense]) 
     send_cmds += strategies[2].send_cmds
     logger.debug(send_cmds)
 
+    return send_cmds
+
+
+def on_kickoff_our_cbf(logger: Logger, observer: Observer) -> list[RobotCommand]:
+    """on_kick_our_cbf
+
+    This function is called on our kickoff.
+
+    Args:
+        logger (Logger): Logger instance.
+        observer (Observer): Observer instance.
+    """
+    send_cmds: list[RobotCommand] = on_stop_cbf(logger, observer)
+    logger.debug(send_cmds)
+    return send_cmds
+
+
+def on_kickoff_their_cbf(logger: Logger, observer: Observer) -> list[RobotCommand]:
+    """on_kick_their_cbf
+
+    This function is called on enemy kickoff.
+
+    Args:
+        logger (Logger): Logger instance.
+        observer (Observer): Observer instance.
+    """
+    send_cmds: list[RobotCommand] = on_stop_cbf(logger, observer)
+    logger.debug(send_cmds)
     return send_cmds
