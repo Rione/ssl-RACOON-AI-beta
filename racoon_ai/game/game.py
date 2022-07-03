@@ -26,6 +26,7 @@ from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_thei
 from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
 from .rules.on_stop import on_stop_cbf
 from .rules.on_test import test_cbf
+from .rules.on_timeout import on_timeout_our_cbf, on_timeout_their_cbf
 
 
 class Game:
@@ -91,7 +92,9 @@ class Game:
             self.__logger.debug(sim_cmds)
             self.__send(sim_cmds)
 
-    def handle_ref_command(self) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:  # pylint: disable=R0911
+    def handle_ref_command(  # pylint: disable=R0911,R0912
+        self,
+    ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
@@ -133,6 +136,12 @@ class Game:
 
         if self.__is_their_indirect_free(cmd):
             return (on_indirect_their_cbf, self.__observer)
+
+        if self.__is_our_timeout(cmd):
+            return (on_timeout_our_cbf, self.__observer)
+
+        if self.__is_their_timeout(cmd):
+            return (on_timeout_their_cbf, self.__observer)
 
         return (on_stop_cbf, self.__observer)
 
@@ -238,4 +247,30 @@ class Game:
         """
         return (self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_BLUE)) or (
             not self.__observer.is_team_yellow and (command is REF_COMMAND.INDIRECT_FREE_YELLOW)
+        )
+
+    def __is_our_timeout(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_timeout
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our timeout.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_BLUE)
+        )
+
+    def __is_their_timeout(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_timeout
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their timeout.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.TIMEOUT_YELLOW)
         )
