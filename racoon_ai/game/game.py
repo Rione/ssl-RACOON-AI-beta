@@ -18,6 +18,7 @@ from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
 from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_halt import on_halt_cbf
+from .rules.on_normal_start import on_default_cbf
 from .rules.on_stop import on_stop_cbf
 from .rules.on_test import test_cbf
 
@@ -96,5 +97,8 @@ class Game:
 
         if self.__observer.referee.command is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
+
+        if self.__observer.referee.command is REF_COMMAND.NORMAL_START:
+            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         return (on_stop_cbf, None)
