@@ -10,13 +10,13 @@ from logging import Logger, getLogger
 from typing import Callable
 
 from racoon_ai.gui.view import Gui
-from racoon_ai.models.referee import Referee
+from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 from racoon_ai.strategy import Defense, Keeper, Offense, Role, SubRole
 
-from .rules import RULE_ARG_TYPE, on_default_cbf, rule_handler
+from .rules import RULE_ARG_TYPE, on_default_cbf, on_halt_cbf, rule_handler
 
 
 class Game:
@@ -84,5 +84,8 @@ class Game:
 
     def handle_ref_command(self) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
-        self.__logger.debug("Current ref_command: %s", Referee.cmd_to_str(self.__observer.referee.command))
+        self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
+
+        if self.__observer.referee.command == REF_COMMAND.HALT:
+            return (on_halt_cbf, self.__observer)
         return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
