@@ -20,6 +20,7 @@ from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_halt import on_halt_cbf
 from .rules.on_normal_start import on_default_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
+from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
 from .rules.on_stop import on_stop_cbf
 from .rules.on_test import test_cbf
 
@@ -87,7 +88,7 @@ class Game:
             self.__logger.debug(sim_cmds)
             self.__send(sim_cmds)
 
-    def handle_ref_command(self) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
+    def handle_ref_command(self) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:  # pylint: disable=R0911
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
@@ -108,6 +109,12 @@ class Game:
 
         if self.__is_their_kickoff(cmd):
             return (on_prep_kickoff_their_cbf, self.__observer)
+
+        if self.__is_our_penalty(cmd):
+            return (on_prep_penalty_our_cbf, self.__observer)
+
+        if self.__is_their_penalty(cmd):
+            return (on_prep_penalty_their_cbf, self.__observer)
 
         return (on_stop_cbf, self.__observer)
 
@@ -135,4 +142,30 @@ class Game:
         """
         return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_BLUE)) or (
             not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_KICKOFF_YELLOW)
+        )
+
+    def __is_our_penalty(self, command: "REF_COMMAND.V") -> bool:
+        """is_our_penalty
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is our penalty.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_YELLOW)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_BLUE)
+        )
+
+    def __is_their_penalty(self, command: "REF_COMMAND.V") -> bool:
+        """is_their_penalty
+
+        Args:
+            command (Referee_Info.Command.ValueType)
+
+        Returns:
+            bool: True if command is their penalty.
+        """
+        return (self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_BLUE)) or (
+            not self.__observer.is_team_yellow and (command is REF_COMMAND.PREPARE_PENALTY_YELLOW)
         )

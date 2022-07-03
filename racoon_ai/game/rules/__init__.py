@@ -8,7 +8,7 @@ from racoon_ai.models.robot import RobotCommand
 from racoon_ai.observer import Observer
 from racoon_ai.strategy import StrategyBase
 
-from . import on_halt, on_normal_start, on_prep_kickoff, on_stop, on_test
+from . import on_halt, on_normal_start, on_prep_kickoff, on_prep_penalty, on_stop, on_test
 
 RULE_ARG_TYPE: TypeAlias = Optional[tuple[StrategyBase, ...] | Observer]
 
@@ -37,6 +37,7 @@ __all__ = [
     "on_halt",
     "on_normal_start",
     "on_prep_kickoff",
+    "on_prep_penalty",
     "on_stop",
     "on_test",
 ]
