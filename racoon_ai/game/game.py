@@ -7,9 +7,11 @@
 """
 
 from logging import Logger, getLogger
-from typing import Callable
+from typing import Callable, Optional
 
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.gui.view import Gui
+from racoon_ai.models.coordinate import Point
 from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.movement import Controls
@@ -77,6 +79,8 @@ class Game:
         self.__defense: Defense = Defense(self.__observer, self.__role, self.__subrole, self.__controls)
 
         self.__keeper: Keeper = Keeper(self.__observer, self.__role, self.__controls)
+
+        self.__prev_ball_pos: Optional[Point] = None
 
     def main(self) -> None:
         """Main"""
@@ -146,16 +150,28 @@ class Game:
             return (on_prep_penalty_their_cbf, self.__observer)
 
         if self.__is_our_direct_free(cmd):
+            if self.__is_ball_moved():
+                self.__prev_ball_pos = None
+                return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
             return (on_direct_our_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if self.__is_their_direct_free(cmd):
-            return (on_direct_their_cbf, self.__observer)
+            if not self.__is_ball_moved():
+                return (on_direct_their_cbf, self.__observer)
+            self.__prev_ball_pos = None
+            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if self.__is_our_indirect_free(cmd):
-            return (on_indirect_our_cbf, self.__observer)
+            if not self.__is_ball_moved():
+                return (on_indirect_our_cbf, self.__observer)
+            self.__prev_ball_pos = None
+            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if self.__is_their_indirect_free(cmd):
-            return (on_indirect_their_cbf, self.__observer)
+            if not self.__is_ball_moved():
+                return (on_indirect_their_cbf, self.__observer)
+            self.__prev_ball_pos = None
+            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
 
         if self.__is_our_timeout(cmd):
             return (on_timeout_our_cbf, self.__observer)
@@ -173,6 +189,13 @@ class Game:
             return (on_placement_their_cbf, self.__observer)
 
         return (on_stop_cbf, self.__observer)
+
+    def __is_ball_moved(self, distance: float = 2e3) -> bool:
+        """__is_ball_moved"""
+        current_ball_pos: Point = self.__observer.ball
+        if not self.__prev_ball_pos:
+            self.__prev_ball_pos = current_ball_pos
+        return distance <= MU.distance(current_ball_pos, self.__prev_ball_pos)
 
     def __is_our_kickoff(self, command: "REF_COMMAND.V") -> bool:
         """is_our_kickoff
