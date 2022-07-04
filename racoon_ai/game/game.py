@@ -78,9 +78,7 @@ class Game:
 
         self.__keeper: Keeper = Keeper(self.__observer, self.__role, self.__controls)
 
-        self.__ball_placement: BallPlacement = BallPlacement(
-            self.__observer, self.__role, self.__controls
-        )
+        self.__ball_placement: BallPlacement = BallPlacement(self.__observer, self.__role, self.__controls)
 
     def main(self) -> None:
         """Main"""
