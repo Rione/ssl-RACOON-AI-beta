@@ -57,7 +57,7 @@ class Controls:
             RobotCommand: RobotCommand instance
         """
         bot_id: int = int(bot.robot_id)
-        cmd: RobotCommand = RobotCommand(bot_id)
+        cmd: RobotCommand = RobotCommand(bot_id, use_imu=bot.is_imu_enabled)
         bot_pose: NDArray[float64] = array([bot.x / 1000, bot.y / 1000, bot.theta], dtype=float64)
         target_pose: NDArray[float64] = array([target.x / 1000, target.y / 1000, target.theta], dtype=float64)
 
@@ -94,6 +94,10 @@ class Controls:
         cmd.vel_fwd = float(vel[0])
         cmd.vel_sway = float(vel[1])
         cmd.vel_angular = self.pid_radian(target.theta, bot)
+        cmd.target_pose = target
+
+        if not cmd.use_imu:
+            cmd.vel_angular = self.pid_radian(target.theta, bot)
         cmd = self.speed_limiter(cmd, limiter)
         self.__logger.debug("cmd: %s", cmd)
         return cmd
@@ -105,10 +109,6 @@ class Controls:
             target_theta (float): Target theta
             bot (Robot): Robot instance
         """
-
-        if self.__observer.is_real:
-            return target_theta
-
         vel_angular: float = float(0)
         kp: float = float(self.__k_gain[0])
         kd: float = float(self.__k_gain[1])

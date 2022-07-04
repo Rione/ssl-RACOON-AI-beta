@@ -7,7 +7,7 @@
 
 from logging import Logger, getLogger
 from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRAM, socket
-from time import perf_counter
+from time import perf_counter, sleep
 
 from racoon_ai.models.network import IPNetAddr
 from racoon_ai.models.robot import RobotCommand, SimCommands
@@ -56,6 +56,8 @@ class CommandSender:
         if self.__is_real and self.__target_ids:
             host_ips: set[str] = {f"192.168.100.1{robot_id:02d}" for robot_id in self.__target_ids}
             self.__dists = {IPNetAddr(host, port, mod_name=__name__) for host in host_ips}
+            self.__imu_reset()
+            sleep(0.1)
             return
 
         self.__dists = {IPNetAddr(host, port, mod_name=__name__)}
@@ -102,17 +104,38 @@ class CommandSender:
             )
             self.__sock.sendto(packet, (dist.host, dist.port))
 
+    def __imu_reset(self, count: int = 10) -> None:
+        """reset_imu
+
+        Send reset IMU command to all robots.
+        """
+        self.__logger.info("Resetting IMU...")
+        commands: SimCommands = SimCommands(
+            isteamyellow=self.__is_team_yellow,
+            robot_commands=[RobotCommand(254)],
+        )
+
+        start: float = perf_counter()
+        for _ in range(count):
+            self.send(commands)
+        self.__logger.info("Sent reset IMU for %.3f seconds", perf_counter() - start)
+
     def __stop_robots(self, count: int = int(1e4)) -> None:
         """stop_robots
 
         Send stop command to all robots.
         """
         self.__logger.info("Stopping robots...")
+
+        id_set: set[int] = {255} if self.__is_real else self.__target_ids
+        self.__logger.info("Robot IDs: %s", id_set)
+
         commands: SimCommands = SimCommands(
             isteamyellow=self.__is_team_yellow,
-            robot_commands=[RobotCommand(i) for i in set(self.__target_ids)],
+            robot_commands=[RobotCommand(i) for i in id_set],
         )
+
         start: float = perf_counter()
         for _ in range(count):
             self.send(commands)
-        self.__logger.info("Stopped robots in %.3f seconds", perf_counter() - start)
+        self.__logger.info("Sent stop for %.3f seconds", perf_counter() - start)

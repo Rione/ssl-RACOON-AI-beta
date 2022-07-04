@@ -6,6 +6,7 @@ from logging import Logger
 
 from racoon_ai.observer import Observer
 
+from .basics import halt_all, move2pose
 from .controls import Controls
 
 
@@ -31,4 +32,6 @@ def create_controls(config: ConfigParser, logger: Logger, observer: Observer) ->
 __all__ = [
     "Controls",
     "create_controls",
+    "halt_all",
+    "move2pose",
 ]

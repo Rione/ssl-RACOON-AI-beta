@@ -18,7 +18,7 @@ from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class Observer(MWReceiver):
+class Observer(MWReceiver):  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
@@ -32,6 +32,7 @@ class Observer(MWReceiver):
     def __init__(
         self,
         target_ids: set[int],
+        imu_enabled_ids: set[int],
         is_real: bool = False,
         is_team_yellow: bool = False,
         *,
@@ -49,10 +50,14 @@ class Observer(MWReceiver):
         self.__referee: Referee = Referee()
 
         self.__target_ids: set[int] = target_ids
+        self.__imu_enabled_ids: set[int] = imu_enabled_ids
+
         self.__is_real: bool = is_real
         self.__is_team_yellow: bool = is_team_yellow
 
-        self.__our_robots: list[Robot] = [Robot(i) for i in range(16)]
+        self.__our_robots: list[Robot] = [
+            Robot(i, is_imu_enabled=(self.is_real and (i in self.imu_enabled_ids))) for i in range(16)
+        ]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
         self.__our_robots_available: set[Robot] = set()
@@ -73,32 +78,6 @@ class Observer(MWReceiver):
     def main(self) -> None:
         """main"""
         proto: RacoonMW_Packet = super().recv()
-        self.ball.update(proto.ball)
-        self.__logger.debug("Ball: %s", self.ball)
-
-        self.geometry.update(proto.geometry)
-        self.__logger.debug("Geometry: %s", self.geometry)
-
-        self.referee.update(proto.referee)
-        self.__logger.debug("Referee: %s", self.referee)
-
-        bot: Optional[Robot]
-        proto_bot: Robot_Infos
-        for proto_bot in proto.our_robots:
-            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
-
-        for proto_bot in proto.enemy_robots:
-            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
 
         self.__sec_per_frame = proto.info.secperframe
 
@@ -111,6 +90,35 @@ class Observer(MWReceiver):
         self.__is_vision_recv = proto.info.is_vision_recv
 
         self.__attack_direction = proto.info.attack_direction
+
+        self.ball.update(proto.ball, self.sec_per_frame)
+        self.__logger.debug("Ball: %s", self.ball)
+
+        self.geometry.update(proto.geometry)
+        self.__logger.debug("Geometry: %s", self.geometry)
+
+        self.referee.update(proto.referee)
+        self.__logger.debug("Referee: %s", self.referee)
+
+        bot: Optional[Robot]
+        proto_bot: Robot_Infos
+        for proto_bot in proto.our_robots:
+            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
+            if not bot:
+                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
+
+        for proto_bot in proto.enemy_robots:
+            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
+            if not bot:
+                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
 
         self.__our_robots_available = set(
             bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
@@ -151,6 +159,15 @@ class Observer(MWReceiver):
             set[int]
         """
         return self.__target_ids
+
+    @property
+    def imu_enabled_ids(self) -> set[int]:
+        """imu_enabled_ids
+
+        Returns:
+            set[int]
+        """
+        return self.__imu_enabled_ids
 
     @property
     def is_real(self) -> bool:

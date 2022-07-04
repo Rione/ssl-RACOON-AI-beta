@@ -5,7 +5,8 @@
         - Ball
 """
 
-from racoon_ai.models.coordinate import Point
+from racoon_ai.common import MathUtils as MU
+from racoon_ai.models.coordinate import Point, Vector3f
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Ball_Info
 
 
@@ -19,15 +20,9 @@ class Ball(Point):
 
         z (float): z coordinate
 
-        diff_x (float): difference between x coordinate and last x coordinate
-
-        diff_y (float): difference between y coordinate and last y coordinate
+        diff (Pose): difference between x coordinate and last x coordinate
 
         filtered (Point): filtered coordinate (x, y)
-
-        filtered_x (float) : Kalman Filtered X
-
-        filtered_y (float) : Kalman Filtered Y
 
         speed (float) : ball speed (absolute value)
 
@@ -41,8 +36,8 @@ class Ball(Point):
     def __init__(self) -> None:
         super().__init__(0, 0)  # x, y, z
         self.__filtered: Point = Point(0, 0)
-        self.__diff_x: float = float(0)
-        self.__diff_y: float = float(0)
+        self.__diff: Vector3f = Vector3f(0, 0, 0)
+        self.__sec_per_frame: float = float(0)
         self.__speed: float = float(0)
         self.__speed_slope: float = float(0)
         self.__speed_slope_radian: float = float(0)
@@ -52,7 +47,9 @@ class Ball(Point):
         return (
             "("
             f"pt=Point(x={self.x:.1f}, y={self.y:.1f}, z={self.z:.1f}), "
-            f"filtered=Point(x={self.filtered_x:.1f}, y={self.filtered_y:.1f}), "
+            f"filtered=Point(x={self.filtered.x:.1f}, y={self.filtered.y:.1f}), "
+            f"diff=Vector3f{self.diff.x!s}, "
+            f"vel=Vector3f{self.velocity!s}, "
             f"speed={self.speed:.1f}, "
             f"speed_slope={self.speed_slope:.1f}, "
             f"speed_slope_radian={self.speed_slope_radian:.1f}, "
@@ -78,24 +75,24 @@ class Ball(Point):
         return self.__filtered
 
     @property
-    def filtered_x(self) -> float:
-        """filtered_x"""
-        return self.filtered.x
+    def diff(self) -> Vector3f:
+        """diff
+
+        NOTE: `diff.z` is not available now (always 0)
+        """
+        return self.__diff
 
     @property
-    def filtered_y(self) -> float:
-        """filtered_y"""
-        return self.filtered.y
+    def velocity(self) -> Vector3f:
+        """velocity
 
-    @property
-    def diff_x(self) -> float:
-        """diff_x"""
-        return self.__diff_x
-
-    @property
-    def diff_y(self) -> float:
-        """diff_y"""
-        return self.__diff_y
+        NOTE: `velocity.z` is not available now (always 0)
+        """
+        return Vector3f(
+            self.diff.x / MU.div_safe(self.__sec_per_frame),
+            self.diff.y / MU.div_safe(self.__sec_per_frame),
+            0,
+        )
 
     @property
     def speed(self) -> float:
@@ -129,15 +126,17 @@ class Ball(Point):
         """
         return self.__speed_intercept
 
-    def update(self, dball: Ball_Info) -> None:
+    def update(self, dball: Ball_Info, sec_par_frame: float) -> None:
         """update
 
         update this object with data from protobuf
 
         Args:
             dball (Ball_Info): Ball_Info
+            sec_par_frame (float): seconds per frame
         """
         self.__from_proto(dball)
+        self.__sec_per_frame = sec_par_frame
 
     def __from_proto(self, dball: Ball_Info) -> None:
         """from_proto
@@ -149,9 +148,9 @@ class Ball(Point):
         """
         self.x = dball.x
         self.y = dball.y
-        self.__diff_x = dball.diff_x
-        self.__diff_y = dball.diff_y
+        self.z = dball.z
         self.__filtered = Point(dball.filtered_x, dball.filtered_y)
+        self.__diff = Vector3f(dball.diff_x, dball.diff_y, 0)
         self.__speed = dball.speed
         self.__speed_slope = dball.slope
         self.__speed_slope_radian = dball.slope_radian
