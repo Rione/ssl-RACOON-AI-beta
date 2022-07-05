@@ -12,6 +12,7 @@ from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Defense, Keeper, Offense
 
 from .on_normal_start import on_default_cbf
+
 # from .on_placement import on_placement_our_cbf
 
 
