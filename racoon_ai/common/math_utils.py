@@ -15,11 +15,17 @@ from racoon_ai.models.coordinate import Point, Pose
 class MathUtils:
     """MathUtils
 
-    This class contains
+    This class contains:
+        - PI
         - TWO_PI
+        - HALF_PI
         - PI_SQUARE
-        - angle_normalize
-        - angle_reduce
+        - div_safe
+        - distance
+        - radian
+        - radian_normalize
+        - radian_reduce
+        - has_intersection_with_line
     """
 
     PI: Final[float] = pi
@@ -192,17 +198,6 @@ class MathUtils:
         val3 = cls.__substitution_fn(pt3, pt4, pt1)
         val4 = cls.__substitution_fn(pt3, pt4, pt2)
         return (val1 * val2 < 0) and (val3 * val4 < 0)
-
-    @classmethod
-    def radian_neo(cls, obj1: Point, obj2: Point, center: float = 0) -> float:
-        """radian
-        Args:
-            obj1 Point: object at least has x and y
-            obj2 Point: object at least has x and y
-        Returns:
-            float: radian value
-        """
-        return cls.radian_normalize(atan2(obj1.y - obj2.y, obj1.x - obj2.x) - center)
 
 
 if __name__ == "__main__":

@@ -60,8 +60,6 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         ]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
-        self.__our_robots_available: set[Robot] = set()
-
         self.__sec_per_frame: float
         self.__n_camras: int
         self.__num_of_our_robots: int
@@ -119,10 +117,6 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             bot.update(proto_bot, self.sec_per_frame)
             self.__logger.debug(bot)
             del bot
-
-        self.__our_robots_available = set(
-            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
-        )
 
     @property
     def ball(self) -> Ball:
@@ -203,7 +197,9 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         Returns:
             set[Robot]: Available robots (i.e. is_online and is_visible)
         """
-        return self.__our_robots_available
+        return set(
+            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
+        )
 
     @property
     def enemy_robots(self) -> list[Robot]:
@@ -213,6 +209,19 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             list[Robot]
         """
         return self.__enemy_robots
+
+    @property
+    def enemy_robots_available(self) -> set[Robot]:
+        """enemy_robots_available
+
+        Returns:
+            set[Robot]: Available robots (i.e. is_visible)
+        """
+        return set(
+            bot
+            for bot in (self.get_enemy_by_id(bid, True, True) for bid in range(self.num_of_enemy_vision_robots))
+            if bot
+        )
 
     def get_our_by_id(self, robot_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
         """get_our_by_id
@@ -363,8 +372,8 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         return self.__num_of_our_robots
 
     @property
-    def num_of_enemy_robots(self) -> int:
-        """num_of_enemy_robots
+    def num_of_enemy_vision_robots(self) -> int:
+        """num_of_enemy_vision_robots
 
         How many enemy robots visible
 

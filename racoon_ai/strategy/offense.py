@@ -26,6 +26,9 @@ class Offense(StrategyBase):
 
     Args:
         observer (Observer): Observer instance
+        role (Role): Role instance
+        subrole (SubRole): SubRole instance
+        controls (Controls): Controls instance
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.
@@ -35,7 +38,8 @@ class Offense(StrategyBase):
         super().__init__(observer, controls, role)
 
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
+        self.__logger.debug("Initializing...")
+
         self.__subrole: SubRole = subrole
 
     def main(self) -> None:
@@ -43,25 +47,24 @@ class Offense(StrategyBase):
         # commandの情報を格納するリスト
         self.send_cmds = []
         bot: Optional[Robot]
-        cmd: RobotCommand
+        cmd: Optional[RobotCommand]
 
         for i in range(self.role.get_offense_quantity):
-            bot = self.observer.get_our_by_id(self.role.get_offense_id(i))
-            if bot:
+            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     cmd = self.controls.ball_around(self.observer.geometry.their_goal, bot)
-                    if (
-                        bot.distance_ball_robot <= 105
-                        and abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
+                    if bot.distance_ball_robot <= 105 and (
+                        abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
                     ):
                         cmd.kickpow = 10
                     # cmd = self.controls.avoid_enemy(cmd, bot, Pose(self.observer.ball.x, self.observer.ball.y))
                     # cmd = self.controls.avoid_penalty_area(cmd, bot)
                     cmd = self.controls.speed_limiter(cmd)
-                    self.send_cmds.append(cmd)
-                else:
-                    cmd = RobotCommand(bot.robot_id)
-                    self.send_cmds.append(cmd)
+                    self.send_cmds += [cmd]
+                    continue
+
+                cmd = RobotCommand(bot.robot_id)
+                self.send_cmds += [cmd]
 
     def stop_offense(self) -> None:
         """main"""

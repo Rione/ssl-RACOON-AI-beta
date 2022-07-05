@@ -6,9 +6,8 @@
         - BallPlacement
 """
 
-import math
-import time
 from logging import getLogger
+from math import cos, sin
 from typing import Optional
 
 from racoon_ai.common.math_utils import MathUtils as MU
@@ -19,7 +18,6 @@ from racoon_ai.observer import Observer
 
 from .base import StrategyBase
 from .role import Role
-from .subrole import SubRole
 
 
 class BallPlacement(StrategyBase):
@@ -51,54 +49,49 @@ class BallPlacement(StrategyBase):
         cmd: RobotCommand
 
         # find nearest to ball robot
-        bot = self.observer.get_our_by_id(1)
         point: Point = Point(-1500, 0, 0)
-        if point is not None and bot is not None:
-            target_pose: Pose
-            # 2点間の中心座標を算出
-            target_pose = Pose((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2, 0)
+        bot = self.observer.get_our_by_id(5)
+        if not bot:
+            return RobotCommand(1)
 
-            # ロボットがtarget_poseに近づいたら
+        target_pose: Pose
+        # 2点間の中心座標を算出
+        target_pose = Pose((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2, 0)
+
+        # ロボットがtarget_poseに近づいたら
+        if MU.distance(target_pose, bot) < 10:
+            self.__move_to_ball = True
+
+        if self.__move_to_ball:
+            target_pose = Pose(self.observer.ball.x, self.observer.ball.y, 0)
+
+        cmd = self.controls.pid(target_pose, bot, 0.5)
+        cmd.dribble_pow = float(1)
+
+        if bot.is_ball_catched:
+            target_pose = Pose(point.x, point.y, 0)
+            cmd = self.controls.pid(target_pose, bot, 0.3)
+            cmd.dribble_pow = float(1)
+
             if MU.distance(target_pose, bot) < 10:
-                self.__move_to_ball = True
+                self.__is_arrived = True
+                self.__logger.info("Arrived")
 
-            if self.__move_to_ball:
-                target_pose = Pose(self.observer.ball.x, self.observer.ball.y, 0)
-
-            cmd = self.controls.pid(target_pose, bot, 0.5)
+        if self.__is_arrived:
+            target_pose = Pose(point.x - 125 * cos(bot.theta), point.y - 125 * sin(bot.theta), 0)
+            cmd = self.controls.pid(target_pose, bot)
             cmd.dribble_pow = True
 
-            if bot.is_ball_catched:
-                target_pose = Pose(point.x, point.y, 0)
-                cmd = self.controls.pid(target_pose, bot, 0.3)
-                cmd.dribble_pow = True
-
-                if MU.distance(target_pose, bot) < 10:
-                    self.__is_arrived = True
-                    self.__logger.info("Arrived")
-
-            if self.__is_arrived:
-                target_pose = Pose(point.x - 125 * math.cos(bot.theta), point.y - 125 * math.sin(bot.theta), 0)
-                cmd = self.controls.pid(target_pose, bot)
-                cmd.dribble_pow = True
-
-                if MU.distance(target_pose, bot) < 10:
-                    self.__wait_counter += 1
-                    cmd.dribble_pow = False
-                    if self.__wait_counter > 100:
-                        self.__is_fin = True
-
-            if self.__is_fin:
-                target_pose = Pose(point.x - 300 * math.cos(bot.theta), point.y - 300 * math.sin(bot.theta), 0)
-                cmd = self.controls.pid(target_pose, bot)
+            if MU.distance(target_pose, bot) < 10:
+                self.__wait_counter += 1
                 cmd.dribble_pow = False
+                if self.__wait_counter > 100:
+                    self.__is_fin = True
 
-            cmd.vel_angular = bot.radian_ball_robot
-        else:
-            cmd = RobotCommand(1)
-            cmd.vel_fwd = 0
-            cmd.vel_sway = 0
-            cmd.vel_angular = 0
-            cmd.dribble_pow = 0
-            cmd.kickpow = 0
+        if self.__is_fin:
+            target_pose = Pose(point.x - 300 * cos(bot.theta), point.y - 300 * sin(bot.theta), 0)
+            cmd = self.controls.pid(target_pose, bot)
+            cmd.dribble_pow = False
+
+        cmd.vel_angular = bot.radian_ball_robot
         return cmd

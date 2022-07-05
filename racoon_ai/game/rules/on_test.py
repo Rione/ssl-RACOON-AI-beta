@@ -23,7 +23,7 @@ def test_cbf(logger: Logger, args: tuple[Defense, Keeper, Offense]) -> list[Robo
 
     Args:
         logger (Logger): Logger instance.
-        args: tuple[BallPlacement]
+        args: tuple[StrategyBase, ...]
     """
     send_cmds: list[RobotCommand] = on_default_cbf(logger, args)
     logger.debug(send_cmds)

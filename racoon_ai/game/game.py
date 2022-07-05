@@ -183,7 +183,7 @@ class Game:
             pass
 
         if self.__is_our_placement(cmd):
-            return (on_placement_our_cbf, self.__observer)
+            return (on_placement_our_cbf, (self.__ball_placement,))
 
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
