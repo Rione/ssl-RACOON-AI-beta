@@ -109,11 +109,10 @@ class Game:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
-        test_mode: bool = False
+        test_mode: bool = True
         if test_mode:
-            # return (test_cbf, (self.__defense, self.__keeper, self.__offense))
-            return (test_cbf, (self.__ball_placement,))
-            # return (test_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (test_cbf, (self.__defense, self.__keeper, self.__offense))
+            # return (test_cbf, (self.__ball_placement,))
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
         if cmd is REF_COMMAND.HALT:

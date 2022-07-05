@@ -13,7 +13,7 @@ from typing import Optional
 from numpy import sign
 
 from racoon_ai.common.math_utils import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
@@ -41,9 +41,7 @@ class Defense(StrategyBase):
 
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-
         self.__subrole: SubRole = subrole
-
         self.__enemy_offense: list[int] = []
         self.__defense_quantity: int = 0
         self.__max_robot_radius: float = 90
@@ -51,6 +49,9 @@ class Defense(StrategyBase):
         self.__enemy_quantity: int = 0
         self.__enemy_attacker: int = -1
         self.__count: int = 0
+        self.__goal: Point = self.observer.geometry.goal
+        self.__their_goal: Point = self.observer.geometry.their_goal
+        self.__attack_direction: float = self.observer.attack_direction
 
     def main(self) -> None:
         """main"""
@@ -93,8 +94,9 @@ class Defense(StrategyBase):
         enemy_offense = [
             (
                 enemy.robot_id,
-                MU.distance(enemy, self.observer.geometry.goal),
-                MU.radian(enemy, self.observer.geometry.goal),
+                MU.distance(enemy, self.__goal),
+                MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))
+                * self.__attack_direction,
             )
             for enemy in self.observer.enemy_robots
             if enemy.is_visible is True
@@ -105,8 +107,12 @@ class Defense(StrategyBase):
                 enemy_offense.append(
                     (
                         self.observer.enemy_robots[self.__enemy_attacker].robot_id,
-                        MU.distance(self.observer.enemy_robots[self.__enemy_attacker], self.observer.geometry.goal),
-                        MU.radian(self.observer.enemy_robots[self.__enemy_attacker], self.observer.geometry.goal),
+                        MU.distance(self.observer.enemy_robots[self.__enemy_attacker], self.__goal),
+                        MU.radian_reduce(
+                            MU.radian(self.observer.enemy_robots[self.__enemy_attacker], self.__goal),
+                            MU.radian(self.__their_goal, self.__goal),
+                        )
+                        * self.__attack_direction,
                     )
                 )
 
@@ -118,29 +124,37 @@ class Defense(StrategyBase):
 
     def __keep_penalty_area(self, robot: Robot, enemy: Robot) -> RobotCommand:
         """keep_penalty_area"""
-        radian_enemy_goal = MU.radian(enemy, self.observer.geometry.goal)
+        radian_enemy_goal = (
+            MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))
+            * self.__attack_direction
+        )
+        radian_enemy_robot = MU.radian(enemy, robot)
 
         if abs(radian_enemy_goal) >= MU.PI / 2:
             radian_enemy_goal = (sign(radian_enemy_goal) * MU.PI) / 2
 
         if abs(radian_enemy_goal) < MU.PI / 4:
             target_pose = Pose(
-                (self.observer.geometry.goal.x + self.observer.geometry.goal_width + self.__max_robot_radius),
+                (
+                    self.__goal.x
+                    + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                ),
                 ((self.observer.geometry.goal_width + self.__max_robot_radius) * tan(radian_enemy_goal)),
-                radian_enemy_goal,
+                radian_enemy_robot,
             )
 
         else:
             target_pose = Pose(
                 (
-                    self.observer.geometry.goal.x
-                    + (self.observer.geometry.goal.y + self.observer.geometry.goal_width + self.__max_robot_radius)
+                    self.__goal.x
+                    + (self.__goal.y + self.observer.geometry.goal_width + self.__max_robot_radius)
                     / tan(radian_enemy_goal)
                     * sign(radian_enemy_goal)
+                    * self.__attack_direction
                 ),
-                (self.observer.geometry.goal.y + (self.observer.geometry.goal_width + self.__max_robot_radius))
+                (self.__goal.y + (self.observer.geometry.goal_width + self.__max_robot_radius))
                 * sign(radian_enemy_goal),
-                radian_enemy_goal,
+                radian_enemy_robot,
             )
 
         if self.__diff_defense_enemy_quantity >= 1 and enemy.robot_id is self.__enemy_attacker:
@@ -163,19 +177,25 @@ class Defense(StrategyBase):
         target_pose: Pose
         if self.__defense_quantity == 1:
             target_pose = Pose(
-                (self.observer.geometry.goal.x + self.observer.geometry.goal_width + self.__max_robot_radius),
-                self.observer.geometry.goal_y,
-                0,
+                (
+                    self.__goal.x
+                    + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                ),
+                self.__goal.y,
+                MU.radian(self.__their_goal, self.__goal),
             )
 
         else:
             target_pose = Pose(
-                (self.observer.geometry.goal.x + self.observer.geometry.goal_width + self.__max_robot_radius),
+                (
+                    self.__goal.x
+                    + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                ),
                 (
                     self.observer.geometry.goal_width
                     - i * (self.observer.geometry.goal_width * 2 / (self.__defense_quantity - 1))
                 ),
-                0,
+                MU.radian(self.__their_goal, self.__goal),
             )
 
         return self.controls.pid(target_pose, robot)

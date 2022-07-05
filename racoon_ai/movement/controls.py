@@ -13,7 +13,7 @@ from numpy import array, divide, dot, float64, multiply, sign, subtract, zeros
 from numpy.typing import NDArray
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.observer import Observer
 
@@ -93,6 +93,7 @@ class Controls:
 
         cmd.vel_fwd = float(vel[0])
         cmd.vel_sway = float(vel[1])
+        cmd.vel_angular = self.pid_radian(target.theta, bot)
         cmd.target_pose = target
 
         if not cmd.use_imu:
@@ -189,8 +190,6 @@ class Controls:
 
     def avoid_penalty_area(self, cmd: RobotCommand, bot: Robot) -> RobotCommand:
         """avoid_penalty_erie"""
-        bvel: NDArray[float64]
-        vel: NDArray[float64]
 
         rot_theta: NDArray[float64] = array(
             [
@@ -200,23 +199,22 @@ class Controls:
             dtype=float64,
         )
 
-        theta: float = MU.radian(bot, self.__observer.geometry.goal)
-        robot_dis: float = MU.distance(bot, self.__observer.geometry.goal)
+        theta = MU.radian(bot, self.__observer.geometry.goal)
+        robot_dis = MU.distance(bot, self.__observer.geometry.goal)
         if abs(theta) < (MU.PI / 4):
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-
-        bvel = array(
+        bvel_our: NDArray[float64] = array(
             [
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * cos(theta),
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * sin(theta),
             ],
             dtype=float64,
         )
-        vel = dot(bvel, rot_theta)
-        cmd.vel_fwd += vel[0]
-        cmd.vel_sway += vel[1]
+        vel_our: NDArray[float64] = dot(bvel_our, rot_theta)
+        cmd.vel_fwd += vel_our[0]
+        cmd.vel_sway += vel_our[1]
 
         theta = MU.radian_reduce(MU.radian(bot, self.__observer.geometry.their_goal), MU.PI)
         robot_dis = MU.distance(bot, self.__observer.geometry.their_goal)
@@ -224,16 +222,54 @@ class Controls:
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-
-        bvel = array(
+        bvel_their: NDArray[float64] = array(
             [
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * -1 * cos(theta),
                 self.__standard_distance_penalty / (distance_robot_penalty**2) * -1 * sin(theta),
             ],
             dtype=float64,
         )
-        vel = dot(bvel, rot_theta)
+        vel_their: NDArray[float64] = dot(bvel_their, rot_theta)
+        cmd.vel_fwd += vel_their[0]
+        cmd.vel_sway += vel_their[1]
 
-        cmd.vel_fwd += vel[0]
-        cmd.vel_sway += vel[1]
         return cmd
+
+    def ball_around(self, target: Point, bot: Robot) -> RobotCommand:
+        """ball_around"""
+        radian_target_robot: float = MU.radian_reduce(MU.radian(target, bot), bot.theta)
+        adjustment: float = bot.distance_ball_robot / 1000
+
+        vel_fwd: float = cos(bot.radian_ball_robot) * adjustment
+        vel_sway: float = sin(bot.radian_ball_robot) * adjustment
+
+        radian_around: float = MU.radian(self.__observer.ball, bot)
+        discrimination: float = MU.radian_reduce(
+            MU.radian(bot, self.__observer.ball),
+            MU.radian(target, self.__observer.ball),
+        )
+        radian_around -= ((discrimination / MU.div_safe(abs(discrimination))) * MU.PI) / 2
+        radian_around -= bot.theta
+        adjustment = 100 / MU.div_safe(bot.distance_ball_robot)
+
+        vel_fwd += cos(radian_around) * adjustment
+        vel_sway += sin(radian_around) * adjustment
+
+        discrimination = MU.radian_reduce(
+            MU.radian(self.__observer.ball, bot),
+            MU.radian(target, bot),
+        )
+        adjustment = 0.1 / MU.div_safe(abs(discrimination))
+
+        vel_fwd += cos(bot.radian_ball_robot) * adjustment
+        vel_sway += sin(bot.radian_ball_robot) * adjustment
+
+        adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
+        speed = bot.distance_ball_robot / 500
+
+        command = RobotCommand(bot.robot_id)
+        command.vel_fwd = speed * vel_fwd / adjustment
+        command.vel_sway = speed * vel_sway / adjustment
+        command.vel_angular = self.pid_radian(radian_target_robot + bot.theta, bot)
+        command.target_pose.theta = radian_target_robot + bot.theta
+        return command
