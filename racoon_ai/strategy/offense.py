@@ -36,7 +36,6 @@ class Offense(StrategyBase):
 
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-
         self.__subrole: SubRole = subrole
 
     def main(self) -> None:

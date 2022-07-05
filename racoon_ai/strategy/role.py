@@ -54,9 +54,9 @@ class Role:
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
-        self.__goal: Point = self.__observer.geometry.their_goal
-        self.__their_goal: Point = self.__observer.geometry.goal
-        self.__attack_direction: float = -1
+        self.__goal: Point = self.__observer.geometry.goal
+        self.__their_goal: Point = self.__observer.geometry.their_goal
+        self.__attack_direction: float = self.__observer.attack_direction
 
     @property
     def keeper_id(self) -> int:

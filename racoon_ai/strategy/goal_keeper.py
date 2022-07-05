@@ -39,9 +39,9 @@ class Keeper(StrategyBase):
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
         self.__radius: float = self.observer.geometry.goal_width_half + self.observer.geometry.max_robot_radius
-        self.__goal: Point = self.observer.geometry.their_goal
-        self.__their_goal: Point = self.observer.geometry.goal
-        self.__attack_direction: float = -1
+        self.__goal: Point = self.observer.geometry.goal
+        self.__their_goal: Point = self.observer.geometry.their_goal
+        self.__attack_direction: float = self.observer.attack_direction
 
     def main(self) -> None:
         """main"""
@@ -51,7 +51,7 @@ class Keeper(StrategyBase):
         cmd: RobotCommand
 
         bot = self.observer.get_our_by_id(self.role.keeper_id)
-        # print(self.observer.attack_direction)
+        print(self.observer.attack_direction, self.__goal.x)
 
         if bot:
             self.__logger.debug(bot)
