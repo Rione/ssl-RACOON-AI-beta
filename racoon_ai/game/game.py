@@ -109,9 +109,9 @@ class Game:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
-        test_mode: bool = True
+        test_mode: bool = False
         if test_mode:
-            return (test_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_stop_cbf, (self.__defense, self.__keeper, self.__offense))
             # return (test_cbf, (self.__ball_placement,))
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
@@ -188,7 +188,7 @@ class Game:
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
 
-        return (on_stop_cbf, self.__observer)
+        return (on_stop_cbf, (self.__defense, self.__keeper, self.__offense))
 
     def __is_ball_moved(self, distance: float = 15e2) -> bool:
         """__is_ball_moved"""
