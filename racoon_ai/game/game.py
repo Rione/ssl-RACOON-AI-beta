@@ -111,7 +111,7 @@ class Game:
 
         test_mode: bool = False
         if test_mode:
-            return (on_stop_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (test_cbf, (self.__defense, self.__keeper, self.__offense))
             # return (test_cbf, (self.__ball_placement,))
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command

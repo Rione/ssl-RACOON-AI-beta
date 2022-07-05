@@ -86,9 +86,8 @@ class Offense(StrategyBase):
                     )
                     cmd = self.controls.pid(target_pose, bot)
                     cmd = self.controls.avoid_ball(cmd, bot, target_pose)
-                    print(bot.distance_ball_robot)
-                    # cmd = self.controls.avoid_enemy(cmd, bot, Pose(self.observer.ball.x, self.observer.ball.y))
-                    # cmd = self.controls.avoid_penalty_area(cmd, bot)
+                    cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
+                    cmd = self.controls.avoid_penalty_area(cmd, bot)
                     cmd = self.controls.speed_limiter(cmd)
                     self.send_cmds.append(cmd)
                 else:
