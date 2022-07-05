@@ -158,6 +158,22 @@ class Pose(Point):
         self.__theta = float(theta)
 
     @staticmethod
+    def from_point(obj: Point) -> "Pose":
+        """from_point
+
+        Args:
+            obj (Point): The point to convert
+
+        Returns:
+            Pose: The converted pose
+
+        Examples:
+            >>> Pose.from_point(Point(1, 2, 3))
+            Pose(1.0, 2.0, 0.0, 3.0)
+        """
+        return Pose(obj.x, obj.y, theta=0, z=obj.z)
+
+    @staticmethod
     def from_vector3f(obj: "Vector3f") -> "Pose":
         """from_vector3f
 
@@ -243,7 +259,7 @@ class Vector3f:
         self.__z = float(z)
 
     @staticmethod
-    def from_point(obj: "Point") -> "Vector3f":
+    def from_point(obj: Point) -> "Vector3f":
         """from_point
 
         Args:
@@ -259,7 +275,7 @@ class Vector3f:
         return Vector3f(obj.x, obj.y, obj.z)
 
     @staticmethod
-    def from_pose(obj: "Pose") -> "Vector3f":
+    def from_pose(obj: Pose) -> "Vector3f":
         """from_pose
 
         Args:

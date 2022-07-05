@@ -21,6 +21,7 @@ class StrategyBase:
     Args:
         observer (Observer): Observer instance
         controls (Controls): Controls instance
+        role (Role): Role instance
 
     Attributes:
         send_cmds (list[RobotCommand]): RobotCommand list.

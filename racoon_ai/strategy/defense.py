@@ -40,7 +40,7 @@ class Defense(StrategyBase):
         super().__init__(observer, controls, role)
 
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
+        self.__logger.debug("Initializing...")
         self.__subrole: SubRole = subrole
         self.__enemy_offense: list[int] = []
         self.__defense_quantity: int = 0
@@ -57,13 +57,10 @@ class Defense(StrategyBase):
         """main"""
         self.send_cmds = []
         self.__defense_quantity = self.role.get_defense_quantity
-        self.__enemy_quantity = self.observer.num_of_enemy_robots
+        self.__enemy_quantity = self.observer.num_of_enemy_vision_robots
         self.__diff_defense_enemy_quantity = self.__defense_quantity - (self.__enemy_quantity - 1)
         self.__enemy_attacker = self.__subrole.enemy_attacker_id
         self.__count = 0
-        bot: Optional[Robot]
-        ene: Optional[Robot]
-        cmd: RobotCommand
 
         if self.__defense_quantity == 0:
             return
@@ -71,19 +68,19 @@ class Defense(StrategyBase):
         # defenseのテスト動作
         self.__enemy_offense_decide()
 
-        if self.__enemy_quantity <= 1:
-            for i in range(self.__defense_quantity):
-                bot = self.observer.get_our_by_id(self.role.get_defense_id(i))
-                if bot:
+        for i in range(self.__defense_quantity):
+            bot: Optional[Robot]
+            if bot := self.observer.get_our_by_id(self.role.get_defense_id(i)):
+                cmd: RobotCommand
+                if self.__enemy_quantity <= 1:
                     cmd = self.__default_position(bot, i)
-                    self.send_cmds.append(cmd)
-        else:
-            for i in range(self.__defense_quantity):
-                bot = self.observer.get_our_by_id(self.role.get_defense_id(i))
-                ene = self.observer.get_enemy_by_id(self.__enemy_offense[i])
-                if bot and ene:
+                    self.send_cmds += [cmd]
+                    continue
+
+                ene: Optional[Robot]
+                if ene := self.observer.get_enemy_by_id(self.__enemy_offense[i]):
                     cmd = self.__keep_penalty_area(bot, ene)
-                    self.send_cmds.append(cmd)
+                    self.send_cmds += [cmd]
 
     def __enemy_offense_decide(self) -> None:
         """enemy_offense_decide"""
@@ -157,7 +154,7 @@ class Defense(StrategyBase):
                 radian_enemy_robot,
             )
 
-        if self.__diff_defense_enemy_quantity >= 1 and enemy.robot_id is self.__enemy_attacker:
+        if (1 <= self.__diff_defense_enemy_quantity) and (enemy.robot_id is self.__enemy_attacker):
             if abs(radian_enemy_goal) < MU.PI / 4:
                 target_pose.y += self.__max_robot_radius * (self.__diff_defense_enemy_quantity - self.__count * 2)
             else:
@@ -166,10 +163,7 @@ class Defense(StrategyBase):
                 ) * sign(radian_enemy_goal)
             self.__count += 1
 
-        command: RobotCommand = self.controls.pid(target_pose, robot)
-        command.dribble_pow = 0
-        command.kickpow = 0
-        return command
+        return self.controls.pid(target_pose, robot)
 
     def __default_position(self, robot: Robot, i: int) -> RobotCommand:
         """keep_penalty_area"""

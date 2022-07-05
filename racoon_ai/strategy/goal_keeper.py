@@ -50,13 +50,10 @@ class Keeper(StrategyBase):
         bot: Optional[Robot]
         cmd: RobotCommand
 
-        bot = self.observer.get_our_by_id(self.role.keeper_id)
-        print(self.observer.attack_direction, self.__goal.x)
-
-        if bot:
+        if bot := self.observer.get_our_by_id(self.role.keeper_id):
             self.__logger.debug(bot)
             cmd = self.__keep_goal(bot)
-            self.send_cmds.append(cmd)
+            self.send_cmds += [cmd]
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""

@@ -109,7 +109,7 @@ class Game:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
-        test_mode: bool = True
+        test_mode: bool = False
         if test_mode:
             return (test_cbf, (self.__defense, self.__keeper, self.__offense))
             # return (test_cbf, (self.__ball_placement,))
@@ -183,7 +183,7 @@ class Game:
             pass
 
         if self.__is_our_placement(cmd):
-            return (on_placement_our_cbf, self.__observer)
+            return (on_placement_our_cbf, (self.__ball_placement,))
 
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
