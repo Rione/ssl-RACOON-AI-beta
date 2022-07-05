@@ -13,7 +13,7 @@ from numpy import array, divide, dot, float64, multiply, sign, subtract, zeros
 from numpy.typing import NDArray
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.observer import Observer
 
@@ -234,3 +234,42 @@ class Controls:
         cmd.vel_sway += vel_their[1]
 
         return cmd
+
+    def ball_around(self, target: Point, bot: Robot) -> RobotCommand:
+        """ball_around"""
+        radian_target_robot: float = MU.radian_reduce(MU.radian(target, bot), bot.theta)
+        adjustment: float = bot.distance_ball_robot / 1000
+
+        vel_fwd: float = cos(bot.radian_ball_robot) * adjustment
+        vel_sway: float = sin(bot.radian_ball_robot) * adjustment
+
+        radian_around: float = MU.radian(self.__observer.ball, bot)
+        discrimination: float = MU.radian_reduce(
+            MU.radian(bot, self.__observer.ball),
+            MU.radian(target, self.__observer.ball),
+        )
+        radian_around -= ((discrimination / MU.div_safe(abs(discrimination))) * MU.PI) / 2
+        radian_around -= bot.theta
+        adjustment = 100 / MU.div_safe(bot.distance_ball_robot)
+
+        vel_fwd += cos(radian_around) * adjustment
+        vel_sway += sin(radian_around) * adjustment
+
+        discrimination = MU.radian_reduce(
+            MU.radian(self.__observer.ball, bot),
+            MU.radian(target, bot),
+        )
+        adjustment = 0.1 / MU.div_safe(abs(discrimination))
+
+        vel_fwd += cos(bot.radian_ball_robot) * adjustment
+        vel_sway += sin(bot.radian_ball_robot) * adjustment
+
+        adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
+        speed = bot.distance_ball_robot / 500
+
+        command = RobotCommand(bot.robot_id)
+        command.vel_fwd = speed * vel_fwd / adjustment
+        command.vel_sway = speed * vel_sway / adjustment
+        command.vel_angular = self.pid_radian(radian_target_robot + bot.theta, bot)
+        command.target_pose.theta = radian_target_robot + bot.theta
+        return command

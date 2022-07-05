@@ -41,9 +41,7 @@ class Defense(StrategyBase):
 
         self.__logger = getLogger(__name__)
         self.__logger.info("Initializing...")
-
         self.__subrole: SubRole = subrole
-
         self.__enemy_offense: list[int] = []
         self.__defense_quantity: int = 0
         self.__max_robot_radius: float = 90
@@ -51,8 +49,8 @@ class Defense(StrategyBase):
         self.__enemy_quantity: int = 0
         self.__enemy_attacker: int = -1
         self.__count: int = 0
-        self.__goal: Point = self.__observer.geometry.their_goal
-        self.__their_goal: Point = self.__observer.geometry.goal
+        self.__goal: Point = self.observer.geometry.their_goal
+        self.__their_goal: Point = self.observer.geometry.goal
         self.__attack_direction: float = -1
 
     def main(self) -> None:
