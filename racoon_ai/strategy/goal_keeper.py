@@ -51,6 +51,7 @@ class Keeper(StrategyBase):
         cmd: RobotCommand
 
         bot = self.observer.get_our_by_id(self.role.keeper_id)
+        print(self.observer.attack_direction, self.__goal.x)
 
         if bot:
             self.__logger.debug(bot)
@@ -72,4 +73,4 @@ class Keeper(StrategyBase):
             radian_ball_robot,
         )
 
-        return self.controls.pid(target_pose, robot)
+        return self.controls.pid(target_pose, robot, -1)
