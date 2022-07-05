@@ -251,7 +251,7 @@ class Controls:
             MU.radian(bot, self.__observer.ball),
             MU.radian(target, self.__observer.ball),
         )
-        radian_around -= ((discrimination / MU.div_safe(abs(discrimination))) * MU.PI) / 2
+        radian_around -= (sin(discrimination) * MU.PI) / 2
         radian_around -= bot.theta
         adjustment = 100 / MU.div_safe(bot.distance_ball_robot)
 
@@ -262,11 +262,10 @@ class Controls:
             MU.radian(self.__observer.ball, bot),
             MU.radian(target, bot),
         )
-        adjustment = 0.1 / MU.div_safe(abs(discrimination))
 
+        adjustment = 0.1 / MU.div_safe(abs(discrimination))
         vel_fwd += cos(bot.radian_ball_robot) * adjustment
         vel_sway += sin(bot.radian_ball_robot) * adjustment
-
         adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
         speed = bot.distance_ball_robot / 500
 
@@ -276,3 +275,41 @@ class Controls:
         command.vel_angular = self.pid_radian(radian_target_robot + bot.theta, bot)
         command.target_pose.theta = radian_target_robot + bot.theta
         return command
+
+    def avoid_ball(
+        self, cmd: RobotCommand, bot: Robot, target_pose: Point, avoid_distance: float = 500
+    ) -> RobotCommand:
+        """avoid_enemy"""
+
+        radian_target_robot = MU.radian(target_pose, bot)
+        avoid_distance = avoid_distance**2
+
+        rot_theta: NDArray[float64] = array(
+            [
+                [cos(bot.theta), -sin(bot.theta)],
+                [sin(bot.theta), cos(bot.theta)],
+            ],
+            dtype=float64,
+        )
+
+        radian_ball_robot = MU.radian(self.__observer.ball, bot)
+        distance_ball_robot = MU.distance(self.__observer.ball, bot)
+        distance_target_robot = MU.distance(target_pose, bot) / 1000
+        bvel: NDArray[float64] = array(
+            [
+                avoid_distance
+                * distance_target_robot
+                * cos(radian_ball_robot - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot))))
+                / (distance_ball_robot**2),
+                avoid_distance
+                * distance_target_robot
+                * sin(radian_ball_robot - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot))))
+                / (distance_ball_robot**2),
+            ],
+            dtype=float64,
+        )
+        vel: NDArray[float64] = dot(bvel, rot_theta)
+        cmd.vel_fwd += vel[0]
+        cmd.vel_sway += vel[1]
+
+        return cmd

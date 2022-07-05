@@ -188,7 +188,7 @@ class Game:
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
 
-        return (on_stop_cbf, self.__observer)
+        return (on_stop_cbf, (self.__defense, self.__keeper, self.__offense))
 
     def __is_ball_moved(self, distance: float = 15e2) -> bool:
         """__is_ball_moved"""

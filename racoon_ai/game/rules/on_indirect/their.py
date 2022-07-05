@@ -9,19 +9,19 @@
 from logging import Logger
 
 from racoon_ai.models.robot import RobotCommand
-from racoon_ai.observer import Observer
+from racoon_ai.strategy import Defense, Keeper, Offense
 
 from ..on_stop import on_stop_cbf
 
 
-def on_indirect_their_cbf(logger: Logger, args: Observer) -> list[RobotCommand]:
+def on_indirect_their_cbf(logger: Logger, args: tuple[Defense, Keeper, Offense]) -> list[RobotCommand]:
     """on_indirect_their_cbf
 
     This function is to prepare enemy indirect free kick.
 
     Args:
         logger (Logger): Logger instance.
-        observer (Observer): Observer instance.
+        args (tuple[StrategyBase, ...]): Tuple of strategy instances.
 
     Returns:
         list[RobotCommand]
