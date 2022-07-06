@@ -16,9 +16,8 @@ from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 
+from ..role import Role, SubRole
 from .base import StrategyBase
-from .role import Role
-from .subrole import SubRole
 
 
 class Offense(StrategyBase):

@@ -9,25 +9,25 @@
 from logging import Logger
 
 from racoon_ai.models.robot import RobotCommand
-from racoon_ai.strategy import OutOfPlay
+from racoon_ai.strategy import Strategy
 
 
-def on_placement_our_cbf(logger: Logger, args: tuple[OutOfPlay]) -> list[RobotCommand]:
+def on_placement_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     """on_placement_our_cbf
 
     This function is called at our placement.
 
     Args:
         logger (Logger): Logger instance.
-        args (tuple[StrategyBase, ...]): StrategyBase instances.
+        strategy (Strategy): Strategy instance.
 
     Returns:
         list[RobotCommand]
     """
     # OutOfPlay instance
-    args[0].placement()
+    strategy.out_of_play.placement_our()
 
     send_cmds: list[RobotCommand] = []
-    send_cmds += args[0].send_cmds
+    send_cmds += strategy.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds

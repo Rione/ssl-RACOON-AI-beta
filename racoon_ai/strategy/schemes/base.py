@@ -12,7 +12,7 @@ from racoon_ai.models.robot import RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 
-from .role import Role
+from ..role import Role
 
 
 class StrategyBase:

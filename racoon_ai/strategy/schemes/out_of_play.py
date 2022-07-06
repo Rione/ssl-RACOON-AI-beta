@@ -16,9 +16,8 @@ from racoon_ai.models.robot import Robot
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 
+from ..role import Role, SubRole
 from .base import StrategyBase
-from .role import Role
-from .subrole import SubRole
 
 
 class OutOfPlay(StrategyBase):
@@ -47,8 +46,8 @@ class OutOfPlay(StrategyBase):
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
 
-    def placement(self) -> None:
-        """placement"""
+    def placement_our(self) -> None:
+        """placement_our"""
         self.__logger.debug("Placement...")
 
         self.send_cmds = []  # リスト初期化
