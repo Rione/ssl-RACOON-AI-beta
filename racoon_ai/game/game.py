@@ -33,7 +33,8 @@ from .rules.on_placement import on_placement_our_cbf, on_placement_their_cbf
 from .rules.on_prep_kickoff import on_prep_kickoff_our_cbf, on_prep_kickoff_their_cbf
 from .rules.on_prep_penalty import on_prep_penalty_our_cbf, on_prep_penalty_their_cbf
 from .rules.on_stop import on_stop_cbf
-from .rules.on_test import test_cbf
+
+# from .rules.on_test import test_cbf
 from .rules.on_timeout import on_timeout_our_cbf, on_timeout_their_cbf
 
 
@@ -105,7 +106,7 @@ class Game:  # pylint: disable=R0903
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
         if self.__use_test_rule:
-            return (test_cbf, self.__strategy)
+            return on_timeout_our_cbf, self.__strategy
             # return (test_cbf, (self.__ball_placement,))
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
@@ -168,10 +169,10 @@ class Game:  # pylint: disable=R0903
             return (on_default_cbf, self.__strategy)
 
         if self.__is_our_timeout(cmd):
-            return (on_timeout_our_cbf, self.__observer)
+            return (on_timeout_our_cbf, self.__strategy)
 
         if self.__is_their_timeout(cmd):
-            return (on_timeout_their_cbf, self.__observer)
+            return (on_timeout_their_cbf, self.__strategy)
 
         if cmd is (REF_COMMAND.GOAL_BLUE or REF_COMMAND.GOAL_YELLOW):
             pass

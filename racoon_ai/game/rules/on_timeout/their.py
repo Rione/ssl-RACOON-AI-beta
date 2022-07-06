@@ -11,8 +11,6 @@ from logging import Logger
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
-from ..on_stop import on_stop_cbf
-
 
 def on_timeout_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     """on_timeout_their_cbf
@@ -26,6 +24,6 @@ def on_timeout_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotComman
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    send_cmds: list[RobotCommand] = strategy.out_of_play.time_out()
     logger.debug(send_cmds)
     return send_cmds
