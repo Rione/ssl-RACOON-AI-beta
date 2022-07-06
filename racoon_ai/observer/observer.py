@@ -18,7 +18,7 @@ from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class Observer(MWReceiver):  # pylint: disable=R0904
+class Observer:  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
@@ -40,7 +40,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         port: int = 30011,
     ) -> None:
 
-        super().__init__(host, port)
+        self.__mw_receiver: MWReceiver = MWReceiver(host, port)
 
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
@@ -71,11 +71,11 @@ class Observer(MWReceiver):  # pylint: disable=R0904
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
-        super().__del__()
+        del self.__mw_receiver
 
     def main(self) -> None:
         """main"""
-        proto: RacoonMW_Packet = super().recv()
+        proto: RacoonMW_Packet = self.__mw_receiver.recv()
 
         self.__sec_per_frame = proto.info.secperframe
 
