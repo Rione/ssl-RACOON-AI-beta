@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QLabel, QMainWindow  # pylint: disable=E0611
 
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.observer import Observer
-from racoon_ai.strategy import Role
+from racoon_ai.strategy.role import Role
 
 
 class Main(QMainWindow):

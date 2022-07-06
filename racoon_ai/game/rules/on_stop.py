@@ -9,30 +9,27 @@
 from logging import Logger
 
 from racoon_ai.models.robot import RobotCommand
-from racoon_ai.strategy import Defense, Keeper, Offense
+from racoon_ai.strategy import Strategy
 
 
-def on_stop_cbf(logger: Logger, args: tuple[Defense, Keeper, Offense]) -> list[RobotCommand]:
+def on_stop_cbf(logger: Logger, strategies: Strategy) -> list[RobotCommand]:
     """on_halt_cbf
 
     This function is called when the game is halted.
 
     Args:
         logger (Logger): Logger instance.
-        args (tuple[Defense, Keeper, Offense]): Tuple of strategy instances.
+        args (Strategy): Strategy instance.
     """
-    # Defense
-    args[0].main()
+    strategies.defense.main()
 
-    # Keeper
-    args[1].main()
+    strategies.keeper.main()
 
-    # Offense
-    args[2].stop_offense()
+    strategies.offense.stop_offense()
 
     send_cmds: list[RobotCommand] = []
-    send_cmds += args[0].send_cmds
-    send_cmds += args[1].send_cmds
-    send_cmds += args[2].send_cmds
+    send_cmds += strategies.defense.send_cmds
+    send_cmds += strategies.keeper.send_cmds
+    send_cmds += strategies.offense.send_cmds
     logger.debug(send_cmds)
     return send_cmds

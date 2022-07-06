@@ -14,7 +14,8 @@ from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
-from racoon_ai.strategy import BallPlacement, Defense, Keeper, Offense, Role, SubRole
+from racoon_ai.strategy import Strategy
+from racoon_ai.strategy.role import Role
 
 from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_direct import on_direct_our_cbf, on_direct_their_cbf
@@ -50,7 +51,7 @@ class Game:  # pylint: disable=R0903
     def __init__(
         self,
         observer: Observer,
-        controles: Controls,
+        controls: Controls,
         send: Callable[[SimCommands], None],
         *,
         show_gui: bool = False,
@@ -63,8 +64,6 @@ class Game:  # pylint: disable=R0903
 
         self.__observer: Observer = observer
 
-        self.__controls: Controls = controles
-
         self.__role: Role = Role(self.__observer, keeper_id=keeper_id)
 
         self.__send: Callable[[SimCommands], None] = send
@@ -74,15 +73,7 @@ class Game:  # pylint: disable=R0903
 
         self.__gui: Gui = Gui(show_gui, self.__observer, self.__role)
 
-        self.__subrole: SubRole = SubRole(self.__observer, self.__role)
-
-        self.__offense: Offense = Offense(self.__observer, self.__role, self.__subrole, self.__controls)
-
-        self.__defense: Defense = Defense(self.__observer, self.__role, self.__subrole, self.__controls)
-
-        self.__keeper: Keeper = Keeper(self.__observer, self.__role, self.__controls)
-
-        self.__ball_placement: BallPlacement = BallPlacement(self.__observer, self.__role, self.__controls)
+        self.__strategy: Strategy = Strategy(self.__observer, self.__role, controls)
 
         self.__tmp_ball_diff_sum: float = float(0)
 
@@ -92,7 +83,7 @@ class Game:  # pylint: disable=R0903
         while True:
             self.__observer.main()
             self.__role.main()
-            self.__subrole.main()
+            self.__strategy.subrole.main()
             self.__gui.update()
 
             args: tuple[
@@ -114,7 +105,7 @@ class Game:  # pylint: disable=R0903
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
         if self.__use_test_rule:
-            return (test_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (test_cbf, self.__strategy)
             # return (test_cbf, (self.__ball_placement,))
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
@@ -135,10 +126,10 @@ class Game:  # pylint: disable=R0903
                 if self.__is_their_penalty(prev_cmd):
                     return (on_penalty_their_cbf, self.__observer)
 
-            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_default_cbf, self.__strategy)
 
         if cmd is REF_COMMAND.FORCE_START:
-            return (on_force_start_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_force_start_cbf, self.__strategy)
 
         if self.__is_our_kickoff(cmd):
             return (on_prep_kickoff_our_cbf, self.__observer)
@@ -154,27 +145,27 @@ class Game:  # pylint: disable=R0903
 
         if self.__is_our_direct_free(cmd):
             if not self.__is_ball_moved():
-                return (on_direct_our_cbf, (self.__defense, self.__keeper, self.__offense))
+                return (on_direct_our_cbf, self.__strategy)
             self.__tmp_ball_diff_sum = float(0)
-            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_default_cbf, self.__strategy)
 
         if self.__is_their_direct_free(cmd):
             if not self.__is_ball_moved():
                 return (on_direct_their_cbf, self.__observer)
             self.__tmp_ball_diff_sum = float(0)
-            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_default_cbf, self.__strategy)
 
         if self.__is_our_indirect_free(cmd):
             if not self.__is_ball_moved():
                 return (on_indirect_our_cbf, self.__observer)
             self.__tmp_ball_diff_sum = float(0)
-            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_default_cbf, self.__strategy)
 
         if self.__is_their_indirect_free(cmd):
             if not self.__is_ball_moved():
                 return (on_indirect_their_cbf, self.__observer)
             self.__tmp_ball_diff_sum = float(0)
-            return (on_default_cbf, (self.__defense, self.__keeper, self.__offense))
+            return (on_default_cbf, self.__strategy)
 
         if self.__is_our_timeout(cmd):
             return (on_timeout_our_cbf, self.__observer)
@@ -186,12 +177,12 @@ class Game:  # pylint: disable=R0903
             pass
 
         if self.__is_our_placement(cmd):
-            return (on_placement_our_cbf, (self.__ball_placement,))
+            return (on_placement_our_cbf, self.__strategy)
 
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
 
-        return (on_stop_cbf, (self.__defense, self.__keeper, self.__offense))
+        return (on_stop_cbf, self.__strategy)
 
     def __is_ball_moved(self, distance: float = 15e2) -> bool:
         """__is_ball_moved"""

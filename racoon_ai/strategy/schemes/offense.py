@@ -16,9 +16,8 @@ from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
 
+from ..role import Role, SubRole
 from .base import StrategyBase
-from .role import Role
-from .subrole import SubRole
 
 
 class Offense(StrategyBase):
@@ -74,9 +73,8 @@ class Offense(StrategyBase):
         cmd: RobotCommand
 
         for i in range(self.role.get_offense_quantity):
-            bot = self.observer.get_our_by_id(self.role.get_offense_id(i))
-            if bot:
-                if bot.robot_id == self.__subrole.our_attacker_id:
+            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+                if bot.robot_id != self.__subrole.our_attacker_id:
                     radian_goal_ball = MU.radian(self.observer.geometry.their_goal, self.observer.ball)
                     radian_ball_robot = MU.radian(self.observer.ball, bot)
                     target_pose = Pose(
@@ -85,12 +83,11 @@ class Offense(StrategyBase):
                         radian_ball_robot,
                     )
                     cmd = self.controls.pid(target_pose, bot)
-                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
-                    cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
-                    cmd = self.controls.avoid_penalty_area(cmd, bot)
-                    cmd = self.controls.speed_limiter(cmd)
-                    self.send_cmds.append(cmd)
                 else:
                     cmd = RobotCommand(bot.robot_id)
-                    cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
-                    self.send_cmds.append(cmd)
+
+                cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
+                cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
+                cmd = self.controls.avoid_penalty_area(cmd, bot)
+                cmd = self.controls.speed_limiter(cmd)
+                self.send_cmds.append(cmd)
