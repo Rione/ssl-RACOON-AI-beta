@@ -14,7 +14,7 @@ from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.movement import Controls
 from racoon_ai.observer import Observer
-from racoon_ai.strategy import BallPlacement, Defense, Keeper, Offense, Role, SubRole
+from racoon_ai.strategy import Defense, Keeper, Offense, OutOfPlay, Role, SubRole
 
 from .rules import RULE_ARG_TYPE, rule_handler
 from .rules.on_direct import on_direct_our_cbf, on_direct_their_cbf
@@ -82,7 +82,7 @@ class Game:  # pylint: disable=R0903
 
         self.__keeper: Keeper = Keeper(self.__observer, self.__role, self.__controls)
 
-        self.__ball_placement: BallPlacement = BallPlacement(self.__observer, self.__role, self.__controls)
+        self.__out_of_play: OutOfPlay = OutOfPlay(self.__observer, self.__role, self.__subrole, self.__controls)
 
         self.__tmp_ball_diff_sum: float = float(0)
 
@@ -186,7 +186,7 @@ class Game:  # pylint: disable=R0903
             pass
 
         if self.__is_our_placement(cmd):
-            return (on_placement_our_cbf, (self.__ball_placement,))
+            return (on_placement_our_cbf, (self.__out_of_play,))
 
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__observer)
