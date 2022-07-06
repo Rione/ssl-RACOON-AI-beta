@@ -47,6 +47,7 @@ class RacoonMain:
             self.__controls,
             self.__sender.send,
             show_gui=conf.getboolean("commons", "showGui"),
+            use_test_rule=conf.getboolean("commons", "useTestRule"),
         )
 
         self.__game.main()
