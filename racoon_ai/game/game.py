@@ -36,7 +36,7 @@ from .rules.on_test import test_cbf
 from .rules.on_timeout import on_timeout_our_cbf, on_timeout_their_cbf
 
 
-class Game:
+class Game:  # pylint: disable=R0903
     """Game
 
     Args:
@@ -54,6 +54,7 @@ class Game:
         send: Callable[[SimCommands], None],
         *,
         show_gui: bool = False,
+        use_test_rule: bool = False,
         keeper_id: int = 0,
     ) -> None:
 
@@ -67,6 +68,9 @@ class Game:
         self.__role: Role = Role(self.__observer, keeper_id=keeper_id)
 
         self.__send: Callable[[SimCommands], None] = send
+
+        self.__use_test_rule: bool = use_test_rule
+        self.__logger.info("Use test rule: %s", self.__use_test_rule)
 
         self.__gui: Gui = Gui(show_gui, self.__observer, self.__role)
 
@@ -94,7 +98,7 @@ class Game:
             args: tuple[
                 Callable[[Logger, RULE_ARG_TYPE], list[RobotCommand]],
                 RULE_ARG_TYPE,
-            ] = self.handle_ref_command()
+            ] = self._handle_ref_command()
             sim_cmds = SimCommands(
                 self.__observer.is_team_yellow,
                 rule_handler(args[0], self.__logger, args[1]),
@@ -103,14 +107,13 @@ class Game:
             self.__logger.debug(sim_cmds)
             self.__send(sim_cmds)
 
-    def handle_ref_command(  # pylint: disable=R0911,R0912
+    def _handle_ref_command(  # pylint: disable=R0911,R0912
         self,
     ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
-        test_mode: bool = False
-        if test_mode:
+        if self.__use_test_rule:
             return (test_cbf, (self.__defense, self.__keeper, self.__offense))
             # return (test_cbf, (self.__ball_placement,))
 
