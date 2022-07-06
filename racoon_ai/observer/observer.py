@@ -18,7 +18,7 @@ from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class Observer(MWReceiver):  # pylint: disable=R0904
+class Observer:  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
@@ -40,7 +40,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         port: int = 30011,
     ) -> None:
 
-        super().__init__(host, port)
+        self.__mw_receiver: MWReceiver = MWReceiver(host, port)
 
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
@@ -71,11 +71,11 @@ class Observer(MWReceiver):  # pylint: disable=R0904
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
-        super().__del__()
+        del self.__mw_receiver
 
     def main(self) -> None:
         """main"""
-        proto: RacoonMW_Packet = super().recv()
+        proto: RacoonMW_Packet = self.__mw_receiver.recv()
 
         self.__sec_per_frame = proto.info.secperframe
 
@@ -110,7 +110,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             del bot
 
         for proto_bot in proto.enemy_robots:
-            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
+            bot = self.get_enemy_by_id(proto_bot.robot_id, False)
             if not bot:
                 self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
                 continue
@@ -218,9 +218,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             set[Robot]: Available robots (i.e. is_visible)
         """
         return set(
-            bot
-            for bot in (self.get_enemy_by_id(bid, True, True) for bid in range(self.num_of_enemy_vision_robots))
-            if bot
+            bot for bot in (self.get_enemy_by_id(bid, True) for bid in range(self.num_of_enemy_vision_robots)) if bot
         )
 
     def get_our_by_id(self, robot_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
@@ -241,12 +239,11 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             only_visible=only_visible,
         )
 
-    def get_enemy_by_id(self, enemy_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
+    def get_enemy_by_id(self, enemy_id: int, only_visible: bool = True) -> Optional[Robot]:
         """get_enemy_by_id
 
         Args:
             enemy_id (int): Enemy ID
-            only_online (bool, optional): If true, only return online robot (default: False)
             only_visible (bool, optional): If true, only return visible robot (default: True)
 
         Returns:
@@ -256,7 +253,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             enemy_id,
             maximum=len(self.__enemy_robots),
             search_enemy=True,
-            only_online=only_online,
+            only_online=False,
             only_visible=only_visible,
         )
 
