@@ -67,15 +67,14 @@ class Defense(StrategyBase):
         # defenseのテスト動作
         self.__enemy_offense_decide()
 
+        if self.__enemy_quantity <= 1:
+            self.default_position()
+            return
+
         for i in range(self.__defense_quantity):
             bot: Optional[Robot]
             if bot := self.observer.get_our_by_id(self.role.get_defense_id(i)):
                 cmd: RobotCommand
-                if self.__enemy_quantity <= 1:
-                    cmd = self.__default_position(bot, i)
-                    self.send_cmds += [cmd]
-                    continue
-
                 ene: Optional[Robot]
                 if ene := self.observer.get_enemy_by_id(self.__enemy_offense[i]):
                     cmd = self.__keep_penalty_area(bot, ene)
@@ -164,31 +163,37 @@ class Defense(StrategyBase):
 
         return self.controls.pid(target_pose, robot)
 
-    def __default_position(self, robot: Robot, i: int) -> RobotCommand:
+    def default_position(self) -> None:
         """keep_penalty_area"""
 
         target_pose: Pose
-        if self.__defense_quantity == 1:
-            target_pose = Pose(
-                (
-                    self.__goal.x
-                    + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
-                ),
-                self.__goal.y,
-                MU.radian(self.__their_goal, self.__goal),
-            )
+        cmd: RobotCommand
+        self.send_cmds = []
+        self.__defense_quantity = self.role.get_defense_quantity
 
-        else:
-            target_pose = Pose(
-                (
-                    self.__goal.x
-                    + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
-                ),
-                (
-                    self.observer.geometry.goal_width
-                    - i * (self.observer.geometry.goal_width * 2 / (self.__defense_quantity - 1))
-                ),
-                MU.radian(self.__their_goal, self.__goal),
-            )
+        for i in range(self.__defense_quantity):
+            if bot := self.observer.get_our_by_id(self.role.get_defense_id(i)):
+                if self.__defense_quantity == 1:
+                    target_pose = Pose(
+                        (
+                            self.__goal.x
+                            + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                        ),
+                        self.__goal.y,
+                        MU.radian(self.__their_goal, self.__goal),
+                    )
 
-        return self.controls.pid(target_pose, robot)
+                else:
+                    target_pose = Pose(
+                        (
+                            self.__goal.x
+                            + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                        ),
+                        (
+                            self.observer.geometry.goal_width
+                            - i * (self.observer.geometry.goal_width * 2 / (self.__defense_quantity - 1))
+                        ),
+                        MU.radian(self.__their_goal, self.__goal),
+                    )
+                cmd = self.controls.pid(target_pose, bot)
+                self.send_cmds += [cmd]
