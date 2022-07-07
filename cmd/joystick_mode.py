@@ -1,23 +1,23 @@
 #!/usr/bin/env python3.10
-# mypy: ignore-errors
-# pylint: skip-file
+# pylint: disable=R0801
 
 """joystick_mode.py
 
     This is the joystick script.
 """
 
-import time
 from math import radians
+from sys import exit as sys_exit
+from time import sleep
 
-import pygame  # type: ignore
-from pygame.locals import JOYAXISMOTION, JOYBUTTONDOWN  # pylint: disable=no-name-in-module
+import pygame
+from pygame import JOYAXISMOTION, JOYBUTTONDOWN  # pylint: disable=E0611
 
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.networks.sender import CommandSender
 
 
-def main() -> None:
+def main() -> None:  # pylint: disable=R0912,R0915
     """main
 
     This function is for the main function.
@@ -34,7 +34,7 @@ def main() -> None:
         print("ボタン数 :", joystick.get_numbuttons())
     except pygame.error:
         print("ジョイスティックが接続されていません")
-        exit()
+        sys_exit()
 
     # pygameの初期化
     pygame.init()
@@ -49,27 +49,22 @@ def main() -> None:
     try:
         while active:
             # イベントの取得
-            for e in pygame.event.get():
+            for event in pygame.event.get():
                 sim_cmds = SimCommands(isteamyellow=False)
-                command = RobotCommand(int(robot_id))
-                command.vel_fwd = 0
-                command.vel_sway = 0
-                command.vel_angular = 0
-                command.dribble_pow = 0
-                command.kickpow = 0
+                command = RobotCommand(int(robot_id), chip_enabled=False, use_imu=False)
 
                 # Button 9 (R1)
-                if joystick.get_button(9) == 1:
+                if joystick.get_button(9):
                     command.dribble_pow = 1
 
-                if joystick.get_button(5) == 1:
+                if joystick.get_button(5):
                     command.vel_angular = radians(30)
 
-                if joystick.get_button(7) == 1:
+                if joystick.get_button(7):
                     command.vel_angular = radians(-30)
 
                 # ジョイスティックのボタンの入力
-                if e.type == JOYAXISMOTION:
+                if event.type == JOYAXISMOTION:
 
                     # PS3 DUALSHOCK: MARU
                     if joystick.get_button(13):
@@ -100,14 +95,14 @@ def main() -> None:
 
                     sender.send(sim_cmds)
 
-                    time.sleep(0.016)
+                    sleep(0.016)
 
-                elif e.type == JOYBUTTONDOWN:
-                    if int(e.button) == 11:
+                elif event.type == JOYBUTTONDOWN:
+                    if int(event.button) == 11:
                         command.kickpow = 80
                         sim_cmds.robot_commands.append(command)
                         sender.send(sim_cmds)
-                        time.sleep(0.016)
+                        sleep(0.016)
 
     finally:
         print("終了します")
