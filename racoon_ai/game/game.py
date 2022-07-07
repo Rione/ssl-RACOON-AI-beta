@@ -166,10 +166,10 @@ class Game:  # pylint: disable=R0903
             return (on_default_cbf, self.__strategy)
 
         if self.__is_our_timeout(cmd):
-            return (on_timeout_our_cbf, self.__observer)
+            return (on_timeout_our_cbf, self.__strategy)
 
         if self.__is_their_timeout(cmd):
-            return (on_timeout_their_cbf, self.__observer)
+            return (on_timeout_their_cbf, self.__strategy)
 
         if cmd is (REF_COMMAND.GOAL_BLUE or REF_COMMAND.GOAL_YELLOW):
             pass
