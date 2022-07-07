@@ -56,7 +56,7 @@ class Offense(StrategyBase):
                         abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
                     ):
                         cmd.kickpow = 10
-                    # cmd = self.controls.avoid_enemy(cmd, bot, Pose(self.observer.ball.x, self.observer.ball.y))
+                    # cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
                     # cmd = self.controls.avoid_penalty_area(cmd, bot)
                     cmd = self.controls.speed_limiter(cmd)
                     self.send_cmds += [cmd]

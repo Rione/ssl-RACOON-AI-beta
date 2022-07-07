@@ -28,7 +28,7 @@ class Role:
 
     def __init__(self, observer: Observer, *, keeper_id: int = 0) -> None:
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
+        self.__logger.debug("Initializing...")
         self.__observer: Observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
