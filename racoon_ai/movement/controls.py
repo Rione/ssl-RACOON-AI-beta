@@ -144,8 +144,8 @@ class Controls:
         if adjustment <= limiter:
             return cmd
 
-        cmd.vel_sway = cmd.vel_sway / MU.div_safe(adjustment * limiter)
-        cmd.vel_fwd = cmd.vel_fwd / MU.div_safe(adjustment * limiter)
+        cmd.vel_sway = (cmd.vel_sway / MU.div_safe(adjustment)) * limiter
+        cmd.vel_fwd = (cmd.vel_fwd / MU.div_safe(adjustment)) * limiter
         return cmd
 
     def avoid_enemy(self, cmd: RobotCommand, bot: Robot, target_point: Point) -> RobotCommand:
