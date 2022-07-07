@@ -12,7 +12,7 @@ from PySide6.QtCore import QTimer  # pylint: disable=E0611
 from PySide6.QtGui import QColor, QFont  # pylint: disable=E0611
 from PySide6.QtWidgets import QLabel  # pylint: disable=E0611
 
-from racoon_ai.networks.receiver import MWReceiver
+from racoon_ai.observer import Observer
 
 from .main import Main
 
@@ -25,8 +25,8 @@ class Chart:  # pylint: disable=R0903
         None
     """
 
-    def __init__(self, main: Main, observer: MWReceiver) -> None:
-        self.__observer: MWReceiver = observer
+    def __init__(self, main: Main, observer: Observer) -> None:
+        self.__observer: Observer = observer
         self.__main: Main = main
         self.graphWidget: PlotWidget = PlotWidget(self.__main)  # pylint: disable=C0103
         self.__speed_text: QLabel

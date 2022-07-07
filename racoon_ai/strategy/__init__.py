@@ -1,16 +1,11 @@
 #!/usr/bin/env python 3.10
 # pylint: disable=C0114
 
-from .defense import Defense
-from .goal_keeper import Keeper
-from .offense import Offense
-from .role import Role
-from .subrole import SubRole
+from . import role, schemes
+from .strategy import Strategy
 
 __all__ = [
-    "Defense",
-    "Keeper",
-    "Offense",
-    "Role",
-    "SubRole",
+    "role",
+    "schemes",
+    "Strategy",
 ]

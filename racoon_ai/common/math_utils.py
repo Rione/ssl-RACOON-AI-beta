@@ -15,23 +15,30 @@ from racoon_ai.models.coordinate import Point, Pose
 class MathUtils:
     """MathUtils
 
-    This class contains
+    This class contains:
+        - PI
         - TWO_PI
+        - HALF_PI
         - PI_SQUARE
-        - angle_normalize
-        - angle_reduce
+        - div_safe
+        - distance
+        - radian
+        - radian_normalize
+        - radian_reduce
+        - has_intersection_with_line
     """
 
     PI: Final[float] = pi
 
     TWO_PI: Final[float] = 2 * PI
 
+    HALF_PI: Final[float] = PI / 2
+
     PI_SQUARE: Final[float] = pow(PI, 2)
 
     @staticmethod
     def div_safe(val: float, designated: float = 1e-10) -> float:
         """div_safe
-
         judge if value is zero and return the designated
 
         Args:

@@ -8,6 +8,7 @@
 
 from typing import Optional
 
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Robot_Infos
 
@@ -19,6 +20,8 @@ class Robot(Pose):
     Args:
         robot_id (int): robot id
 
+        is_imu_enabled (bool): is imu enabled
+
     Attributes:
         robot_id (int): robot id
 
@@ -28,13 +31,9 @@ class Robot(Pose):
 
         theta (float): orientation (radian) in the x-y plane
 
-        diff_x (float): difference between x coordinate and last x coordinate
-
-        diff_y (float): difference between y coordinate and last y coordinate
-
-        diff_theta (float): difference between orientation and last orientation
-
         z (float): z coordinate
+
+        diff (Pose): difference between this and previous pose
 
         distance_ball_robot (float): distance between ball and robot center
 
@@ -57,14 +56,14 @@ class Robot(Pose):
         battery_voltage (float, optional) : battery voltage
     """
 
-    def __init__(self, robot_id: int) -> None:
+    def __init__(self, robot_id: int, is_imu_enabled: bool = False) -> None:
         super().__init__(0, 0)  # x, y, theta, z
         self.__robot_id: int = robot_id
-        self.__diff_x: float = float(0)
-        self.__diff_y: float = float(0)
-        self.__diff_theta: float = float(0)
+        self.__is_imu_enabled: bool = is_imu_enabled
+        self.__diff: Pose = Pose(0, 0)
         self.__distance_ball_robot: float = float(0)
         self.__radian_ball_robot: float = float(0)
+        self.__sec_par_frame: float = float(0)
         self.__speed: float = float(0)
         self.__speed_slope: float = float(0)
         self.__speed_intercept: float = float(0)
@@ -75,40 +74,24 @@ class Robot(Pose):
         self.__battery_voltage: Optional[float] = None
 
     def __str__(self) -> str:
-        if self.__battery_voltage is None:
-            return (
-                "("
-                f"id={self.robot_id:2d}, "
-                f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
-                f"rad_ball_robot={self.radian_ball_robot:.1f}, "
-                f"dist_ball_robot={self.distance_ball_robot:.1f}, "
-                f"speed={self.speed:.1f}, "
-                f"speed_slope={self.speed_slope:.1f}, "
-                f"speed_intercept={self.speed_intercept:.1f}, "
-                f"vel_angular={self.vel_angular:.1f}, "
-                f"ball_catched={self.is_ball_catched:b}, "
-                f"is_online={self.is_online:b}, "
-                f"is_visible={self.is_visible:b},"
-                f"battery_vol={None}"
-                ")"
-            )
-
-        return (
-            "("
-            f"id={self.robot_id:2d}, "
-            f"pose=Pose({self.x:.1f}, {self.y:.1f}, {self.theta:.1f}, {self.z:.1f}), "
-            f"radian_ball={self.radian_ball_robot:.1f}, "
-            f"distance_ball={self.distance_ball_robot:.1f}, "
-            f"speed={self.speed:.1f}, "
-            f"speed_slope={self.speed_slope:.1f}, "
-            f"speed_intercept={self.speed_intercept:.1f}, "
-            f"vel_angular={self.vel_angular:.1f}, "
-            f"ball_catched={self.is_ball_catched:b}, "
-            f"is_online={self.is_online:b}, "
-            f"is_visible={self.is_visible:b},"
-            f"battery_voltage={self.battery_voltage:3.1%}"
-            ")"
-        )
+        msg: str = "("
+        msg += f"id={self.robot_id:2d}, "
+        msg += f"imu_enabled={self.is_imu_enabled!s}, "
+        msg += f"pose=Pose{super().__str__()}, "
+        msg += f"diff=Pose{self.diff!s}, "
+        msg += f"vel=Pose{self.velocity!s} , "
+        msg += f"rad_ball_robot={self.radian_ball_robot:.1f}, "
+        msg += f"dist_ball_robot={self.distance_ball_robot:.1f}, "
+        msg += f"speed={self.speed:.1f}, "
+        msg += f"speed_slope={self.speed_slope:.1f}, "
+        msg += f"speed_intercept={self.speed_intercept:.1f}, "
+        msg += f"vel_angular={self.vel_angular:.1f}, "
+        msg += f"ball_catched={self.is_ball_catched!s}, "
+        msg += f"is_online={self.is_online!s}, "
+        msg += f"is_visible={self.is_visible!s}, "
+        msg += f"battery_vol={self.battery_voltage:.2E}" if self.battery_voltage is not None else "battery_vol=#N/A"
+        msg += ")"
+        return msg
 
     def __repr__(self) -> str:
         raise NotImplementedError
@@ -136,52 +119,70 @@ class Robot(Pose):
         """robot id"""
         return self.__robot_id
 
-    # pylint: disable=R0801
     @property
-    def diff_x(self) -> float:
-        """diff_x"""
-        return self.__diff_x
+    def is_imu_enabled(self) -> bool:
+        """is_imu_enabled"""
+        return self.__is_imu_enabled
 
-    # pylint: disable=R0801
     @property
-    def diff_y(self) -> float:
-        """diff_y"""
-        return self.__diff_y
+    def diff(self) -> Pose:
+        """diff
 
-    # pylint: disable=R0801
-    @property
-    def diff_theta(self) -> float:
-        """diff_theta"""
-        return self.__diff_theta
+        diff between this and last pose
 
-    # pylint: disable=R0801
+        NOTE: `diff.z` is not available now (always 0)
+        """
+        return self.__diff
+
     @property
-    def speed(self) -> float:
+    def velocity(self) -> Pose:
+        """velocity
+
+        velocity of robot
+
+        Returns:
+            Pose: velocity of robot
+        """
+        return Pose(
+            self.diff.x / MU.div_safe(self.__sec_par_frame),
+            self.diff.y / MU.div_safe(self.__sec_par_frame),
+            self.diff.theta / MU.div_safe(self.__sec_par_frame),
+            0,
+        )
+
+    @property
+    def speed(self) -> float:  # pylint: disable=R0801
         """speed
 
         speed of robot (absolute value)
+
+        Returns:
+            float
         """
         return self.__speed
 
-    # pylint: disable=R0801
     @property
-    def speed_slope(self) -> float:
+    def speed_slope(self) -> float:  # pylint: disable=R0801
         """speed_slope
 
         slope of robot speed
+
+        Returns:
+            float
         """
         return self.__speed_slope
 
-    # pylint: disable=R0801
     @property
-    def speed_intercept(self) -> float:
+    def speed_intercept(self) -> float:  # pylint: disable=R0801
         """speed_intercept
 
         intercept of robot speed relative t Y-axis
+
+        Returns:
+            float
         """
         return self.__speed_intercept
 
-    # pylint: disable=R0801
     @property
     def vel_angular(self) -> float:
         """vel_angular"""
@@ -207,7 +208,7 @@ class Robot(Pose):
         """battery_voltage"""
         return self.__battery_voltage
 
-    def update(self, drobot: Robot_Infos) -> None:
+    def update(self, drobot: Robot_Infos, sec_par_frame: float) -> None:
         """
         Update robot
 
@@ -215,6 +216,7 @@ class Robot(Pose):
             drobot (Robot_Infos): Robot_Infos
         """
         self.__from_proto(drobot)
+        self.__sec_par_frame = sec_par_frame
 
     def __from_proto(self, dbot: Robot_Infos) -> None:
         """from_proto
@@ -225,9 +227,7 @@ class Robot(Pose):
         self.x = dbot.x
         self.y = dbot.y
         self.theta = dbot.theta
-        self.__diff_x = dbot.diff_x
-        self.__diff_y = dbot.diff_y
-        self.__diff_theta = dbot.diff_theta
+        self.__diff = Pose(dbot.diff_x, dbot.diff_y, dbot.diff_theta, 0)
         self.__distance_ball_robot = dbot.distance_ball_robot
         self.__radian_ball_robot = dbot.radian_ball_robot
         self.__speed = dbot.speed

@@ -9,7 +9,9 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.networks.receiver.mw_receiver import MWReceiver
+from racoon_ai.models.coordinate import Point
+from racoon_ai.models.robot import Robot
+from racoon_ai.observer import Observer
 
 
 class Role:
@@ -24,10 +26,10 @@ class Role:
         defense_id_list (list[int]): Defensive robots id.
     """
 
-    def __init__(self, observer: MWReceiver, *, keeper_id: int = 0) -> None:
+    def __init__(self, observer: Observer, *, keeper_id: int = 0) -> None:
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
-        self.__observer = observer
+        self.__logger.debug("Initializing...")
+        self.__observer: Observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
         self.__keeper: int = keeper_id
@@ -52,6 +54,9 @@ class Role:
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
+        self.__goal: Point = self.__observer.geometry.goal
+        self.__their_goal: Point = self.__observer.geometry.their_goal
+        self.__attack_direction: float = self.__observer.attack_direction
 
     @property
     def keeper_id(self) -> int:
@@ -80,7 +85,7 @@ class Role:
 
     def get_offense_id(self, offense_id: int) -> int:
         """get_offense_id"""
-        return self.__defense[offense_id]
+        return self.__offense[offense_id]
 
     def get_defense_id(self, defense_id: int) -> int:
         """get_defense_id"""
@@ -115,8 +120,9 @@ class Role:
         defense = [
             (
                 robot.robot_id,
-                self.__defence_basis_dis(robot.robot_id),
-                MU.radian(robot, self.__observer.geometry.goal),
+                self.__defence_basis_dis(robot),
+                MU.radian_reduce(MU.radian(robot, self.__goal), MU.radian(self.__their_goal, self.__goal))
+                * self.__attack_direction,
             )
             for robot in self.__observer.our_robots_available
             if robot.robot_id != self.keeper_id
@@ -128,19 +134,19 @@ class Role:
             defense.sort(reverse=True, key=lambda x: x[2])
         self.__defense = list(row[0] for row in defense)
 
-    def __defence_basis_dis(self, robot_id: int) -> float:
+    def __defence_basis_dis(self, bot: Robot) -> float:
         """defence_basis_dis"""
 
-        robot = self.__observer.get_our_by_id(robot_id)
-        if robot is None:
-            return float(1e6)
+        if not bot:
+            return 1e6
 
-        theta = MU.radian(robot, self.__observer.geometry.goal)
-        robot_dis = MU.distance(robot, self.__observer.geometry.goal)
+        theta = MU.radian_reduce(MU.radian(bot, self.__goal), MU.radian(self.__their_goal, self.__goal))
+        robot_dis = MU.distance(bot, self.__goal)
 
         if abs(theta) < (MU.PI / 4):
-            return robot_dis - (self.__observer.geometry.penalty_area_depth / cos(theta))
-        return robot_dis - (self.__observer.geometry.penalty_area_width / sin(theta))
+            return robot_dis - (self.__observer.geometry.goal_width / cos(theta))
+        return robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
+        # 上記の値が帰ってくるようになったらデバック
 
     def __decide_offense(self) -> None:
         """decide_offense

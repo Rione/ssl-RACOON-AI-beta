@@ -8,6 +8,7 @@
 """
 
 import time
+from math import radians
 
 import pygame  # type: ignore
 from pygame.locals import JOYAXISMOTION, JOYBUTTONDOWN  # pylint: disable=no-name-in-module
@@ -41,7 +42,7 @@ def main() -> None:
     robot_id: str = input("テストするロボットIDを入力してください: ")
 
     # センダーの設定
-    sender = CommandSender(is_real=True, online_ids=[int(robot_id)])
+    sender = CommandSender(is_real=True, target_ids={int(robot_id)})
 
     # ループ
     active = True
@@ -62,10 +63,10 @@ def main() -> None:
                     command.dribble_pow = 1
 
                 if joystick.get_button(5) == 1:
-                    command.vel_angular = 0.05
+                    command.vel_angular = radians(30)
 
                 if joystick.get_button(7) == 1:
-                    command.vel_angular = -0.05
+                    command.vel_angular = radians(-30)
 
                 # ジョイスティックのボタンの入力
                 if e.type == JOYAXISMOTION:
@@ -92,8 +93,8 @@ def main() -> None:
 
                     command.vel_fwd = int(joystick.get_axis(1) * 10) * 0.1 * -1
                     command.vel_sway = int(joystick.get_axis(0) * 10) * 0.1 * -1
-                    command.vel_angular = int(joystick.get_axis(2) * 10) * 0.1 * 0.3 * -1
-                    print("十時キー:", command.vel_fwd, command.vel_sway)
+                    command.vel_angular = radians(int(joystick.get_axis(2) * 10) * 18) * -1
+                    print("十時キー:", command.vel_fwd, command.vel_sway, command.vel_angular)
 
                     sim_cmds.robot_commands.append(command)
 
@@ -103,7 +104,7 @@ def main() -> None:
 
                 elif e.type == JOYBUTTONDOWN:
                     if int(e.button) == 11:
-                        command.kickpow = 1
+                        command.kickpow = 80
                         sim_cmds.robot_commands.append(command)
                         sender.send(sim_cmds)
                         time.sleep(0.016)
