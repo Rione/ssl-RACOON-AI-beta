@@ -13,7 +13,7 @@ from typing import Optional
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot
-from racoon_ai.movement import Controls
+from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
 
 from ..role import Role, SubRole
@@ -45,6 +45,11 @@ class OutOfPlay(StrategyBase):
         self.__is_arrived: bool = False
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
+
+    def reset_imu(self) -> None:
+        """reset_imu"""
+        self.send_cmds = []
+        self.send_cmds += reset_all_imu(list(self.observer.our_robots_available))
 
     def placement_our(self) -> None:
         """placement_our"""

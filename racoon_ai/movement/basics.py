@@ -44,3 +44,31 @@ def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
     command.vel_angular = MU.radian_reduce(radian_target_robot, rotation)
     command.target_pose = dist
     return command
+
+
+def _reset_imu(bot: Robot) -> RobotCommand:
+    """reset_imu
+
+    Args:
+        bot (Robot)
+
+    Returns:
+        RobotCommand
+    """
+    cmd: RobotCommand = RobotCommand(bot.robot_id + 100, use_imu=bot.is_imu_enabled)
+    cmd.target_pose = bot
+    cmd.target_pose.theta = MU.radian_normalize(bot.theta)
+    return cmd
+
+
+def reset_all_imu(our_available_bots: list[Robot]) -> list[RobotCommand]:
+    """reset_all_imu
+
+    Args:
+        target_ids (set[int])
+
+    Returns:
+        list[RobotCommand]
+    """
+    print([_reset_imu(bot) for bot in our_available_bots if bot.is_imu_enabled])
+    return []
