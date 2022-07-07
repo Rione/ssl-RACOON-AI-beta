@@ -70,5 +70,4 @@ def reset_all_imu(our_available_bots: list[Robot]) -> list[RobotCommand]:
     Returns:
         list[RobotCommand]
     """
-    print([_reset_imu(bot) for bot in our_available_bots if bot.is_imu_enabled])
-    return []
+    return [_reset_imu(bot) for bot in our_available_bots if bot.is_imu_enabled]
