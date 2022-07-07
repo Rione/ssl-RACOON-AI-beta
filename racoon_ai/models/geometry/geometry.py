@@ -67,6 +67,7 @@ class Geometry:
         self.__ball_radius: float = float(0)
         self.__max_robot_radius: float = float(0)
         self.__goal: Point = Point(0, 0)
+        self.__attack_direction: int = int(1)
 
     def __str__(self) -> str:
         return (
@@ -86,7 +87,7 @@ class Geometry:
             f"goal_height={self.goal_height:1d}, "
             f"ball_radius={self.ball_radius:.1f}, "
             f"max_robot_radius={self.max_robot_radius:.1f}, "
-            f"goal=Point(x={self.goal_x:.1f}, y={self.goal_y:.1f})"
+            f"goal=Point(x={self.goal.x:.1f}, y={self.goal.y:.1f})"
             ")"
         )
 
@@ -168,24 +169,14 @@ class Geometry:
     @property
     def goal(self) -> Point:
         """goal"""
-        return self.__goal
-
-    @property
-    def goal_x(self) -> float:
-        """goal_x"""
-        return self.goal.x
-
-    @property
-    def goal_y(self) -> float:
-        """goal_y"""
-        return self.goal.y
+        return Point(self.__goal.x * self.__attack_direction, self.__goal.y)
 
     @property
     def their_goal(self) -> Point:
         """their_goal"""
-        return Point(-self.goal_x, self.goal_y)
+        return Point(-self.goal.x, self.goal.y)
 
-    def update(self, geometry: Geometry_Info) -> None:
+    def update(self, geometry: Geometry_Info, attack_direction: int) -> None:
         """
         Update robot
 
@@ -193,6 +184,7 @@ class Geometry:
             geometry (Geometry_Info): Geometry_Info
         """
         self.__from_proto(geometry)
+        self.__attack_direction = attack_direction
 
     def __from_proto(self, geometry: Geometry_Info) -> None:
         """from_proto
