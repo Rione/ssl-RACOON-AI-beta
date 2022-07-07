@@ -37,7 +37,7 @@ class OutOfPlay(StrategyBase):
         super().__init__(observer, controls, role)
 
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
+        self.__logger.debug("Initializing...")
 
         self.__subrole = subrole
 

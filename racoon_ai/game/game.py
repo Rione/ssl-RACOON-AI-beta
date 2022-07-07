@@ -102,12 +102,10 @@ class Game:  # pylint: disable=R0903
         self,
     ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
-        self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
-
         if self.__use_test_rule:
             return (test_cbf, self.__strategy)
-            # return (test_cbf, (self.__ball_placement,))
 
+        self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
         if cmd is REF_COMMAND.HALT:
             return (on_halt_cbf, self.__observer)
