@@ -1,12 +1,12 @@
 #!/usr/bin/env python3.10
-# pylint: skip-file
+# pylint: disable=R0801
 
 """drbr_test.py
 
     This is the dribbler test script.
 """
 
-import time
+from time import sleep
 
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.networks.sender import CommandSender
@@ -18,7 +18,7 @@ def main() -> None:
     This function is for the main function.
 
     Returns:
-        None`
+        None
     """
 
     robot_id: str = input("テストするロボットIDを入力してください: ")
@@ -31,18 +31,17 @@ def main() -> None:
         command.vel_fwd = 0
         command.vel_sway = 0
         command.vel_angular = -1.0
-        command.dribble_pow = False
-        command.kickpow = 0
+        command.dribble_pow = float(1)
+        command.kickpow = float(0)
 
         sim_cmds.robot_commands.append(command)
 
         while True:
             # Simulation又はRobotに送信
-            
             sender.send(sim_cmds)
 
             print("ドリブラー信号を送信しています.")
-            time.sleep(float(drr_sec))
+            sleep(float(drr_sec))
     finally:
         print("終了します")
         del sender
