@@ -27,6 +27,8 @@ class SubRole:
 
     def __init__(self, observer: Observer, role: Role) -> None:
         self.__logger = getLogger(__name__)
+        self.__logger.debug("Initializing ...")
+
         self.__our_attacker: int = -1
         self.__enemy_attacker: int = -1
         self.__receiver: int = -1
