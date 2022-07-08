@@ -29,7 +29,7 @@ def on_prep_kickoff_our_cbf(logger: Logger, strategies: Strategy) -> list[RobotC
 
     strategies.keeper.main()
 
-    strategies.out_of_play.pre_kick_off_offense()
+    strategies.out_of_play.pre_kick_off_offense(True)
 
     send_cmds: list[RobotCommand] = []
     send_cmds += strategies.defense.send_cmds

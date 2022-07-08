@@ -127,7 +127,7 @@ class OutOfPlay(StrategyBase):
 
         return self.send_cmds
 
-    def pre_kick_off_offense(self) -> None:
+    def pre_kick_off_offense(self, is_our: bool = False) -> None:
         """pre_kick_off_offense"""
 
         self.send_cmds = []
@@ -141,6 +141,16 @@ class OutOfPlay(StrategyBase):
                         self.observer.ball.y,
                         MU.radian(self.__their_goal, self.__goal),
                     )
+                    cmd = self.controls.pid(target_pose, bot)
+                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                    if is_our:
+                        target_pose = Pose(
+                            self.observer.ball.x - 120 * self.__attack_direction,
+                            self.observer.ball.y,
+                            MU.radian(self.__their_goal, self.__goal),
+                        )
+                        cmd = self.controls.pid(target_pose, bot)
+                        cmd = self.controls.avoid_ball(cmd, bot, target_pose, 120 * 1.2)
 
                 else:
                     target_pose = Pose(
@@ -148,8 +158,8 @@ class OutOfPlay(StrategyBase):
                         self.observer.geometry.field_width / 2 * (1 - 0.5 * (i + 1)),
                         MU.radian(self.__their_goal, self.__goal),
                     )
-                cmd = self.controls.pid(target_pose, bot)
-                cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                    cmd = self.controls.pid(target_pose, bot)
+                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                 cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
                 cmd = self.controls.speed_limiter(cmd)
                 self.send_cmds += [cmd]
