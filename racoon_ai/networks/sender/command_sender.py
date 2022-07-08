@@ -54,7 +54,7 @@ class CommandSender:
         self.__dists: set[IPNetAddr]
 
         if self.__is_real and self.__target_ids:
-            host_ips: set[str] = {f"192.168.100.1{robot_id:02d}" for robot_id in self.__target_ids}
+            host_ips: set[str] = {f"192.168.0.1{robot_id:02d}" for robot_id in self.__target_ids}
             self.__dists = {IPNetAddr(host, port, mod_name=__name__) for host in host_ips}
             self.__imu_reset()
             sleep(0.1)

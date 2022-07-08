@@ -86,7 +86,7 @@ class Geometry:
             f"goal_height={self.goal_height:1d}, "
             f"ball_radius={self.ball_radius:.1f}, "
             f"max_robot_radius={self.max_robot_radius:.1f}, "
-            f"goal=Point(x={self.goal_x:.1f}, y={self.goal_y:.1f})"
+            f"goal=Point(x={self.goal.x:.1f}, y={self.goal.y:.1f})"
             ")"
         )
 
@@ -171,19 +171,9 @@ class Geometry:
         return self.__goal
 
     @property
-    def goal_x(self) -> float:
-        """goal_x"""
-        return self.goal.x
-
-    @property
-    def goal_y(self) -> float:
-        """goal_y"""
-        return self.goal.y
-
-    @property
     def their_goal(self) -> Point:
         """their_goal"""
-        return Point(-self.goal_x, self.goal_y)
+        return Point(-self.goal.x, -self.goal.y)
 
     def update(self, geometry: Geometry_Info) -> None:
         """

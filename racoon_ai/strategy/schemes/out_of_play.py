@@ -10,9 +10,9 @@ from logging import getLogger
 from math import cos, sin
 from typing import Optional
 
-from racoon_ai.common.math_utils import MathUtils as MU
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
-from racoon_ai.models.robot import Robot
+from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
 
@@ -45,11 +45,13 @@ class OutOfPlay(StrategyBase):
         self.__is_arrived: bool = False
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
+        self.__maintenance_point: float = 1
 
     def reset_imu(self) -> None:
         """reset_imu"""
         self.send_cmds = []
         self.send_cmds += reset_all_imu(list(self.observer.our_robots_available))
+        self.__maintenance_point = 1  # 正or負
 
     def placement_our(self) -> None:
         """placement_our"""
@@ -102,3 +104,24 @@ class OutOfPlay(StrategyBase):
 
                 cmd.vel_angular = bot.radian_ball_robot
                 self.send_cmds += [cmd]
+
+    def time_out(self) -> list[RobotCommand]:
+        """placement_our"""
+        self.__logger.debug("Placement...")
+
+        self.send_cmds = []  # リスト初期化
+        bot: Optional[Robot]
+
+        target_pose = Pose(
+            -self.observer.geometry.field_length / 2 * self.observer.attack_direction,
+            self.observer.geometry.field_width / 2 * self.__maintenance_point,
+            0,
+        )
+
+        for bot in self.observer.our_robots_available:
+            cmd = self.controls.pid(target_pose, bot)
+            cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+            self.send_cmds += [cmd]
+            target_pose.x += 500 * self.observer.attack_direction
+
+        return self.send_cmds

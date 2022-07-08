@@ -26,8 +26,13 @@ def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
         logger (Logger): Logger instance.
         args: (Strategy) instance.
     """
-    # send_cmds: list[RobotCommand] = on_default_cbf(logger, args)
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, args)
-    # send_cmds: list[RobotCommand] = on_placement_our_cbf(logger, args)
+    args.defense.default_position()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += on_stop_cbf(logger, args)
+    # send_cmds += on_default_cbf(logger, args)
+    # send_cmds += on_stop_cbf(logger, args)
+    # send_cmds += on_placement_our_cbf(logger, args)
+    send_cmds += args.defense.send_cmds
     logger.debug(send_cmds)
     return send_cmds
