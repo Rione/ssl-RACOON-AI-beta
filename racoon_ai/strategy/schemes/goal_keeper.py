@@ -57,6 +57,9 @@ class Keeper(StrategyBase):
 
     def __keep_goal(self, robot: Robot) -> RobotCommand:
         """keep_goal"""
+        self.__goal.x=1150
+        self.__radius=400
+        self.__attack_direction=-1
         radian_ball_goal = MU.radian_reduce(
             MU.radian(self.observer.ball, self.__goal), MU.radian(self.__their_goal, self.__goal)
         )
@@ -69,5 +72,6 @@ class Keeper(StrategyBase):
             (self.__goal.y + self.__radius * sin(radian_ball_goal) * self.__attack_direction),
             radian_ball_robot,
         )
+        cmd = self.controls.pid(target_pose, robot, 0.5)
 
-        return self.controls.pid(target_pose, robot, -1)
+        return cmd

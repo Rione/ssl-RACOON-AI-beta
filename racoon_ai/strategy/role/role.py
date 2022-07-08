@@ -110,7 +110,7 @@ class Role:
 
     def __decide_keeper(self) -> None:
         """decide_keeper"""
-        self.__keeper = 0
+        self.__keeper = 3
 
     def __decide_defense(self) -> None:
         """decide_defense"""
