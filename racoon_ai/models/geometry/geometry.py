@@ -67,7 +67,6 @@ class Geometry:
         self.__ball_radius: float = float(0)
         self.__max_robot_radius: float = float(0)
         self.__goal: Point = Point(0, 0)
-        self.__attack_direction: int = int(1)
 
     def __str__(self) -> str:
         return (
@@ -169,14 +168,14 @@ class Geometry:
     @property
     def goal(self) -> Point:
         """goal"""
-        return Point(self.__goal.x * self.__attack_direction, self.__goal.y)
+        return self.__goal
 
     @property
     def their_goal(self) -> Point:
         """their_goal"""
-        return Point(-self.goal.x, self.goal.y)
+        return Point(-self.goal.x, -self.goal.y)
 
-    def update(self, geometry: Geometry_Info, attack_direction: int) -> None:
+    def update(self, geometry: Geometry_Info) -> None:
         """
         Update robot
 
@@ -184,7 +183,6 @@ class Geometry:
             geometry (Geometry_Info): Geometry_Info
         """
         self.__from_proto(geometry)
-        self.__attack_direction = attack_direction
 
     def __from_proto(self, geometry: Geometry_Info) -> None:
         """from_proto
