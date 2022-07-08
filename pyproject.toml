@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "racoon_ai"
-version = "0.5.0"
+version = "0.6.9"
 description = "Ri-one Accurate Operation AI"
 authors = ["Ri-one-SSL <rionesslq@gmail.com>"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
 python = "3.10.*"

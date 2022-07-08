@@ -9,6 +9,7 @@ from logging import getLogger
 from math import cos, sin
 
 from racoon_ai.common import MathUtils as MU
+from racoon_ai.models.coordinate import Point
 from racoon_ai.models.robot import Robot
 from racoon_ai.observer import Observer
 
@@ -27,7 +28,7 @@ class Role:
 
     def __init__(self, observer: Observer, *, keeper_id: int = 0) -> None:
         self.__logger = getLogger(__name__)
-        self.__logger.info("Initializing...")
+        self.__logger.debug("Initializing...")
         self.__observer: Observer = observer
         # self.__pass: int = 0
         # self.__pass_receive: int = 0
@@ -53,6 +54,9 @@ class Role:
             [1, 4, 5, 1],
             [1, 4, 5, 2],
         ]
+        self.__goal: Point = self.__observer.geometry.goal
+        self.__their_goal: Point = self.__observer.geometry.their_goal
+        self.__attack_direction: float = self.__observer.attack_direction
 
     @property
     def keeper_id(self) -> int:
@@ -117,7 +121,8 @@ class Role:
             (
                 robot.robot_id,
                 self.__defence_basis_dis(robot),
-                MU.radian(robot, self.__observer.geometry.goal),
+                MU.radian_reduce(MU.radian(robot, self.__goal), MU.radian(self.__their_goal, self.__goal))
+                * self.__attack_direction,
             )
             for robot in self.__observer.our_robots_available
             if robot.robot_id != self.keeper_id
@@ -135,8 +140,8 @@ class Role:
         if not bot:
             return 1e6
 
-        theta = MU.radian(bot, self.__observer.geometry.goal)
-        robot_dis = MU.distance(bot, self.__observer.geometry.goal)
+        theta = MU.radian_reduce(MU.radian(bot, self.__goal), MU.radian(self.__their_goal, self.__goal))
+        robot_dis = MU.distance(bot, self.__goal)
 
         if abs(theta) < (MU.PI / 4):
             return robot_dis - (self.__observer.geometry.goal_width / cos(theta))

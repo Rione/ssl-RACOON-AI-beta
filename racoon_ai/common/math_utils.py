@@ -15,11 +15,17 @@ from racoon_ai.models.coordinate import Point, Pose
 class MathUtils:
     """MathUtils
 
-    This class contains
+    This class contains:
+        - PI
         - TWO_PI
+        - HALF_PI
         - PI_SQUARE
-        - angle_normalize
-        - angle_reduce
+        - div_safe
+        - distance
+        - radian
+        - radian_normalize
+        - radian_reduce
+        - has_intersection_with_line
     """
 
     PI: Final[float] = pi

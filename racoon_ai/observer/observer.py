@@ -18,7 +18,7 @@ from racoon_ai.networks.receiver.mw_receiver import MWReceiver
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import RacoonMW_Packet, Robot_Infos
 
 
-class Observer(MWReceiver):  # pylint: disable=R0904
+class Observer:  # pylint: disable=R0904
     """VisionReceiver
 
     Args:
@@ -40,7 +40,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         port: int = 30011,
     ) -> None:
 
-        super().__init__(host, port)
+        self.__mw_receiver: MWReceiver = MWReceiver(host, port)
 
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
@@ -60,8 +60,6 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         ]
         self.__enemy_robots: list[Robot] = [Robot(i) for i in range(16)]
 
-        self.__our_robots_available: set[Robot] = set()
-
         self.__sec_per_frame: float
         self.__n_camras: int
         self.__num_of_our_robots: int
@@ -73,37 +71,11 @@ class Observer(MWReceiver):  # pylint: disable=R0904
 
     def __del__(self) -> None:
         self.__logger.debug("Destructor called")
-        super().__del__()
+        del self.__mw_receiver
 
     def main(self) -> None:
         """main"""
-        proto: RacoonMW_Packet = super().recv()
-        self.ball.update(proto.ball)
-        self.__logger.debug("Ball: %s", self.ball)
-
-        self.geometry.update(proto.geometry)
-        self.__logger.debug("Geometry: %s", self.geometry)
-
-        self.referee.update(proto.referee)
-        self.__logger.debug("Referee: %s", self.referee)
-
-        bot: Optional[Robot]
-        proto_bot: Robot_Infos
-        for proto_bot in proto.our_robots:
-            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
-
-        for proto_bot in proto.enemy_robots:
-            bot = self.get_enemy_by_id(proto_bot.robot_id, False, False)
-            if bot is not None:
-                bot.update(proto_bot)
-                self.__logger.debug(bot)
-            else:
-                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
+        proto: RacoonMW_Packet = self.__mw_receiver.recv()
 
         self.__sec_per_frame = proto.info.secperframe
 
@@ -117,9 +89,34 @@ class Observer(MWReceiver):  # pylint: disable=R0904
 
         self.__attack_direction = proto.info.attack_direction
 
-        self.__our_robots_available = set(
-            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
-        )
+        self.ball.update(proto.ball, self.sec_per_frame)
+        self.__logger.debug("Ball: %s", self.ball)
+
+        self.geometry.update(proto.geometry)
+        self.__logger.debug("Geometry: %s", self.geometry)
+
+        self.referee.update(proto.referee)
+        self.__logger.debug("Referee: %s", self.referee)
+
+        bot: Optional[Robot]
+        proto_bot: Robot_Infos
+        for proto_bot in proto.our_robots:
+            bot = self.get_our_by_id(proto_bot.robot_id, False, False)
+            if not bot:
+                self.__logger.warning("Our robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
+
+        for proto_bot in proto.enemy_robots:
+            bot = self.get_enemy_by_id(proto_bot.robot_id, False)
+            if not bot:
+                self.__logger.warning("Enemy robot %d could not be set", proto_bot.robot_id)
+                continue
+            bot.update(proto_bot, self.sec_per_frame)
+            self.__logger.debug(bot)
+            del bot
 
     @property
     def ball(self) -> Ball:
@@ -200,7 +197,9 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         Returns:
             set[Robot]: Available robots (i.e. is_online and is_visible)
         """
-        return self.__our_robots_available
+        return set(
+            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
+        )
 
     @property
     def enemy_robots(self) -> list[Robot]:
@@ -210,6 +209,17 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             list[Robot]
         """
         return self.__enemy_robots
+
+    @property
+    def enemy_robots_available(self) -> set[Robot]:
+        """enemy_robots_available
+
+        Returns:
+            set[Robot]: Available robots (i.e. is_visible)
+        """
+        return set(
+            bot for bot in (self.get_enemy_by_id(bid, True) for bid in range(self.num_of_enemy_vision_robots)) if bot
+        )
 
     def get_our_by_id(self, robot_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
         """get_our_by_id
@@ -229,12 +239,11 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             only_visible=only_visible,
         )
 
-    def get_enemy_by_id(self, enemy_id: int, only_online: bool = False, only_visible: bool = True) -> Optional[Robot]:
+    def get_enemy_by_id(self, enemy_id: int, only_visible: bool = True) -> Optional[Robot]:
         """get_enemy_by_id
 
         Args:
             enemy_id (int): Enemy ID
-            only_online (bool, optional): If true, only return online robot (default: False)
             only_visible (bool, optional): If true, only return visible robot (default: True)
 
         Returns:
@@ -244,7 +253,7 @@ class Observer(MWReceiver):  # pylint: disable=R0904
             enemy_id,
             maximum=len(self.__enemy_robots),
             search_enemy=True,
-            only_online=only_online,
+            only_online=False,
             only_visible=only_visible,
         )
 
@@ -360,8 +369,8 @@ class Observer(MWReceiver):  # pylint: disable=R0904
         return self.__num_of_our_robots
 
     @property
-    def num_of_enemy_robots(self) -> int:
-        """num_of_enemy_robots
+    def num_of_enemy_vision_robots(self) -> int:
+        """num_of_enemy_vision_robots
 
         How many enemy robots visible
 

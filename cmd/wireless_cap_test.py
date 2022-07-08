@@ -1,12 +1,11 @@
 #!/usr/bin/env python3.10
-# pylint: skip-file
-# mypy: ignore-errors
+# pylint: disable=R0801
 
 """kicker_test.py
 
     This is the kicker_test script.
 """
-import time
+from time import sleep
 
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.networks.sender import CommandSender
@@ -30,7 +29,7 @@ def main() -> None:
             for i in range(0, 160, 3):
                 # Simulation又はRobotに送信
                 sim_cmds = SimCommands(isteamyellow=False)
-                command = RobotCommand(int(robot_id))
+                command = RobotCommand(int(robot_id), chip_enabled=False, use_imu=False)
                 command.vel_fwd = 0
                 command.vel_sway = 0
                 command.vel_angular = i / 180 * 3.14
@@ -41,7 +40,7 @@ def main() -> None:
 
                 sender.send(sim_cmds)
 
-                time.sleep(0.016)
+                sleep(0.016)
 
             for i in range(160, 160, -3):
                 # Simulation又はRobotに送信
@@ -58,8 +57,8 @@ def main() -> None:
 
                 sender.send(sim_cmds)
 
-                time.sleep(0.016)
-            
+                sleep(0.016)
+
             for i in range(-160, 0, 3):
                 # Simulation又はRobotに送信
                 sim_cmds = SimCommands(isteamyellow=False)
@@ -74,8 +73,7 @@ def main() -> None:
 
                 sender.send(sim_cmds)
 
-                time.sleep(0.016)
-            
+                sleep(0.016)
 
     finally:
         print("終了します")
