@@ -197,9 +197,7 @@ class Observer:  # pylint: disable=R0904
         Returns:
             set[Robot]: Available robots (i.e. is_online and is_visible)
         """
-        return set(
-            bot for bot in (self.get_our_by_id(bid, True, True) for bid in range(self.num_of_our_vision_robots)) if bot
-        )
+        return set(bot for bot in (self.get_our_by_id(bid, True, True) for bid in self.target_ids) if bot)
 
     @property
     def enemy_robots(self) -> list[Robot]:
