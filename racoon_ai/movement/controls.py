@@ -269,7 +269,7 @@ class Controls:
         adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
         speed = bot.distance_ball_robot / 500
 
-        command = RobotCommand(bot.robot_id)
+        command = RobotCommand(bot.robot_id, use_imu=bot.is_imu_enabled)
         command.vel_fwd = speed * vel_fwd / adjustment
         command.vel_sway = speed * vel_sway / adjustment
         command.vel_angular = self.pid_radian(radian_target_robot + bot.theta, bot)
