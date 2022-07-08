@@ -1,13 +1,12 @@
 #!/usr/bin/env python3.10
-# pylint: skip-file
-# mypy: ignore-errors
+# pylint: disable=R0801
 
 """kicker_test.py
 
     This is the kicker_test script.
 """
 
-import time
+from time import sleep
 
 from racoon_ai.models.robot import RobotCommand, SimCommands
 from racoon_ai.networks.sender import CommandSender
@@ -45,7 +44,7 @@ def main() -> None:
 
         print("キッカー信号を送信しました.")
 
-        time.sleep(0.5)
+        sleep(0.5)
     finally:
         print("終了します")
         del sender
