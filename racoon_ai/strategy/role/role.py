@@ -162,7 +162,7 @@ class Role:
                 robot.robot_id,
                 MU.distance(robot, self.__observer.geometry.their_goal),
                 MU.radian_reduce(
-                    MU.radian(robot, self.__observer.geometry.their_goal), MU.radian(self.__their_goal, self.__goal)
+                    MU.radian(robot, self.__observer.geometry.their_goal), MU.radian(self.__goal, self.__their_goal)
                 )
                 * self.__attack_direction,
             )
