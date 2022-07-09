@@ -18,6 +18,7 @@ def on_halt_cbf(logger: Logger, observer: Observer) -> list[RobotCommand]:
 
     This function is called when the game is halted.
     """
-    send_cmds: list[RobotCommand] = halt_all(observer.target_ids, observer.is_real)
+    send_cmds: list[RobotCommand] = []
+    send_cmds += halt_all(observer.target_ids, look_at_reference_dir=True)
     logger.debug(send_cmds)
     return send_cmds

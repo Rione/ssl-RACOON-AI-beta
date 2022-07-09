@@ -71,3 +71,11 @@ class Keeper(StrategyBase):
         )
 
         return self.controls.pid(target_pose, robot, -1)
+
+    def to_goal_position(self) -> None:
+        """to_goal_position"""
+        if bot := self.observer.get_our_by_id(self.role.keeper_id):
+            target_pose = Pose(self.__goal.x, self.__goal.y, MU.radian(self.observer.ball, bot))
+
+            cmd: RobotCommand = self.controls.pid(target_pose, bot)
+            self.send_cmds += [cmd]

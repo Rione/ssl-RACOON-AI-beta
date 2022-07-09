@@ -54,7 +54,7 @@ def on_kickoff_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    send_cmds: list[RobotCommand] = on_default_cbf(logger, strategy)
     logger.debug(send_cmds)
     return send_cmds
 
@@ -88,7 +88,13 @@ def on_penalty_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategy.keeper.main()
+
+    strategy.out_of_play.penalty_kick()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategy.keeper.send_cmds
+    send_cmds += strategy.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
 
@@ -100,11 +106,17 @@ def on_penalty_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotComman
 
     Args:
         logger (Logger): Logger instance.
-        strategy (Strategy): Strategy instance.
+        strategies (Strategy): Strategy instance.
 
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategy.offense.penalty_kick(True)
+
+    strategy.out_of_play.penalty_kick(True)
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategy.offense.send_cmds
+    send_cmds += strategy.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
