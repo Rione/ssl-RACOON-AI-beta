@@ -12,7 +12,6 @@ from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
 from .on_prep_kickoff import on_prep_kickoff_their_cbf
-from .on_stop import on_stop_cbf
 
 
 def on_default_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
@@ -77,35 +76,47 @@ def on_kickoff_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotComman
     return send_cmds
 
 
-def on_penalty_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
+def on_penalty_our_cbf(logger: Logger, strategies: Strategy) -> list[RobotCommand]:
     """on_penalty_our_cbf
 
     This function is called on our penalty.
 
     Args:
         logger (Logger): Logger instance.
-        strategy (Strategy): Strategy instance.
+        strategies (Strategy): Strategy instance.
 
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategies.keeper.main()
+
+    strategies.out_of_play.penalty_kick()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategies.keeper.send_cmds
+    send_cmds += strategies.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
 
 
-def on_penalty_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
+def on_penalty_their_cbf(logger: Logger, strategies: Strategy) -> list[RobotCommand]:
     """on_penalty_their_cbf
 
     This function is called on enemy penalty.
 
     Args:
         logger (Logger): Logger instance.
-        strategy (Strategy): Strategy instance.
+        strategies (Strategy): Strategy instance.
 
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategies.offense.penalty_kick(True)
+
+    strategies.out_of_play.penalty_kick(True)
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategies.offense.send_cmds
+    send_cmds += strategies.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
