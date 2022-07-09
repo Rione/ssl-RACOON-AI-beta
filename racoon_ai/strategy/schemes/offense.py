@@ -40,6 +40,9 @@ class Offense(StrategyBase):
         self.__logger.debug("Initializing...")
 
         self.__subrole: SubRole = subrole
+        # self.__goal: Point = self.observer.geometry.goal
+        # self.__their_goal: Point = self.observer.geometry.their_goal
+        # self.__attack_direction: float = self.observer.attack_direction
 
     def main(self) -> None:
         """main"""
@@ -51,19 +54,24 @@ class Offense(StrategyBase):
         for i in range(self.role.get_offense_quantity):
             if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
                 if bot.robot_id == self.__subrole.our_attacker_id:
-                    cmd = self.controls.ball_around(self.observer.geometry.their_goal, bot)
-                    if bot.distance_ball_robot <= 105 and (
-                        abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
-                    ):
-                        cmd.kickpow = 10
-                    # cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
-                    # cmd = self.controls.avoid_penalty_area(cmd, bot)
-                    cmd = self.controls.speed_limiter(cmd)
-                    self.send_cmds += [cmd]
+                    self.shoot_to_goal()
                     continue
 
                 cmd = RobotCommand(bot.robot_id)
                 self.send_cmds += [cmd]
+
+    def shoot_to_goal(self) -> None:
+        """shoot_to_goal"""
+        if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
+            cmd = self.controls.ball_around(self.observer.geometry.their_goal, bot)
+            if bot.distance_ball_robot <= 105 and (
+                abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
+            ):
+                cmd.kickpow = 10
+            cmd = self.controls.avoid_penalty_area(cmd, bot)
+            cmd = self.controls.avoid_enemy(cmd, bot, self.observer.geometry.their_goal)
+            cmd = self.controls.speed_limiter(cmd)
+            self.send_cmds += [cmd]
 
     def stop_offense(self) -> None:
         """main"""
@@ -91,3 +99,15 @@ class Offense(StrategyBase):
                 cmd = self.controls.avoid_penalty_area(cmd, bot)
                 cmd = self.controls.speed_limiter(cmd)
                 self.send_cmds.append(cmd)
+
+    def penalty_kick(self, pre_kick: bool = False) -> None:
+        """penalty_kick"""
+        self.send_cmds = []
+        cmd: RobotCommand
+        if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
+            if pre_kick:
+                cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot)
+                self.send_cmds += [cmd]
+                return
+
+            self.shoot_to_goal()
