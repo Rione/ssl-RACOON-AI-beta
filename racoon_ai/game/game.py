@@ -130,10 +130,10 @@ class Game:  # pylint: disable=R0903
             return (on_force_start_cbf, self.__strategy)
 
         if self.__is_our_kickoff(cmd):
-            return (on_prep_kickoff_our_cbf, self.__observer)
+            return (on_prep_kickoff_our_cbf, self.__strategy)
 
         if self.__is_their_kickoff(cmd):
-            return (on_prep_kickoff_their_cbf, self.__observer)
+            return (on_prep_kickoff_their_cbf, self.__strategy)
 
         if self.__is_our_penalty(cmd):
             return (on_prep_penalty_our_cbf, self.__observer)

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.10
 
-"""ball_placement.py
+"""out_of_play.py
 
     This module contains:
-        - BallPlacement
+        - OutOfPlay
 """
 
 from logging import getLogger
@@ -11,7 +11,7 @@ from math import cos, sin
 from typing import Optional
 
 from racoon_ai.common import MathUtils as MU
-from racoon_ai.models.coordinate import Pose
+from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
@@ -46,6 +46,12 @@ class OutOfPlay(StrategyBase):
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
         self.__maintenance_point: float = 1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
+
+        self.__offense_quantity: int = 0
+        self.__goal: Point = self.observer.geometry.goal
+        self.__their_goal: Point = self.observer.geometry.their_goal
+        self.__attack_direction: float = self.observer.attack_direction
+        self.__center_circle_radius: float = 500
 
     def reset_imu(self) -> None:
         """reset_imu"""
@@ -127,3 +133,59 @@ class OutOfPlay(StrategyBase):
             target_pose.x += 500 * self.observer.attack_direction
 
         return self.send_cmds
+
+    def pre_kick_off_offense(self, is_our: bool = False) -> None:
+        """pre_kick_off_offense"""
+
+        self.send_cmds = []
+        self.__offense_quantity = self.role.get_offense_quantity
+
+        for i in range(self.__offense_quantity):
+            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+                if bot.robot_id == self.__subrole.our_attacker_id:
+                    target_pose = Pose(
+                        self.observer.ball.x - self.__center_circle_radius * 1.2 * self.__attack_direction,
+                        self.observer.ball.y,
+                        MU.radian(self.__their_goal, self.__goal),
+                    )
+                    cmd = self.controls.pid(target_pose, bot)
+                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                    if is_our:
+                        cmd = self.controls.to_front_ball(self.__their_goal, bot)
+                        self.send_cmds += [cmd]
+                        continue
+
+                else:
+                    target_pose = Pose(
+                        -350 * self.__attack_direction,
+                        self.observer.geometry.field_width / 2 * (1 - 0.5 * (i + 1)),
+                        MU.radian(self.__their_goal, self.__goal),
+                    )
+                    cmd = self.controls.pid(target_pose, bot)
+                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+                cmd = self.controls.speed_limiter(cmd)
+                self.send_cmds += [cmd]
+
+    def penalty_kick(self, is_our: bool = False) -> None:
+        """penalty_kick"""
+
+        self.send_cmds = []
+        ignore_robot_id: int = self.role.keeper_id
+        revers: float = 1
+        if is_our:
+            revers = -1
+            ignore_robot_id = self.__subrole.our_attacker_id
+
+        for bot in self.observer.our_robots_available:
+            if bot.robot_id != ignore_robot_id:
+                target_pose = Pose(
+                    self.observer.geometry.field_length / 2 * self.__attack_direction * revers,
+                    bot.y,
+                    0,
+                )
+                cmd: RobotCommand = self.controls.pid(target_pose, bot)
+                cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+                cmd = self.controls.speed_limiter(cmd)
+                self.send_cmds += [cmd]

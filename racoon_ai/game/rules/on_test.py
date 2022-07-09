@@ -14,7 +14,7 @@ from racoon_ai.strategy import Strategy
 # from .on_halt import on_halt_cbf
 # from .on_placement import on_placement_our_cbf
 # from .on_normal_start import on_default_cbf
-from .on_stop import on_stop_cbf
+# from .on_stop import on_stop_cbf
 
 
 def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
@@ -26,13 +26,19 @@ def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
         logger (Logger): Logger instance.
         args: (Strategy) instance.
     """
-    args.defense.default_position()
+
+    args.keeper.main()
+    # args.defense.default_position()
 
     send_cmds: list[RobotCommand] = []
-    send_cmds += on_stop_cbf(logger, args)
-    # send_cmds += on_default_cbf(logger, args)
     # send_cmds += on_stop_cbf(logger, args)
+    # send_cmds += on_default_cbf(logger, args)
     # send_cmds += on_placement_our_cbf(logger, args)
+
+    send_cmds += args.keeper.send_cmds
     send_cmds += args.defense.send_cmds
+    send_cmds += args.offense.send_cmds
+    send_cmds += args.out_of_play.send_cmds
+
     logger.debug(send_cmds)
     return send_cmds

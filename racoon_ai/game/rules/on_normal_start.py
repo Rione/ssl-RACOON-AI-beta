@@ -11,7 +11,7 @@ from logging import Logger
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
-from .on_stop import on_stop_cbf
+from .on_prep_kickoff import on_prep_kickoff_their_cbf
 
 
 def on_default_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
@@ -54,7 +54,7 @@ def on_kickoff_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    send_cmds: list[RobotCommand] = on_default_cbf(logger, strategy)
     logger.debug(send_cmds)
     return send_cmds
 
@@ -71,7 +71,7 @@ def on_kickoff_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotComman
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    send_cmds: list[RobotCommand] = on_prep_kickoff_their_cbf(logger, strategy)
     logger.debug(send_cmds)
     return send_cmds
 
@@ -88,7 +88,13 @@ def on_penalty_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategy.keeper.main()
+
+    strategy.out_of_play.penalty_kick()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategy.keeper.send_cmds
+    send_cmds += strategy.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
 
@@ -105,6 +111,12 @@ def on_penalty_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotComman
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategy.offense.penalty_kick(True)
+
+    strategy.out_of_play.penalty_kick(True)
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategy.offense.send_cmds
+    send_cmds += strategy.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds

@@ -266,12 +266,16 @@ class Controls:
         adjustment = 0.1 / MU.div_safe(abs(discrimination))
         vel_fwd += cos(bot.radian_ball_robot) * adjustment
         vel_sway += sin(bot.radian_ball_robot) * adjustment
-        adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
-        speed = bot.distance_ball_robot / 500
 
-        command = RobotCommand(bot.robot_id)
-        command.vel_fwd = speed * vel_fwd / adjustment
-        command.vel_sway = speed * vel_sway / adjustment
+        adjustment = MU.div_safe(sqrt(vel_fwd * vel_fwd + vel_sway * vel_sway))
+        speed = bot.distance_ball_robot / 1000
+
+        vel_fwd = speed * vel_fwd / adjustment
+        vel_sway = speed * vel_sway / adjustment
+
+        command = RobotCommand(bot.robot_id, use_imu=bot.is_imu_enabled)
+        command.vel_fwd = vel_fwd
+        command.vel_sway = vel_sway
         command.vel_angular = self.pid_radian(radian_target_robot + bot.theta, bot)
         command.target_pose.theta = radian_target_robot + bot.theta
         return command
@@ -312,4 +316,18 @@ class Controls:
         cmd.vel_fwd += vel[0]
         cmd.vel_sway += vel[1]
 
+        return cmd
+
+    def to_front_ball(self, target_point: Point, bot: Robot) -> RobotCommand:
+        """to_front_ball"""
+        radian_point_ball = MU.radian(target_point, self.__observer.ball)
+        target_pose = Pose(
+            self.__observer.ball.x - 130 * cos(radian_point_ball),
+            self.__observer.ball.y - 130 * sin(radian_point_ball),
+            radian_point_ball,
+        )
+        cmd = self.pid(target_pose, bot)
+        cmd = self.avoid_ball(cmd, bot, target_pose, 130 * 1.2)
+        cmd = self.avoid_enemy(cmd, bot, target_pose)
+        cmd = self.speed_limiter(cmd)
         return cmd
