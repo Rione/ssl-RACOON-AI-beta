@@ -11,21 +11,28 @@ from logging import Logger
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
-from ..on_stop import on_stop_cbf
 
-
-def on_prep_penalty_their_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
+def on_prep_penalty_their_cbf(logger: Logger, strategies: Strategy) -> list[RobotCommand]:
     """on_penalty_their_cbf
 
     This function is to prepare enemy penalty.
 
     Args:
         logger (Logger): Logger instance.
-        strategy (Strategy): Strategy instance.
+        strategies (Strategy): Strategy instance.
 
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategies.defense.default_position()
+
+    strategies.keeper.main()
+
+    strategies.out_of_play.pre_kick_off_offense()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategies.defense.send_cmds
+    send_cmds += strategies.keeper.send_cmds
+    send_cmds += strategies.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
