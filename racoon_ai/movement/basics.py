@@ -57,11 +57,10 @@ def _reset_imu(bot: Robot) -> RobotCommand:
     """
     cmd: RobotCommand = RobotCommand(bot.robot_id + 100, use_imu=bot.is_imu_enabled)
     cmd.target_pose = bot
-    cmd.target_pose.theta = MU.radian_normalize(bot.theta)
     return cmd
 
 
-def reset_all_imu(our_available_bots: list[Robot]) -> list[RobotCommand]:
+def reset_all_imu(our_available_bots: set[Robot]) -> list[RobotCommand]:
     """reset_all_imu
 
     Args:
@@ -70,4 +69,4 @@ def reset_all_imu(our_available_bots: list[Robot]) -> list[RobotCommand]:
     Returns:
         list[RobotCommand]
     """
-    return [_reset_imu(bot) for bot in our_available_bots if bot.is_imu_enabled]
+    return list(map(_reset_imu, (bot for bot in our_available_bots if bot.is_imu_enabled)))

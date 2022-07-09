@@ -45,13 +45,15 @@ class OutOfPlay(StrategyBase):
         self.__is_arrived: bool = False
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
-        self.__maintenance_point: float = 1
+        self.__maintenance_point: float = 1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
 
     def reset_imu(self) -> None:
         """reset_imu"""
+        self.__logger.debug("Reset IMU by camera theta ...")
+
         self.send_cmds = []
-        self.send_cmds += reset_all_imu(list(self.observer.our_robots_available))
-        self.__maintenance_point = 1  # 正or負
+        cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
+        self.send_cmds += cmds
 
     def placement_our(self) -> None:
         """placement_our"""
