@@ -144,13 +144,9 @@ class OutOfPlay(StrategyBase):
                     cmd = self.controls.pid(target_pose, bot)
                     cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                     if is_our:
-                        target_pose = Pose(
-                            self.observer.ball.x - 120 * self.__attack_direction,
-                            self.observer.ball.y,
-                            MU.radian(self.__their_goal, self.__goal),
-                        )
-                        cmd = self.controls.pid(target_pose, bot)
-                        cmd = self.controls.avoid_ball(cmd, bot, target_pose, 120 * 1.2)
+                        cmd = self.controls.to_front_ball(self.__their_goal, bot)
+                        self.send_cmds += [cmd]
+                        continue
 
                 else:
                     target_pose = Pose(
@@ -160,6 +156,29 @@ class OutOfPlay(StrategyBase):
                     )
                     cmd = self.controls.pid(target_pose, bot)
                     cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+                cmd = self.controls.speed_limiter(cmd)
+                self.send_cmds += [cmd]
+
+    def penalty_kick(self, is_our: bool = False) -> None:
+        """penalty_kick"""
+
+        self.send_cmds = []
+        ignore_robot_id: int = self.role.keeper_id
+        revers: float = 1
+        if is_our:
+            revers = -1
+            ignore_robot_id = self.__subrole.our_attacker_id
+
+        for bot in self.observer.our_robots_available:
+            if bot.robot_id != ignore_robot_id:
+                target_pose = Pose(
+                    self.observer.geometry.field_length / 2 * self.__attack_direction * revers,
+                    bot.y,
+                    0,
+                )
+                cmd: RobotCommand = self.controls.pid(target_pose, bot)
+                cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                 cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
                 cmd = self.controls.speed_limiter(cmd)
                 self.send_cmds += [cmd]

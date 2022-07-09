@@ -317,3 +317,17 @@ class Controls:
         cmd.vel_sway += vel[1]
 
         return cmd
+
+    def to_front_ball(self, target_point: Point, bot: Robot) -> RobotCommand:
+        """to_front_ball"""
+        radian_point_ball = MU.radian(target_point, self.__observer.ball)
+        target_pose = Pose(
+            self.__observer.ball.x - 130 * cos(radian_point_ball),
+            self.__observer.ball.y - 130 * sin(radian_point_ball),
+            radian_point_ball,
+        )
+        cmd = self.pid(target_pose, bot)
+        cmd = self.avoid_ball(cmd, bot, target_pose, 130 * 1.2)
+        cmd = self.avoid_enemy(cmd, bot, target_pose)
+        cmd = self.speed_limiter(cmd)
+        return cmd
