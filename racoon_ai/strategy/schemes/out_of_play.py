@@ -106,6 +106,28 @@ class OutOfPlay(StrategyBase):
                 cmd.vel_angular = bot.radian_ball_robot
                 self.send_cmds += [cmd]
 
+    def placement_their(self) -> None:
+        """placement_their"""
+        self.__logger.debug("Placement...")
+
+        self.send_cmds = []  # リスト初期化
+        bot: Optional[Robot]
+        point: Optional[Point] = self.observer.referee.placement_designated_point
+
+        # find nearest to ball robot
+
+        if point:
+            for bot in self.observer.our_robots_available:
+                if bot.robot_id != self.role.keeper_id:
+                    base_point = Point((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2)
+                    avoid_distance = MU.distance(self.observer.ball, base_point) + 1000
+                    cmd: RobotCommand = self.controls.make_command(bot)
+                    cmd = self.controls.avoid_point(cmd, bot, base_point, avoid_distance)
+                    cmd = self.controls.avoid_ball(cmd, bot, base_point)
+                    cmd = self.controls.avoid_enemy(cmd, bot, base_point)
+                    cmd = self.controls.speed_limiter(cmd)
+                    self.send_cmds += [cmd]
+
     def time_out(self) -> list[RobotCommand]:
         """placement_our"""
         self.__logger.debug("Placement...")
