@@ -14,17 +14,17 @@ from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 
 
-def halt_all(target_ids: set[int], is_real: bool = False) -> list[RobotCommand]:
+def halt_all(target_ids: set[int], *, look_at_reference_dir: bool = True) -> list[RobotCommand]:
     """halt_all
 
     Args:
         target_ids (set[int]): Target IDs.
-        is_real (bool, optional): Is real. (defaults: False)
+        look_at_reference_dir (bool, optional): Look at reference direction (default: True).
 
     Returns:
         list[RobotCommand]: halt command
     """
-    return [RobotCommand(i) for i in ({255} if is_real else target_ids)]
+    return [RobotCommand(i) for i in ({255} if not look_at_reference_dir else target_ids)]
 
 
 def move2pose(robot: Robot, dist: Pose) -> RobotCommand:
