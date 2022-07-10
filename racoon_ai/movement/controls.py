@@ -281,12 +281,12 @@ class Controls:
         return command
 
     def avoid_ball(
-        self, cmd: RobotCommand, bot: Robot, target_pose: Point, avoid_distance: float = 500
+        self, cmd: RobotCommand, bot: Robot, target_pose: Point, basic_distance: float = 500
     ) -> RobotCommand:
         """avoid_enemy"""
 
         radian_target_robot = MU.radian(target_pose, bot)
-        avoid_distance = avoid_distance**2
+        avoid_distance = basic_distance**2
 
         rot_theta: NDArray[float64] = array(
             [
@@ -299,22 +299,29 @@ class Controls:
         radian_ball_robot = MU.radian(self.__observer.ball, bot)
         distance_ball_robot = MU.distance(self.__observer.ball, bot)
         distance_target_robot = MU.distance(target_pose, bot) / 1000
-        bvel: NDArray[float64] = array(
-            [
-                avoid_distance
-                * distance_target_robot
-                * cos(radian_ball_robot - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot))))
-                / (distance_ball_robot**2),
-                avoid_distance
-                * distance_target_robot
-                * sin(radian_ball_robot - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot))))
-                / (distance_ball_robot**2),
-            ],
-            dtype=float64,
-        )
-        vel: NDArray[float64] = dot(bvel, rot_theta)
-        cmd.vel_fwd += vel[0]
-        cmd.vel_sway += vel[1]
+        if distance_ball_robot < basic_distance:
+            bvel: NDArray[float64] = array(
+                [
+                    avoid_distance
+                    * distance_target_robot
+                    * cos(
+                        radian_ball_robot
+                        - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot)))
+                    )
+                    / (distance_ball_robot**2),
+                    avoid_distance
+                    * distance_target_robot
+                    * sin(
+                        radian_ball_robot
+                        - (MU.HALF_PI * sign(MU.radian_reduce(radian_ball_robot, radian_target_robot)))
+                    )
+                    / (distance_ball_robot**2),
+                ],
+                dtype=float64,
+            )
+            vel: NDArray[float64] = dot(bvel, rot_theta)
+            cmd.vel_fwd += vel[0]
+            cmd.vel_sway += vel[1]
 
         return cmd
 
@@ -331,3 +338,35 @@ class Controls:
         cmd = self.avoid_enemy(cmd, bot, target_pose)
         cmd = self.speed_limiter(cmd)
         return cmd
+
+    @staticmethod
+    def avoid_point(cmd: RobotCommand, bot: Robot, target_point: Point, basic_distance: float) -> RobotCommand:
+        """avoid_point"""
+        avoid_distance = basic_distance**2
+
+        rot_theta: NDArray[float64] = array(
+            [
+                [cos(bot.theta), -sin(bot.theta)],
+                [sin(bot.theta), cos(bot.theta)],
+            ],
+            dtype=float64,
+        )
+
+        radian_robot_point = MU.radian(bot, target_point)
+        distance_robot_point = MU.distance(bot, target_point)
+        adjustment: float = avoid_distance / (distance_robot_point**2) - 1
+        adjustment = max(adjustment, 0)
+        bvel: NDArray[float64] = array(
+            [adjustment * cos(radian_robot_point), adjustment * sin(radian_robot_point)],
+            dtype=float64,
+        )
+        vel: NDArray[float64] = dot(bvel, rot_theta)
+        cmd.vel_fwd += vel[0]
+        cmd.vel_sway += vel[1]
+
+        return cmd
+
+    @staticmethod
+    def make_command(bot: Robot) -> RobotCommand:
+        """make_command"""
+        return RobotCommand(bot.robot_id, use_imu=bot.is_imu_enabled)
