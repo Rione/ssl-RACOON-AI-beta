@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.10
 
-"""ball_placement.py
+"""out_of_play.py
 
     This module contains:
-        - BallPlacement
+        - OutOfPlay
 """
 
 from logging import getLogger
@@ -13,7 +13,7 @@ from typing import Optional
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
-from racoon_ai.movement import Controls
+from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
 
 from ..role import Role, SubRole
@@ -45,14 +45,21 @@ class OutOfPlay(StrategyBase):
         self.__is_arrived: bool = False
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
-
-        self.__maintenance_point: float = 1  # 正or負
+        self.__maintenance_point: float = 1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
 
         self.__offense_quantity: int = 0
         self.__goal: Point = self.observer.geometry.goal
         self.__their_goal: Point = self.observer.geometry.their_goal
         self.__attack_direction: float = self.observer.attack_direction
         self.__center_circle_radius: float = 500
+
+    def reset_imu(self) -> None:
+        """reset_imu"""
+        self.__logger.debug("Reset IMU by camera theta ...")
+
+        self.send_cmds = []
+        cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
+        self.send_cmds += cmds
 
     def placement_our(self) -> None:
         """placement_our"""

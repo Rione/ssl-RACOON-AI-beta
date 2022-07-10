@@ -6,7 +6,7 @@ from logging import Logger
 
 from racoon_ai.observer import Observer
 
-from .basics import halt_all, move2pose
+from .basics import halt_all, move2pose, reset_all_imu
 from .controls import Controls
 
 
@@ -34,4 +34,5 @@ __all__ = [
     "create_controls",
     "halt_all",
     "move2pose",
+    "reset_all_imu",
 ]

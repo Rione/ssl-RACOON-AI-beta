@@ -6,7 +6,9 @@
 """
 
 from logging import Logger, getLogger
-from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRAM, socket
+from socket import AF_INET, IP_MULTICAST_TTL, IPPROTO_IP, IPPROTO_UDP, SOCK_DGRAM
+from socket import error as socket_error
+from socket import socket
 from time import perf_counter, sleep
 
 from racoon_ai.models.network import IPNetAddr
@@ -102,7 +104,11 @@ class CommandSender:
                 dist.port,
                 ("real" if self.__is_real else "sim"),
             )
-            self.__sock.sendto(packet, (dist.host, dist.port))
+
+            try:
+                self.__sock.sendto(packet, (dist.host, dist.port))
+            except socket_error as err:
+                self.__logger.error("Failed to send packet to %s:%d\t(%s)", dist.host, dist.port, err.strerror)
 
     def __imu_reset(self, count: int = 10) -> None:
         """reset_imu
