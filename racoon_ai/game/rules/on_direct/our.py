@@ -11,8 +11,6 @@ from logging import Logger
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
-from ..on_stop import on_stop_cbf
-
 
 def on_direct_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     """on_direct_our_cbf
@@ -26,6 +24,16 @@ def on_direct_our_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     Returns:
         list[RobotCommand]
     """
-    send_cmds: list[RobotCommand] = on_stop_cbf(logger, strategy)
+    strategy.defense.main()
+
+    strategy.keeper.main()
+
+    strategy.offense.main()
+
+    send_cmds: list[RobotCommand] = []
+    send_cmds += strategy.defense.send_cmds
+    send_cmds += strategy.keeper.send_cmds
+    send_cmds += strategy.offense.send_cmds
     logger.debug(send_cmds)
+
     return send_cmds

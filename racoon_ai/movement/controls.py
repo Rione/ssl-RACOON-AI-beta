@@ -335,16 +335,16 @@ class Controls:
 
         return cmd
 
-    def to_front_ball(self, target_point: Point, bot: Robot) -> RobotCommand:
+    def to_front_ball(self, target_point: Point, bot: Robot, leave_distance: float = 130) -> RobotCommand:
         """to_front_ball"""
         radian_point_ball = MU.radian(target_point, self.__observer.ball)
         target_pose = Pose(
-            self.__observer.ball.x - 130 * cos(radian_point_ball),
-            self.__observer.ball.y - 130 * sin(radian_point_ball),
+            self.__observer.ball.x - leave_distance * cos(radian_point_ball),
+            self.__observer.ball.y - leave_distance * sin(radian_point_ball),
             radian_point_ball,
         )
         cmd = self.pid(target_pose, bot)
-        cmd = self.avoid_ball(cmd, bot, target_pose, 130 * 1.2)
+        cmd = self.avoid_ball(cmd, bot, target_pose, leave_distance * 1.2)
         cmd = self.avoid_enemy(cmd, bot, target_pose)
         cmd = self.speed_limiter(cmd)
         return cmd
