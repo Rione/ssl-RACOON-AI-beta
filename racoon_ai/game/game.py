@@ -104,7 +104,7 @@ class Game:  # pylint: disable=R0903
     ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
         if self.__use_test_rule:
-            return (on_prep_penalty_their_cbf, self.__strategy)
+            return (on_prep_kickoff_our_cbf, self.__strategy)
 
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
@@ -114,16 +114,16 @@ class Game:  # pylint: disable=R0903
         if cmd is REF_COMMAND.NORMAL_START:
             if prev_cmd := self.__observer.referee.pre_command:
                 if self.__is_our_kickoff(prev_cmd):
-                    return (on_kickoff_our_cbf, self.__observer)
+                    return (on_kickoff_our_cbf, self.__strategy)
 
                 if self.__is_their_kickoff(prev_cmd):
-                    return (on_kickoff_their_cbf, self.__observer)
+                    return (on_kickoff_their_cbf, self.__strategy)
 
                 if self.__is_our_penalty(prev_cmd):
-                    return (on_penalty_our_cbf, self.__observer)
+                    return (on_penalty_our_cbf, self.__strategy)
 
                 if self.__is_their_penalty(prev_cmd):
-                    return (on_penalty_their_cbf, self.__observer)
+                    return (on_penalty_their_cbf, self.__strategy)
 
             return (on_default_cbf, self.__strategy)
 
@@ -137,10 +137,10 @@ class Game:  # pylint: disable=R0903
             return (on_prep_kickoff_their_cbf, self.__strategy)
 
         if self.__is_our_penalty(cmd):
-            return (on_prep_penalty_our_cbf, self.__observer)
+            return (on_prep_penalty_our_cbf, self.__strategy)
 
         if self.__is_their_penalty(cmd):
-            return (on_prep_penalty_their_cbf, self.__observer)
+            return (on_prep_penalty_their_cbf, self.__strategy)
 
         if self.__is_our_direct_free(cmd):
             if not self.__is_ball_moved():
@@ -150,19 +150,19 @@ class Game:  # pylint: disable=R0903
 
         if self.__is_their_direct_free(cmd):
             if not self.__is_ball_moved():
-                return (on_direct_their_cbf, self.__observer)
+                return (on_direct_their_cbf, self.__strategy)
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
         if self.__is_our_indirect_free(cmd):
             if not self.__is_ball_moved():
-                return (on_indirect_our_cbf, self.__observer)
+                return (on_indirect_our_cbf, self.__strategy)
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
         if self.__is_their_indirect_free(cmd):
             if not self.__is_ball_moved():
-                return (on_indirect_their_cbf, self.__observer)
+                return (on_indirect_their_cbf, self.__strategy)
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
@@ -179,7 +179,7 @@ class Game:  # pylint: disable=R0903
             return (on_placement_our_cbf, self.__strategy)
 
         if self.__is_their_placement(cmd):
-            return (on_placement_their_cbf, self.__observer)
+            return (on_placement_their_cbf, self.__strategy)
 
         return (on_stop_cbf, self.__strategy)
 

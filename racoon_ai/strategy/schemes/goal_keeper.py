@@ -74,6 +74,7 @@ class Keeper(StrategyBase):
 
     def to_goal_position(self) -> None:
         """to_goal_position"""
+        self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.role.keeper_id):
             target_pose = Pose(self.__goal.x, self.__goal.y, MU.radian(self.observer.ball, bot))
 
