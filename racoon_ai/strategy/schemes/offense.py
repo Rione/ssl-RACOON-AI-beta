@@ -10,6 +10,8 @@ from logging import getLogger
 from math import cos, sin
 from typing import Optional
 
+from numpy import sign
+
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Pose
 from racoon_ai.models.robot import Robot, RobotCommand
@@ -40,16 +42,16 @@ class Offense(StrategyBase):
         self.__logger.debug("Initializing...")
 
         self.__subrole: SubRole = subrole
+        self.__offense_quantity: int = 0
         # self.__goal: Point = self.observer.geometry.goal
         # self.__their_goal: Point = self.observer.geometry.their_goal
-        # self.__attack_direction: float = self.observer.attack_direction
+        self.__attack_direction: float = self.observer.attack_direction
 
     def main(self) -> None:
         """main"""
         # commandの情報を格納するリスト
         self.send_cmds = []
         bot: Optional[Robot]
-        cmd: Optional[RobotCommand]
 
         for i in range(self.role.get_offense_quantity):
             if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
@@ -57,8 +59,7 @@ class Offense(StrategyBase):
                     self.shoot_to_goal()
                     continue
 
-                cmd = RobotCommand(bot.robot_id)
-                self.send_cmds += [cmd]
+                self.default_position()
 
     def shoot_to_goal(self) -> None:
         """shoot_to_goal"""
@@ -69,7 +70,7 @@ class Offense(StrategyBase):
             ):
                 cmd.kickpow = 10
             cmd = self.controls.avoid_penalty_area(cmd, bot)
-            cmd = self.controls.avoid_enemy(cmd, bot, self.observer.geometry.their_goal)
+            cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.speed_limiter(cmd)
             self.send_cmds += [cmd]
 
@@ -111,3 +112,30 @@ class Offense(StrategyBase):
                 return
 
             self.shoot_to_goal()
+
+    def default_position(self) -> None:
+        """default_position"""
+
+        target_pose: Pose
+        cmd: RobotCommand
+        self.__offense_quantity = self.role.get_offense_quantity
+
+        for i in range(self.__offense_quantity):
+            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+                if bot.robot_id != self.__subrole.our_attacker_id and self.__offense_quantity != 0:
+                    target_pose = Pose(
+                        (
+                            self.observer.geometry.field_length
+                            / 2
+                            * (1 - (2 - ((i + 1) % 2)) / max(self.__offense_quantity, 2))
+                        )
+                        * self.__attack_direction
+                        * sign(self.observer.ball.x * self.__attack_direction),
+                        self.observer.geometry.field_width / 2
+                        - (self.observer.geometry.field_width / (self.__offense_quantity + 1) * (i + 1)),
+                        MU.radian(self.observer.ball, bot),
+                    )
+                    cmd = self.controls.pid(target_pose, bot)
+                    cmd = self.controls.avoid_penalty_area(cmd, bot)
+                    cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+                    self.send_cmds += [cmd]
