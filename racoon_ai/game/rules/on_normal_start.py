@@ -88,12 +88,13 @@ def on_penalty_our_cbf(logger: Logger, strategies: Strategy) -> list[RobotComman
     Returns:
         list[RobotCommand]
     """
-    strategies.keeper.main()
 
-    strategies.out_of_play.penalty_kick()
+    strategies.offense.penalty_kick(True)
+
+    strategies.out_of_play.penalty_kick(True)
 
     send_cmds: list[RobotCommand] = []
-    send_cmds += strategies.keeper.send_cmds
+    send_cmds += strategies.offense.send_cmds
     send_cmds += strategies.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds
@@ -111,12 +112,13 @@ def on_penalty_their_cbf(logger: Logger, strategies: Strategy) -> list[RobotComm
     Returns:
         list[RobotCommand]
     """
-    strategies.offense.penalty_kick(True)
+
+    strategies.keeper.main()
 
     strategies.out_of_play.penalty_kick(True)
 
     send_cmds: list[RobotCommand] = []
-    send_cmds += strategies.offense.send_cmds
+    send_cmds += strategies.keeper.send_cmds
     send_cmds += strategies.out_of_play.send_cmds
     logger.debug(send_cmds)
     return send_cmds

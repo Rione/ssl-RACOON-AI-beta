@@ -179,7 +179,7 @@ class OutOfPlay(StrategyBase):
 
                 else:
                     target_pose = Pose(
-                        -350 * self.__attack_direction,
+                        -600 * self.__attack_direction,
                         self.observer.geometry.field_width / 2 * (1 - 0.5 * (i + 1)),
                         MU.radian(self.__their_goal, self.__goal),
                     )
