@@ -61,6 +61,20 @@ class Offense(StrategyBase):
 
                 self.default_position()
 
+    def direct_their(self) -> None:
+        """direct_their"""
+        # commandの情報を格納するリスト
+        self.send_cmds = []
+        bot: Optional[Robot]
+
+        for i in range(self.role.get_offense_quantity):
+            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+                if bot.robot_id == self.__subrole.our_attacker_id:
+                    self.block_their_attacker()
+                    continue
+
+                self.default_position()
+
     def shoot_to_goal(self) -> None:
         """shoot_to_goal"""
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
@@ -127,7 +141,11 @@ class Offense(StrategyBase):
                         (
                             self.observer.geometry.field_length
                             / 2
-                            * (1 - (2 - ((i + 1) % 2)) / max(self.__offense_quantity, 2))
+                            * (
+                                1
+                                - (self.__offense_quantity - 1 - ((i + 1) % max(self.__offense_quantity - 1, 1)))
+                                / max(self.__offense_quantity, 2)
+                            )
                         )
                         * self.__attack_direction
                         * sign(self.observer.ball.x * self.__attack_direction),
@@ -139,3 +157,17 @@ class Offense(StrategyBase):
                     cmd = self.controls.avoid_penalty_area(cmd, bot)
                     cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
                     self.send_cmds += [cmd]
+
+    def block_their_attacker(self) -> None:
+        """block_their_attacker"""
+        self.send_cmds = []
+        cmd: RobotCommand
+
+        if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
+            if enemy := self.observer.get_enemy_by_id(self.__subrole.enemy_attacker_id):
+                cmd = self.controls.to_front_ball(enemy, bot, 500)
+                self.send_cmds += [cmd]
+                return
+
+            cmd = self.controls.to_front_ball(self.observer.geometry.goal, bot, 500)
+            self.send_cmds += [cmd]
