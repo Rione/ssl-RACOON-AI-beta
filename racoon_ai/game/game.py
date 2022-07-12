@@ -148,7 +148,7 @@ class Game:  # pylint: disable=R0903
         if self.__is_our_direct_free(cmd):
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
-            
+
             if not self.__is_ball_moved():
                 return (on_direct_our_cbf, self.__strategy)
 
@@ -159,7 +159,7 @@ class Game:  # pylint: disable=R0903
         if self.__is_their_direct_free(cmd):
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
-            
+
             if not self.__is_ball_moved():
                 return (on_direct_their_cbf, self.__strategy)
 
@@ -170,7 +170,7 @@ class Game:  # pylint: disable=R0903
         if self.__is_our_indirect_free(cmd):
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
-            
+
             if not self.__is_ball_moved():
                 return (on_indirect_our_cbf, self.__strategy)
 
@@ -181,7 +181,7 @@ class Game:  # pylint: disable=R0903
         if self.__is_their_indirect_free(cmd):
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
-            
+
             if not self.__is_ball_moved():
                 return (on_indirect_their_cbf, self.__strategy)
 
