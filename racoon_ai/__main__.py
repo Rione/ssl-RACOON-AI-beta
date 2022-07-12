@@ -6,6 +6,7 @@
 from configparser import ConfigParser
 from logging import DEBUG, INFO, FileHandler, Formatter, Logger, StreamHandler, getLogger, shutdown
 from subprocess import Popen
+from time import sleep
 from typing import Callable, Optional
 
 from .game import Game
@@ -29,6 +30,8 @@ class RacoonMain:
         self.__logger: Logger = logger
 
         self.__racoon_mw: Optional[Popen[bytes]] = self.exec_mw() if with_mw else None
+
+        sleep(2.5)
 
         self.__observer: Observer = create_observer(self.__conf, self.__logger)
 
