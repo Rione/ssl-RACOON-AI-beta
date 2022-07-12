@@ -263,7 +263,7 @@ class Controls:
         )
         radian_around -= (sin(discrimination) * MU.PI) / 2
         radian_around -= bot.theta
-        adjustment = 200**2 / MU.div_safe(bot.distance_ball_robot**2)
+        adjustment = 250**2 / MU.div_safe(bot.distance_ball_robot**2)
 
         vel_fwd += cos(radian_around) * adjustment
         vel_sway += sin(radian_around) * adjustment
