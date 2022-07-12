@@ -136,7 +136,7 @@ class Controls:
         return vel_angular
 
     @staticmethod
-    def speed_limiter(cmd: RobotCommand, limiter: float = 1) -> RobotCommand:
+    def speed_limiter(cmd: RobotCommand, limiter: float = 0.3) -> RobotCommand:
         """speed_limiter"""
         if limiter <= 0:
             return cmd
