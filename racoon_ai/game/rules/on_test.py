@@ -28,7 +28,7 @@ def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
     """
 
     args.keeper.main()
-    # args.defense.default_position()
+    args.defense.default_position()
 
     send_cmds: list[RobotCommand] = []
     # send_cmds += on_stop_cbf(logger, args)
@@ -40,5 +40,5 @@ def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
     send_cmds += args.offense.send_cmds
     send_cmds += args.out_of_play.send_cmds
 
-    logger.debug(send_cmds)
+    logger.info(send_cmds)
     return send_cmds

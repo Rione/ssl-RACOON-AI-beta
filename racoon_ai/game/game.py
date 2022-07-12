@@ -78,6 +78,8 @@ class Game:  # pylint: disable=R0903
 
         self.__tmp_ball_diff_sum: float = float(0)
 
+        self.__is_inplay: bool = False
+
     def main(self) -> None:
         """Main"""
         self.__logger.info("Starting main roop...")
@@ -109,6 +111,7 @@ class Game:  # pylint: disable=R0903
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
         if cmd is REF_COMMAND.HALT:
+            self.__is_inplay = False
             return (on_halt_cbf, self.__observer)
 
         if cmd is REF_COMMAND.NORMAL_START:
@@ -143,26 +146,46 @@ class Game:  # pylint: disable=R0903
             return (on_prep_penalty_their_cbf, self.__strategy)
 
         if self.__is_our_direct_free(cmd):
+            if self.__is_inplay:
+                return (on_default_cbf, self.__strategy)
+            
             if not self.__is_ball_moved():
                 return (on_direct_our_cbf, self.__strategy)
+
+            self.__is_inplay = True
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
         if self.__is_their_direct_free(cmd):
+            if self.__is_inplay:
+                return (on_default_cbf, self.__strategy)
+            
             if not self.__is_ball_moved():
                 return (on_direct_their_cbf, self.__strategy)
+
+            self.__is_inplay = True
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
         if self.__is_our_indirect_free(cmd):
+            if self.__is_inplay:
+                return (on_default_cbf, self.__strategy)
+            
             if not self.__is_ball_moved():
                 return (on_indirect_our_cbf, self.__strategy)
+
+            self.__is_inplay = True
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
         if self.__is_their_indirect_free(cmd):
+            if self.__is_inplay:
+                return (on_default_cbf, self.__strategy)
+            
             if not self.__is_ball_moved():
                 return (on_indirect_their_cbf, self.__strategy)
+
+            self.__is_inplay = True
             self.__tmp_ball_diff_sum = float(0)
             return (on_default_cbf, self.__strategy)
 
@@ -181,6 +204,7 @@ class Game:  # pylint: disable=R0903
         if self.__is_their_placement(cmd):
             return (on_placement_their_cbf, self.__strategy)
 
+        self.__is_inplay = False
         return (on_stop_cbf, self.__strategy)
 
     def __is_ball_moved(self, distance: float = 15e2) -> bool:
