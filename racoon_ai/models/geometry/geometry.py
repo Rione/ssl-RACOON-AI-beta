@@ -204,3 +204,8 @@ class Geometry:
         self.__ball_radius = geometry.ball_radius
         self.__max_robot_radius = geometry.max_robot_radius
         self.__goal = Point(geometry.goal_x, geometry.goal_y)
+
+        # Override (vision problem)
+        self.__goal_width = int(1200)
+        self.__penalty_area_width = int(2400)
+        self.__penalty_area_depth = int(1200)
