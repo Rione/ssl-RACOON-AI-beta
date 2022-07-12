@@ -51,6 +51,7 @@ class RacoonMain:
             self.__sender.send,
             show_gui=conf.getboolean("commons", "showGui"),
             use_test_rule=conf.getboolean("commons", "useTestRule"),
+            keeper_id=conf.getint("role", "keeper_id"),
         )
 
         self.__game.main()
