@@ -72,9 +72,9 @@ class Defense(StrategyBase):
             self.default_position()
             return
 
-        for i in range(self.__defense_quantity):
+        for i, bot_id in enumerate(self.role.defense_id_list):
             bot: Optional[Robot]
-            if bot := self.observer.get_our_by_id(self.role.get_defense_id(i)):
+            if bot := self.observer.get_our_by_id(bot_id):
                 cmd: RobotCommand
                 ene: Optional[Robot]
                 if ene := self.observer.get_enemy_by_id(self.__enemy_offense[i]):

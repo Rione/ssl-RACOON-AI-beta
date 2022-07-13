@@ -63,13 +63,10 @@ class OutOfPlay(StrategyBase):
             for bot in self.observer.our_robots_available:
                 if not bot:
                     continue
-
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     continue
-
                 target_bots += [bot]
 
-            print(target_bots)
         cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
         self.send_cmds += cmds
 

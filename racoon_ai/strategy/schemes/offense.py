@@ -149,7 +149,7 @@ class Offense(StrategyBase):
         # commandの情報を格納するリスト
         self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
-            cmd = RobotCommand(bot.robot_id)
+            cmd = self.controls.to_front_ball(self.observer.ball, bot)
             cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.avoid_penalty_area(cmd, bot)
