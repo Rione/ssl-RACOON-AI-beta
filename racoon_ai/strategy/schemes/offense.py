@@ -82,10 +82,8 @@ class Offense(StrategyBase):
         """shoot_to_goal"""
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             cmd = self.controls.ball_around(self.observer.geometry.their_goal, bot)
-            if bot.distance_ball_robot <= 105 and (
-                abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
-            ):
-                cmd.kickpow = 1
+            if bot.is_ball_catched and (abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1):
+                cmd.kickpow = 10
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.speed_limiter(cmd)
@@ -99,17 +97,17 @@ class Offense(StrategyBase):
                 if bot.distance_ball_robot <= 105 and (
                     abs(MU.radian_reduce(MU.radian(receiver, bot), bot.theta)) < 0.1
                 ):
-                    cmd.kickpow = 1
+                    cmd.kickpow = 3
             elif enemy := self.observer.get_our_by_id(self.__subrole.enemy_attacker_id):
                 cmd = self.controls.ball_around(enemy, bot)
                 if bot.distance_ball_robot <= 105 and (abs(MU.radian_reduce(MU.radian(enemy, bot), bot.theta)) < 0.1):
-                    cmd.kickpow = 1
+                    cmd.kickpow = 3
             else:
                 cmd = self.controls.ball_around(Point(0, 0), bot)
                 if bot.distance_ball_robot <= 105 and (
                     abs(MU.radian_reduce(MU.radian(Point(0, 0), bot), bot.theta)) < 0.1
                 ):
-                    cmd.kickpow = 1
+                    cmd.kickpow = 3
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.speed_limiter(cmd)

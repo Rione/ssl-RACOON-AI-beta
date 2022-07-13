@@ -31,18 +31,13 @@ class Strategy:
 
         self.__subrole: SubRole = SubRole(observer, role)
 
-        self.__defense: Defense = Defense(observer, role, self.__subrole, controls)
+        self.__defense: Defense = Defense(observer, role, self.__subrole, self.__controls)
 
         self.__keeper: Keeper = Keeper(observer, role, controls)
 
-        self.__offense: Offense = Offense(observer, role, self.__subrole, controls)
+        self.__offense: Offense = Offense(observer, role, self.__subrole, self.__controls)
 
-        self.__out_of_play: OutOfPlay = OutOfPlay(observer, role, self.__subrole, controls)
-
-    @property
-    def controls(self) -> Controls:
-        """controls"""
-        return self.__controls
+        self.__out_of_play: OutOfPlay = OutOfPlay(observer, role, self.__subrole, self.__controls)
 
     @property
     def subrole(self) -> SubRole:

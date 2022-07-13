@@ -54,6 +54,7 @@ class Defense(StrategyBase):
 
     def main(self) -> None:
         """main"""
+
         self.send_cmds = []
         self.__defense_quantity = self.role.get_defense_quantity
         self.__enemy_quantity = self.observer.num_of_enemy_vision_robots
@@ -165,7 +166,6 @@ class Defense(StrategyBase):
 
     def default_position(self) -> None:
         """keep_penalty_area"""
-
         target_pose: Pose
         cmd: RobotCommand
         self.send_cmds = []

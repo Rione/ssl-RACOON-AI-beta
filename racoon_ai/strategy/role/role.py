@@ -94,7 +94,6 @@ class Role:
     def main(self) -> None:
         """main"""
         self.__decide_quantity()
-        self.__decide_keeper()
         self.__decide_defense()
         self.__decide_offense()
         self.__logger.debug(self.keeper_id)
@@ -107,10 +106,6 @@ class Role:
         self.__offense_quantity = self.__role_num[robot_quantity][1]
         self.__defense_quantity = self.__role_num[robot_quantity][2]
         # self.__midfielder_quantity = self.__role_num[robot_quantity][3]
-
-    def __decide_keeper(self) -> None:
-        """decide_keeper"""
-        self.__keeper = 0
 
     def __decide_defense(self) -> None:
         """decide_defense"""
