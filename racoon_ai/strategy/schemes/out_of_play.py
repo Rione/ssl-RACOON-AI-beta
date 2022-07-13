@@ -65,6 +65,7 @@ class OutOfPlay(StrategyBase):
                     continue
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     continue
+                # print(bot.robot_id)
                 target_bots += [bot]
 
         cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
@@ -173,13 +174,6 @@ class OutOfPlay(StrategyBase):
         for i, bot_id in enumerate(self.role.offense_id_list):
             if bot := self.observer.get_our_by_id(bot_id):
                 if bot.robot_id == self.__subrole.our_attacker_id:
-                    target_pose = Pose(
-                        self.observer.ball.x - self.__center_circle_radius * 1.2 * self.__attack_direction,
-                        self.observer.ball.y,
-                        MU.radian(self.__their_goal, self.__goal),
-                    )
-                    cmd = self.controls.pid(target_pose, bot)
-                    # cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                     if is_our:
                         target_pose = Pose(
                             0 - 130 * self.__attack_direction,
@@ -190,6 +184,14 @@ class OutOfPlay(StrategyBase):
                         # cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                         self.send_cmds += [cmd]
                         continue
+
+                    target_pose = Pose(
+                        self.observer.ball.x - self.__center_circle_radius * 1.2 * self.__attack_direction,
+                        self.observer.ball.y,
+                        MU.radian(self.__their_goal, self.__goal),
+                    )
+                    cmd = self.controls.pid(target_pose, bot)
+                    # cmd = self.controls.avoid_ball(cmd, bot, target_pose)
 
                 else:
                     target_pose = Pose(

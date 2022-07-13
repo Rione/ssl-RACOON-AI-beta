@@ -37,10 +37,10 @@ def test_cbf(logger: Logger, args: Strategy) -> list[RobotCommand]:
     # send_cmds += on_placement_our_cbf(logger, args)
     send_cmds += on_prep_kickoff_our_cbf(logger, args)
 
-    send_cmds += args.keeper.send_cmds
-    send_cmds += args.defense.send_cmds
-    send_cmds += args.offense.send_cmds
-    send_cmds += args.out_of_play.send_cmds
+    # send_cmds += args.keeper.send_cmds
+    # send_cmds += args.defense.send_cmds
+    # send_cmds += args.offense.send_cmds
+    # send_cmds += args.out_of_play.send_cmds
 
     logger.debug(send_cmds)
     return send_cmds

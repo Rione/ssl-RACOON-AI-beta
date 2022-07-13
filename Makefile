@@ -79,11 +79,6 @@ $(PROTO_GENDIR)/%.py: $(PROTO_SRCS) $(PROTOC_GEN_MYPY)
 
 $(PROTOL):
 $(PROTOC_GEN_MYPY): $(VENV_DIR)
-	@echo ""
-	$(info ----------------------------------------------)
-	$(info Installing dependencies and project...)
-	@poetry install
-
 $(VENV_DIR): poetry.lock clean-deps $(BIN_DIR)/%
 
 $(BIN_DIR)/%: $(MW_OUT_DIR)/%
@@ -118,7 +113,9 @@ doctor:
 install:
 	@echo ""
 	$(info ----------------------------------------------)
+	$(info Installing ...)
 	@poetry install
+	@poetry run pre-commit install
 
 .PHONY: run
 run: doctor $(TGZ) install

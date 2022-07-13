@@ -1,4 +1,9 @@
 {
+  "git.branchProtection": [
+    "master",
+    "dev",
+  ],
+
   "python.pythonPath": "./.venv/bin/python3.10",
   "python.defaultInterpreterPath": "./.venv/bin/python3.10",
   "python.analysis.typeCheckingMode": "strict",

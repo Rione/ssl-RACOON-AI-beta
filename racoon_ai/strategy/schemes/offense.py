@@ -89,8 +89,8 @@ class Offense(StrategyBase):
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             # close to ball
             if bot.distance_ball_robot <= 700:
-                cmd = self.controls.speed_limiter(cmd, 0.2)
-            cmd = self.controls.speed_limiter(cmd, 0.25)
+                cmd = self.controls.speed_limiter(cmd, 0.15)
+            cmd = self.controls.speed_limiter(cmd, 0.15)
             self.send_cmds += [cmd]
 
     def pass_to_receiver(self) -> None:
@@ -124,34 +124,34 @@ class Offense(StrategyBase):
         bot: Optional[Robot]
         cmd: RobotCommand
 
-        for i in self.role.offense_id_list:
-            if bot := self.observer.get_our_by_id(i):
-                if bot.robot_id != self.__subrole.our_attacker_id:
-                    continue
-                radian_goal_ball = MU.radian(self.observer.geometry.their_goal, self.observer.ball)
-                radian_ball_robot = MU.radian(self.observer.ball, bot)
-                target_pose = Pose(
-                    (self.observer.ball.x - 600 * cos(radian_goal_ball)),
-                    (self.observer.ball.y - 600 * sin(radian_goal_ball)),
-                    radian_ball_robot,
-                )
-                cmd = self.controls.pid(target_pose, bot)
-                cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
-                cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
-                cmd = self.controls.avoid_penalty_area(cmd, bot)
-                cmd = self.controls.speed_limiter(cmd)
-                self.send_cmds.append(cmd)
+        # for i in self.role.offense_id_list:
+        if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
+            cmd = RobotCommand(bot.robot_id)
+            radian_goal_ball = MU.radian(self.observer.geometry.their_goal, self.observer.ball)
+            radian_ball_robot = MU.radian(self.observer.ball, bot)
+            target_pose = Pose(
+                (self.observer.ball.x - 600 * cos(radian_goal_ball)),
+                (self.observer.ball.y - 600 * sin(radian_goal_ball)),
+                radian_ball_robot,
+            )
+            cmd = self.controls.pid(target_pose, bot)
+            cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
+            cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
+            cmd = self.controls.avoid_penalty_area(cmd, bot)
+            cmd = self.controls.speed_limiter(cmd)
+            self.send_cmds.append(cmd)
 
     def stop_attacker(self) -> None:
         """main"""
         # commandの情報を格納するリスト
         self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
-            cmd = self.controls.to_front_ball(self.observer.ball, bot)
-            cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
-            cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
+            cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot, 500)
+            # cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
+            # cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.avoid_penalty_area(cmd, bot)
-            cmd = self.controls.speed_limiter(cmd)
+            cmd = self.controls.speed_limiter(cmd, 1)
+            # print(cmd)
             self.send_cmds.append(cmd)
 
     def penalty_kick(self, pre_kick: bool = False) -> None:
