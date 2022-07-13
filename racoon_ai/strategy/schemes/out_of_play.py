@@ -58,17 +58,19 @@ class OutOfPlay(StrategyBase):
 
         self.send_cmds = []
 
-        if without_attacker:
-            target_bots: list[Robot] = []
+        target_bot_set: set[Robot] = set()
+        if not without_attacker:
+            target_bot_set = self.observer.our_robots_available
+
+        else:
             for bot in self.observer.our_robots_available:
                 if not bot:
                     continue
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     continue
-                # print(bot.robot_id)
-                target_bots += [bot]
+                target_bot_set.add(bot)
 
-        cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
+        cmds: list[RobotCommand] = reset_all_imu(target_bot_set)
         self.send_cmds += cmds
 
     def placement_our(self) -> None:

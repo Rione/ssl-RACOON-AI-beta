@@ -100,7 +100,7 @@ class Game:  # pylint: disable=R0903
             self.__logger.debug(sim_cmds)
             self.__send(sim_cmds)
 
-    def _handle_ref_command(  # pylint: disable=R0911,R0912
+    def _handle_ref_command(  # pylint: disable=R0911,R0912,R0915
         self,
     ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
@@ -119,10 +119,26 @@ class Game:  # pylint: disable=R0903
                     return (on_kickoff_our_cbf, self.__strategy)
 
                 if self.__is_their_kickoff(prev_cmd):
-                    return (on_kickoff_their_cbf, self.__strategy)
+                    if self.__is_inplay:
+                        return (on_default_cbf, self.__strategy)
+
+                    if not self.__is_ball_moved():
+                        return (on_kickoff_their_cbf, self.__strategy)
+
+                    self.__is_inplay = True
+                    self.__tmp_ball_diff_sum = float(0)
+                    return (on_default_cbf, self.__strategy)
 
                 if self.__is_our_penalty(prev_cmd):
-                    return (on_penalty_our_cbf, self.__strategy)
+                    if self.__is_inplay:
+                        return (on_default_cbf, self.__strategy)
+
+                    if not self.__is_ball_moved():
+                        return (on_penalty_our_cbf, self.__strategy)
+
+                    self.__is_inplay = True
+                    self.__tmp_ball_diff_sum = float(0)
+                    return (on_default_cbf, self.__strategy)
 
                 if self.__is_their_penalty(prev_cmd):
                     return (on_penalty_their_cbf, self.__strategy)

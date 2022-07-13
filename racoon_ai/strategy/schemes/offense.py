@@ -88,9 +88,9 @@ class Offense(StrategyBase):
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             # close to ball
-            if bot.distance_ball_robot <= 700:
-                cmd = self.controls.speed_limiter(cmd, 0.15)
-            cmd = self.controls.speed_limiter(cmd, 0.15)
+            if bot.distance_ball_robot <= 600:
+                cmd = self.controls.speed_limiter(cmd, 0.12)
+            cmd = self.controls.speed_limiter(cmd, 0.2)
             self.send_cmds += [cmd]
 
     def pass_to_receiver(self) -> None:
@@ -147,11 +147,8 @@ class Offense(StrategyBase):
         self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot, 500)
-            # cmd = self.controls.avoid_ball(cmd, bot, self.observer.geometry.their_goal)
-            # cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.speed_limiter(cmd, 1)
-            # print(cmd)
             self.send_cmds.append(cmd)
 
     def penalty_kick(self, pre_kick: bool = False) -> None:
