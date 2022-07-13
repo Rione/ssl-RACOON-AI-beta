@@ -92,7 +92,7 @@ class Observer:  # pylint: disable=R0904
         self.ball.update(proto.ball, self.sec_per_frame)
         self.__logger.debug("Ball: %s", self.ball)
 
-        self.geometry.update(proto.geometry)
+        self.geometry.update(proto.geometry, self.attack_direction)
         self.__logger.debug("Geometry: %s", self.geometry)
 
         self.referee.update(proto.referee)

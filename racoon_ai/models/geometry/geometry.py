@@ -175,20 +175,22 @@ class Geometry:
         """their_goal"""
         return Point(-self.goal.x, -self.goal.y)
 
-    def update(self, geometry: Geometry_Info) -> None:
+    def update(self, geometry: Geometry_Info, attack_direction: int) -> None:
         """
         Update robot
 
         Args:
             geometry (Geometry_Info): Geometry_Info
+            attack_direction (int): attack direction
         """
-        self.__from_proto(geometry)
+        self.__from_proto(geometry, attack_direction)
 
-    def __from_proto(self, geometry: Geometry_Info) -> None:
+    def __from_proto(self, geometry: Geometry_Info, atttack_direction: int) -> None:
         """from_proto
 
         Args:
             geometry (Geometry_Info): Geometry_Info
+            attack_direction (int): attack direction
         """
         self.__field_length = geometry.field_length
         self.__field_width = geometry.field_width
@@ -206,7 +208,10 @@ class Geometry:
         self.__goal = Point(geometry.goal_x, geometry.goal_y)
 
         # Override (vision problem)
-        self.__goal = Point(4500, 0)
+        if atttack_direction < 0:
+            self.__goal = Point(4500, 0)
+        else:
+            self.__goal = Point(-4500, 0)
         self.__goal_width = int(1200)
         self.__center_circle_radius = int(500)
         self.__penalty_area_width = int(2400)
