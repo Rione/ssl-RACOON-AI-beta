@@ -160,8 +160,8 @@ class OutOfPlay(StrategyBase):
 
         self.send_cmds = []
 
-        for i in self.role.offense_id_list:
-            if bot := self.observer.get_our_by_id(i):
+        for i, bot_id in enumerate(self.role.offense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     target_pose = Pose(
                         self.observer.ball.x - self.__center_circle_radius * 1.2 * self.__attack_direction,

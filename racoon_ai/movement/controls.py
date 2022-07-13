@@ -339,8 +339,8 @@ class Controls:
         """to_front_ball"""
         radian_point_ball = MU.radian(target_point, self.__observer.ball)
         target_pose = Pose(
-            0 - leave_distance * cos(radian_point_ball),
-            0 - leave_distance * sin(radian_point_ball),
+            self.__observer.ball.x - leave_distance * cos(radian_point_ball),
+            self.__observer.ball.y - leave_distance * sin(radian_point_ball),
             radian_point_ball,
         )
         cmd = self.pid(target_pose, bot)
