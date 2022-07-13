@@ -25,7 +25,6 @@ def on_stop_cbf(logger: Logger, strategies: Strategy) -> list[RobotCommand]:
 
     # strategies.keeper.main()
 
-    # strategies.offense.stop_attacker()
     strategies.offense.stop_attacker()
 
     strategies.out_of_play.reset_imu(without_attacker=True)
