@@ -47,11 +47,10 @@ class OutOfPlay(StrategyBase):
         self.__wait_counter: int = 0
         self.__maintenance_point: float = 1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
 
-        self.__offense_quantity: int = 0
         self.__goal: Point = self.observer.geometry.goal
         self.__their_goal: Point = self.observer.geometry.their_goal
         self.__attack_direction: float = self.observer.attack_direction
-        self.__center_circle_radius: float = 500
+        self.__center_circle_radius: float = self.observer.geometry.center_circle_radius
 
     def reset_imu(self) -> None:
         """reset_imu"""
@@ -160,10 +159,9 @@ class OutOfPlay(StrategyBase):
         """pre_kick_off_offense"""
 
         self.send_cmds = []
-        self.__offense_quantity = self.role.get_offense_quantity
 
-        for i in range(self.__offense_quantity):
-            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+        for i in self.role.offense_id_list:
+            if bot := self.observer.get_our_by_id(i):
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     target_pose = Pose(
                         self.observer.ball.x - self.__center_circle_radius * 1.2 * self.__attack_direction,

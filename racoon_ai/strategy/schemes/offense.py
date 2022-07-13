@@ -82,9 +82,7 @@ class Offense(StrategyBase):
         """shoot_to_goal"""
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             cmd = self.controls.ball_around(self.observer.geometry.their_goal, bot)
-            if bot.distance_ball_robot <= 105 and (
-                abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1
-            ):
+            if bot.is_ball_catched and (abs(MU.radian(self.observer.geometry.their_goal, bot) - bot.theta) < 0.1):
                 cmd.kickpow = 10
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)

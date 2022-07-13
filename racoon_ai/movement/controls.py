@@ -44,7 +44,7 @@ class Controls:
         # self.__max_robot_radius: float = 90
         self.__attack_direction: float = self.__observer.attack_direction
 
-    def pid(self, target: Pose, bot: Robot, limiter: float = 1) -> RobotCommand:  # pylint: disable=R0914
+    def pid(self, target: Pose, bot: Robot, limiter: float = 0.3) -> RobotCommand:  # pylint: disable=R0914
         """pid
 
         Apply PID control to the robot to reach the target pose.
@@ -136,7 +136,7 @@ class Controls:
         return vel_angular
 
     @staticmethod
-    def speed_limiter(cmd: RobotCommand, limiter: float = 0.3) -> RobotCommand:
+    def speed_limiter(cmd: RobotCommand, limiter: float = 0.24) -> RobotCommand:
         """speed_limiter"""
         if limiter <= 0:
             return cmd
@@ -339,8 +339,8 @@ class Controls:
         """to_front_ball"""
         radian_point_ball = MU.radian(target_point, self.__observer.ball)
         target_pose = Pose(
-            self.__observer.ball.x - leave_distance * cos(radian_point_ball),
-            self.__observer.ball.y - leave_distance * sin(radian_point_ball),
+            0 - leave_distance * cos(radian_point_ball),
+            0 - leave_distance * sin(radian_point_ball),
             radian_point_ball,
         )
         cmd = self.pid(target_pose, bot)

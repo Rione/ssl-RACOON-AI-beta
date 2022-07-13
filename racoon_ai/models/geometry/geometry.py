@@ -206,6 +206,8 @@ class Geometry:
         self.__goal = Point(geometry.goal_x, geometry.goal_y)
 
         # Override (vision problem)
+        self.__goal = Point(4500, 0)
         self.__goal_width = int(1200)
+        self.__center_circle_radius = int(500)
         self.__penalty_area_width = int(2400)
         self.__penalty_area_depth = int(1200)
