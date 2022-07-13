@@ -171,8 +171,8 @@ class Defense(StrategyBase):
         self.send_cmds = []
         self.__defense_quantity = self.role.get_defense_quantity
 
-        for i in range(self.__defense_quantity):
-            if bot := self.observer.get_our_by_id(self.role.get_defense_id(i)):
+        for i, bot_id in enumerate(self.role.defense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
                 if self.__defense_quantity == 1:
                     target_pose = Pose(
                         (

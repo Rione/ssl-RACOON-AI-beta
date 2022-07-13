@@ -40,11 +40,11 @@ class Controls:
         self.__pre_bot_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__theta_accumulation: NDArray[float64] = zeros((11,), dtype=float64)
         self.__standard_distance_enemy: float = 500**2
-        self.__standard_distance_penalty: float = 200**2
+        self.__standard_distance_penalty: float = 350**2
         # self.__max_robot_radius: float = 90
         self.__attack_direction: float = self.__observer.attack_direction
 
-    def pid(self, target: Pose, bot: Robot, limiter: float = 0.3) -> RobotCommand:  # pylint: disable=R0914
+    def pid(self, target: Pose, bot: Robot, limiter: float = 0.28) -> RobotCommand:  # pylint: disable=R0914
         """pid
 
         Apply PID control to the robot to reach the target pose.
@@ -136,7 +136,7 @@ class Controls:
         return vel_angular
 
     @staticmethod
-    def speed_limiter(cmd: RobotCommand, limiter: float = 0.24) -> RobotCommand:
+    def speed_limiter(cmd: RobotCommand, limiter: float = 0.20) -> RobotCommand:
         """speed_limiter"""
         if limiter <= 0:
             return cmd
@@ -151,7 +151,7 @@ class Controls:
 
     def avoid_enemy(self, cmd: RobotCommand, bot: Robot, target_point: Point) -> RobotCommand:
         """avoid_enemy"""
-
+        return cmd
         radian_target_robot = MU.radian(target_point, bot)
         distance_robot_target = MU.distance(bot, target_point)
 
@@ -263,7 +263,7 @@ class Controls:
         )
         radian_around -= (sin(discrimination) * MU.PI) / 2
         radian_around -= bot.theta
-        adjustment = 250**2 / MU.div_safe(bot.distance_ball_robot**2)
+        adjustment = 280**2 / MU.div_safe(bot.distance_ball_robot**2)
 
         vel_fwd += cos(radian_around) * adjustment
         vel_sway += sin(radian_around) * adjustment

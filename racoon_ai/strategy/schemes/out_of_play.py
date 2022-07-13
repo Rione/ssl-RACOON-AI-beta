@@ -52,11 +52,24 @@ class OutOfPlay(StrategyBase):
         self.__attack_direction: float = self.observer.attack_direction
         self.__center_circle_radius: float = self.observer.geometry.center_circle_radius
 
-    def reset_imu(self) -> None:
+    def reset_imu(self, without_attacker: bool = False) -> None:
         """reset_imu"""
         self.__logger.debug("Reset IMU by camera theta ...")
 
         self.send_cmds = []
+
+        if without_attacker:
+            target_bots: list[Robot] = []
+            for bot in self.observer.our_robots_available:
+                if not bot:
+                    continue
+
+                if bot.robot_id == self.__subrole.our_attacker_id:
+                    continue
+
+                target_bots += [bot]
+
+            print(target_bots)
         cmds: list[RobotCommand] = reset_all_imu(self.observer.our_robots_available)
         self.send_cmds += cmds
 
@@ -169,7 +182,7 @@ class OutOfPlay(StrategyBase):
                         MU.radian(self.__their_goal, self.__goal),
                     )
                     cmd = self.controls.pid(target_pose, bot)
-                    cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                    # cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                     if is_our:
                         target_pose = Pose(
                             0 - 130 * self.__attack_direction,
@@ -177,7 +190,7 @@ class OutOfPlay(StrategyBase):
                             MU.radian(self.__their_goal, self.__goal),
                         )
                         cmd = self.controls.pid(target_pose, bot)
-                        cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+                        # cmd = self.controls.avoid_ball(cmd, bot, target_pose)
                         self.send_cmds += [cmd]
                         continue
 
