@@ -296,14 +296,14 @@ class Observer:  # pylint: disable=R0904
         if mid == target_id:
             # NOTE: Equivalent to `(not search_enemy) and (not (mid in self.__target_ids))`
             if not ((search_enemy) or (target_id in self.__target_ids)):
-                self.__logger.debug("Robot %d is not in our target ids", target_id)
+                self.__logger.info("Robot %d is not in our target ids", target_id)
 
             bot: Robot = bots[mid]
             if only_online and (not bot.is_online):
-                self.__logger.debug("Robot id %d is offline", mid)
+                self.__logger.info("Robot id %d is offline", mid)
                 return None
             if only_visible and (not bot.is_visible):
-                self.__logger.debug("Robot id %d is not on stage", mid)
+                self.__logger.info("Robot id %d is not on stage", mid)
                 return None
 
             self.__logger.debug("Bot: %s", bot)

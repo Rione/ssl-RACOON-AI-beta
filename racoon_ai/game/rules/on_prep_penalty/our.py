@@ -21,9 +21,9 @@ def on_prep_penalty_our_cbf(logger: Logger, strategies: Strategy) -> list[RobotC
         logger (Logger): Logger instance
         strategies (Strategy): Strategy instance
     """
-    strategies.offense.penalty_kick(True)
+    strategies.offense.penalty_kick(is_prepare=True)
 
-    strategies.out_of_play.penalty_kick(True)
+    strategies.out_of_play.penalty_position(is_our=True)
 
     send_cmds: list[RobotCommand] = []
     send_cmds += strategies.offense.send_cmds

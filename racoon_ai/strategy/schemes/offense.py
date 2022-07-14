@@ -7,7 +7,7 @@
 """
 
 from logging import getLogger
-from math import cos, sin
+from math import cos, radians, sin
 from typing import Optional
 
 from numpy import sign
@@ -53,8 +53,8 @@ class Offense(StrategyBase):
         self.send_cmds = []
         bot: Optional[Robot]
 
-        for i in range(self.role.get_offense_quantity):
-            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+        for _, bot_id in enumerate(self.role.offense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     if is_indirect:
                         self.pass_to_receiver()
@@ -70,8 +70,8 @@ class Offense(StrategyBase):
         self.send_cmds = []
         bot: Optional[Robot]
 
-        for i in range(self.role.get_offense_quantity):
-            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+        for _, bot_id in enumerate(self.role.offense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
                 if bot.robot_id == self.__subrole.our_attacker_id:
                     self.block_their_attacker()
                     continue
@@ -88,9 +88,14 @@ class Offense(StrategyBase):
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
             # close to ball
+            cmd.dribble_pow = 0.0
             if bot.distance_ball_robot <= 600:
-                cmd = self.controls.speed_limiter(cmd, 0.12)
-            cmd = self.controls.speed_limiter(cmd, 0.2)
+                cmd = self.controls.speed_limiter(cmd, 0.18)
+                if abs(bot.radian_ball_robot) < radians(30):
+                    cmd.dribble_pow = 1.0
+                    cmd = self.controls.speed_limiter(cmd, 0.14)
+            else:
+                cmd = self.controls.speed_limiter(cmd, 0.22)
             self.send_cmds += [cmd]
 
     def pass_to_receiver(self) -> None:
@@ -151,17 +156,17 @@ class Offense(StrategyBase):
             cmd = self.controls.speed_limiter(cmd, 1)
             self.send_cmds.append(cmd)
 
-    def penalty_kick(self, pre_kick: bool = False) -> None:
+    def penalty_kick(self, *, is_prepare: bool) -> None:
         """penalty_kick"""
         self.send_cmds = []
         cmd: RobotCommand
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
-            if pre_kick:
-                cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot)
-                self.send_cmds += [cmd]
+            if not is_prepare:
+                self.shoot_to_goal()
                 return
 
-            self.shoot_to_goal()
+            cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot)
+            self.send_cmds += [cmd]
 
     def default_position(self) -> None:
         """default_position"""
@@ -170,8 +175,8 @@ class Offense(StrategyBase):
         cmd: RobotCommand
         self.__offense_quantity = self.role.get_offense_quantity
 
-        for i in range(self.__offense_quantity):
-            if bot := self.observer.get_our_by_id(self.role.get_offense_id(i)):
+        for i, bot_id in enumerate(self.role.offense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
                 if bot.robot_id != self.__subrole.our_attacker_id and self.__offense_quantity != 0:
                     target_pose = Pose(
                         (

@@ -4,6 +4,10 @@
 
     This module contains:
         - on_default_cbf
+        - on_kickoff_our_cbf
+        - on_kickoff_their_cbf
+        - on_penalty_our_cbf
+        - on_penalty_their_cbf
 """
 
 from logging import Logger
@@ -89,9 +93,9 @@ def on_penalty_our_cbf(logger: Logger, strategies: Strategy) -> list[RobotComman
         list[RobotCommand]
     """
 
-    strategies.offense.penalty_kick(True)
+    strategies.offense.penalty_kick(is_prepare=False)
 
-    strategies.out_of_play.penalty_kick(True)
+    strategies.out_of_play.penalty_position(is_our=True)
 
     send_cmds: list[RobotCommand] = []
     send_cmds += strategies.offense.send_cmds
@@ -115,7 +119,7 @@ def on_penalty_their_cbf(logger: Logger, strategies: Strategy) -> list[RobotComm
 
     strategies.keeper.main()
 
-    strategies.out_of_play.penalty_kick(True)
+    strategies.out_of_play.penalty_position(is_our=False)
 
     send_cmds: list[RobotCommand] = []
     send_cmds += strategies.keeper.send_cmds
