@@ -108,7 +108,7 @@ class Game:  # pylint: disable=R0903
         """handle_ref_command"""
 
         if self.__use_test_rule and not self.__is_show_gui:
-            return (on_default_cbf, self.__strategy)
+            return (test_cbf, self.__strategy)
 
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
 
@@ -170,6 +170,7 @@ class Game:  # pylint: disable=R0903
             return (on_prep_penalty_their_cbf, self.__strategy)
 
         if self.__is_our_direct_free(cmd):
+            self.__strategy.out_of_play.reset_flag()
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
 
@@ -181,6 +182,8 @@ class Game:  # pylint: disable=R0903
             return (on_default_cbf, self.__strategy)
 
         if self.__is_their_direct_free(cmd):
+            self.__strategy.out_of_play.reset_flag()
+
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
 
@@ -192,6 +195,8 @@ class Game:  # pylint: disable=R0903
             return (on_default_cbf, self.__strategy)
 
         if self.__is_our_indirect_free(cmd):
+            self.__strategy.out_of_play.reset_flag()
+
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
 
@@ -203,6 +208,8 @@ class Game:  # pylint: disable=R0903
             return (on_default_cbf, self.__strategy)
 
         if self.__is_their_indirect_free(cmd):
+            self.__strategy.out_of_play.reset_flag()
+
             if self.__is_inplay:
                 return (on_default_cbf, self.__strategy)
 

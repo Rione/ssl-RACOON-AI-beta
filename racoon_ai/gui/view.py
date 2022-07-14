@@ -17,6 +17,7 @@ from .modules import Back, Chart, Game, Main, Robot, Vision
 
 REF_COMMAND: TypeAlias = Referee_Info.Command
 
+
 class Gui:  # pylint: disable=R0903
     """Gui
 
@@ -43,7 +44,7 @@ class Gui:  # pylint: disable=R0903
     def __setup(self, observer: Observer, role: Role) -> None:
         """setup"""
         self.__main = Main(observer, role)
-        Chart(self.__main, observer)  # pylint: disable=W0238
+        self.__chart = Chart(self.__main, observer)  # pylint: disable=W0238
         Vision(self.__main)
         Robot(self.__main)
         Back(self.__main)
@@ -55,7 +56,6 @@ class Gui:  # pylint: disable=R0903
         if not self.__is_gui_view:
             return
         self.__main.update()
-        self.__game.update_placement()
         self.__app.processEvents()  # type: ignore
 
     def get_command(self) -> "REF_COMMAND.V":
