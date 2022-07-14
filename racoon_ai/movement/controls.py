@@ -40,7 +40,7 @@ class Controls:
         self.__pre_bot_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__theta_accumulation: NDArray[float64] = zeros((11,), dtype=float64)
         self.__standard_distance_enemy: float = 500**2
-        self.__standard_distance_penalty: float = 300**2
+        self.__standard_distance_penalty: float = 350**2
         # self.__max_robot_radius: float = 90
         self.__attack_direction: float = self.__observer.attack_direction
 
@@ -262,7 +262,7 @@ class Controls:
         )
         radian_around -= (sin(discrimination) * MU.PI) / 2
         radian_around -= bot.theta
-        adjustment = 220**2 / MU.div_safe(bot.distance_ball_robot**2)
+        adjustment = 280**2 / MU.div_safe(bot.distance_ball_robot**2)
 
         vel_fwd += cos(radian_around) * adjustment
         vel_sway += sin(radian_around) * adjustment
