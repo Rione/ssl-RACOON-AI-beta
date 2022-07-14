@@ -34,6 +34,7 @@ class Referee:
         self.__command: REF_COMMAND.V = REF_COMMAND.HALT
         self.__pre_command: Optional[REF_COMMAND.V] = None
         self.__next_command: Optional[REF_COMMAND.V] = None
+        self.__pre_one_command: Optional[REF_COMMAND.V] = None
 
         self.__stage: REF_STAGE.V = REF_STAGE.NORMAL_FIRST_HALF_PRE
 
@@ -72,6 +73,11 @@ class Referee:
     def pre_command(self) -> Optional["Referee_Info.Command.V"]:
         """pre_command"""
         return self.__pre_command
+
+    @property
+    def pre_one_command(self) -> Optional["Referee_Info.Command.V"]:
+        """pre_one_command"""
+        return self.__pre_one_command
 
     @property
     def pre_command_str(self) -> str:
@@ -132,6 +138,7 @@ class Referee:
         Args:
             proto (Referee_Info): Referee_Info
         """
+        self.__pre_one_command = self.__command
         self.__command = proto.command
         self.__stage = proto.stage
         self.__yellow_cards = proto.yellow_cards

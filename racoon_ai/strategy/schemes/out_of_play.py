@@ -73,8 +73,23 @@ class OutOfPlay(StrategyBase):
         cmds: list[RobotCommand] = reset_all_imu(target_bot_set)
         self.send_cmds += cmds
 
+    def reset_flag(self) -> None:
+        """reset_flag"""
+        self.__move_to_ball = False
+        self.__is_arrived = False
+        self.__is_fin = False
+        self.__wait_counter = 0
+
     def placement_our(self) -> None:
         """placement_our"""
+
+        if self.observer.is_team_yellow is False:
+            if self.observer.referee.pre_one_command != 17:  # BALL_PLACEMENT_BLUE
+                self.reset_flag()
+        else:
+            if self.observer.referee.pre_one_command != 17:  # BALL_PLACEMENT_YELLOW
+                self.reset_flag()
+
         self.__logger.debug("Placement...")
 
         self.send_cmds = []  # リスト初期化
