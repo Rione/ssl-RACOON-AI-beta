@@ -16,6 +16,7 @@ from .modules import Back, Chart, Game, Main, Robot, Vision
 
 REF_COMMAND: TypeAlias = Referee_Info.Command
 
+
 class Gui:  # pylint: disable=R0903
     """Gui
 
@@ -43,7 +44,7 @@ class Gui:  # pylint: disable=R0903
     def __setup(self, observer: Observer, role: Role) -> None:
         """setup"""
         self.__main = Main(observer, role)
-        Chart(self.__main, observer)  # pylint: disable=W0238
+        self.__chart = Chart(self.__main, observer)  # pylint: disable=W0238
         Vision(self.__main)
         Robot(self.__main)
         Back(self.__main)

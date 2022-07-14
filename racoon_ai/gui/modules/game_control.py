@@ -16,6 +16,7 @@ from .main import Main
 
 REF_COMMAND: TypeAlias = Referee_Info.Command
 
+
 class Game:  # pylint: disable=R0903
     """Game
     Args:
@@ -112,7 +113,7 @@ class Game:  # pylint: disable=R0903
         toggle_referee.move(1222, 68)
 
     def __set_combo(self) -> None:
-        
+
         self.__combo.addItems(
             [
                 "NORMAL_START",
@@ -136,40 +137,53 @@ class Game:  # pylint: disable=R0903
             ]
         )
         self.__combo.setGeometry(1225, 140, 150, 50)
-    
-    def update_command(self):
+
+    def update_command(self) -> "REF_COMMAND.V":  # pylint: disable=R0911,R0912
         """update combo"""
         if self.__combo.currentText() == "HALT":
             return REF_COMMAND.HALT
-        elif self.__combo.currentText() == "STOP":
+
+        if self.__combo.currentText() == "STOP":
             return REF_COMMAND.STOP
-        elif self.__combo.currentText() == "NORMAL_START":
+
+        if self.__combo.currentText() == "NORMAL_START":
             return REF_COMMAND.NORMAL_START
-        elif self.__combo.currentText() == "FORCE_START":
+
+        if self.__combo.currentText() == "FORCE_START":
             return REF_COMMAND.FORCE_START
-        elif self.__combo.currentText() == "PRE_KICKOFF_BLUE":
+
+        if self.__combo.currentText() == "PRE_KICKOFF_BLUE":
             return REF_COMMAND.PREPARE_KICKOFF_BLUE
-        elif self.__combo.currentText() == "PRE_KICKOFF_YELLOW":
+
+        if self.__combo.currentText() == "PRE_KICKOFF_YELLOW":
             return REF_COMMAND.PREPARE_KICKOFF_YELLOW
-        elif self.__combo.currentText() == "PRE_PENALTY_BLUE":
+
+        if self.__combo.currentText() == "PRE_PENALTY_BLUE":
             return REF_COMMAND.PREPARE_PENALTY_BLUE
-        elif self.__combo.currentText() == "PRE_PENALTY_YELLOW":
+
+        if self.__combo.currentText() == "PRE_PENALTY_YELLOW":
             return REF_COMMAND.PREPARE_PENALTY_YELLOW
-        elif self.__combo.currentText() == "DIRECT_BLUE":
+
+        if self.__combo.currentText() == "DIRECT_BLUE":
             return REF_COMMAND.DIRECT_FREE_BLUE
-        elif self.__combo.currentText() == "DIRECT_YELLOW":
+
+        if self.__combo.currentText() == "DIRECT_YELLOW":
             return REF_COMMAND.DIRECT_FREE_YELLOW
-        elif self.__combo.currentText() == "INDIRECT_BLUE":
+
+        if self.__combo.currentText() == "INDIRECT_BLUE":
             return REF_COMMAND.INDIRECT_FREE_BLUE
-        elif self.__combo.currentText() == "INDIRECT_YELLOW":
+
+        if self.__combo.currentText() == "INDIRECT_YELLOW":
             return REF_COMMAND.INDIRECT_FREE_YELLOW
-        elif self.__combo.currentText() == "PLACEMENT_BLUE":
+
+        if self.__combo.currentText() == "PLACEMENT_BLUE":
             return REF_COMMAND.BALL_PLACEMENT_BLUE
-        elif self.__combo.currentText() == "PLACEMENT_YELLOW":
+
+        if self.__combo.currentText() == "PLACEMENT_YELLOW":
             return REF_COMMAND.BALL_PLACEMENT_YELLOW
 
-        return 0
-            
+        return REF_COMMAND.HALT
+
         # print(self.__combo.currentText())
 
     def __set_box(self) -> None:
