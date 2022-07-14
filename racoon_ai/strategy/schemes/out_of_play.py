@@ -81,7 +81,7 @@ class OutOfPlay(StrategyBase):
         self.__is_fin = False
         self.__wait_counter = 0
 
-    def placement_our(self) -> None:
+    def placement_our(self, show: bool, gui_point: Point) -> None:
         """placement_our"""
 
         if self.observer.is_team_yellow is False:
@@ -99,7 +99,6 @@ class OutOfPlay(StrategyBase):
         # find nearest to ball robot
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             if point := self.observer.referee.placement_designated_point:
-
                 # 2点間の中心座標を算出
                 target_pose = Pose((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2, 0)
 

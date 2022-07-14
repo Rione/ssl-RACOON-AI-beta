@@ -114,6 +114,7 @@ class Game:  # pylint: disable=R0903
 
         if self.__use_test_rule and self.__is_show_gui:
             cmd = self.__gui.get_command()
+            self.__observer.referee._Referee__placement_designated_point = self.__gui.get_placement()
         
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 

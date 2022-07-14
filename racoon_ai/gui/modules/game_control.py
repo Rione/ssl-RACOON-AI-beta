@@ -9,6 +9,7 @@ from typing import TypeAlias
 from PySide6.QtGui import QFont  # pylint: disable=E0611
 from PySide6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox  # pylint: disable=E0611
 
+from racoon_ai.models.coordinate import Point
 from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Referee_Info
 
 from .animated_toggle import AnimatedToggle
@@ -38,6 +39,7 @@ class Game:  # pylint: disable=R0903
         self.__score: QLabel
         self.__score_blue: QLabel
         self.__score_yellow: QLabel
+
         self.__set_texts()
         self.__set_toggle()
         self.__set_combo()
@@ -115,9 +117,9 @@ class Game:  # pylint: disable=R0903
         
         self.__combo.addItems(
             [
-                "NORMAL_START",
-                "STOP",
                 "HALT",
+                "STOP",
+                "NORMAL_START",
                 "FORCE_START",
                 "PRE_KICKOFF_BLUE",
                 "PRE_KICKOFF_YELLOW",
@@ -132,12 +134,12 @@ class Game:  # pylint: disable=R0903
                 "GOAL_BLUE",
                 "GOAL_YELLOW",
                 "PLACEMENT_BLUE",
-                "PRE_KICKOFF_YELLOW",
+                "PLACEMENT_YELLOW"
             ]
         )
         self.__combo.setGeometry(1225, 140, 150, 50)
     
-    def update_command(self):
+    def update_command(self) -> "REF_COMMAND.V":
         """update combo"""
         if self.__combo.currentText() == "HALT":
             return REF_COMMAND.HALT
@@ -167,22 +169,25 @@ class Game:  # pylint: disable=R0903
             return REF_COMMAND.BALL_PLACEMENT_BLUE
         elif self.__combo.currentText() == "PLACEMENT_YELLOW":
             return REF_COMMAND.BALL_PLACEMENT_YELLOW
-
-        return 0
+        else:
+            return 0
             
-        # print(self.__combo.currentText())
+    def update_placement(self) -> Point:
+        """update placement"""
+        return Point(self.__replace_x.value(), self.__replace_y.value())
 
     def __set_box(self) -> None:
-        replace_x = QSpinBox(self.__main)
-        replace_x.resize(70, 30)
-        replace_x.setMaximum(6000)
-        replace_x.setMinimum(-6000)
-        replace_x.move(1252, 197)
-        replace_y = QSpinBox(self.__main)
-        replace_y.resize(70, 30)
-        replace_y.setMaximum(60000)
-        replace_y.setMinimum(-6000)
-        replace_y.move(1252, 222)
+        self.__replace_x = QSpinBox(self.__main)
+        self.__replace_x.setMaximum(6000)
+        self.__replace_x.setMinimum(-6000)
+        self.__replace_x.setGeometry(1252, 197, 70, 30)
+
+
+        self.__replace_y = QSpinBox(self.__main)
+        self.__replace_y.resize(70, 30)
+        self.__replace_y.setMaximum(60000)
+        self.__replace_y.setMinimum(-6000)
+        self.__replace_y.move(1252, 222)
 
         score_blue = QSpinBox(self.__main)
         score_blue.resize(90, 30)
