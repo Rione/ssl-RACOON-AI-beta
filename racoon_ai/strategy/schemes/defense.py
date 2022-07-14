@@ -8,7 +8,6 @@
 
 from logging import getLogger
 from math import tan
-from typing import Optional
 
 from numpy import sign
 
@@ -41,7 +40,7 @@ class Defense(StrategyBase):
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
         self.__subrole: SubRole = subrole
-        self.__enemy_offense: list[int] = []
+        self.__enemy_offense: list[int] = []  # pylint: disable=W0238
         self.__defense_quantity: int = 0
         self.__max_robot_radius: float = 90
         self.__diff_defense_enemy_quantity: int = 0
@@ -72,14 +71,16 @@ class Defense(StrategyBase):
             self.default_position()
             return
 
-        for i, bot_id in enumerate(self.role.defense_id_list):
-            bot: Optional[Robot]
-            if bot := self.observer.get_our_by_id(bot_id):
-                cmd: RobotCommand
-                ene: Optional[Robot]
-                if ene := self.observer.get_enemy_by_id(self.__enemy_offense[i]):
-                    cmd = self.__keep_penalty_area(bot, ene)
-                    self.send_cmds += [cmd]
+        # for i, bot_id in enumerate(self.role.defense_id_list):
+        #     bot: Optional[Robot]
+        #     if bot := self.observer.get_our_by_id(bot_id):
+        #         cmd: RobotCommand
+        #         ene: Optional[Robot]
+        #         if ene := self.observer.get_enemy_by_id(self.__enemy_offense[i]):
+        #             cmd = self.__keep_penalty_area(bot, ene)
+        #             self.send_cmds += [cmd]
+
+        self.__keep_penalty_area_from_attacker()
 
     def __enemy_offense_decide(self) -> None:
         """enemy_offense_decide"""
@@ -116,9 +117,9 @@ class Defense(StrategyBase):
             enemy_offense.sort(reverse=False, key=lambda x: x[1])
             del enemy_offense[defense_quantity:]
             enemy_offense.sort(reverse=True, key=lambda x: x[2])
-        self.__enemy_offense = list(row[0] for row in enemy_offense)
+        self.__enemy_offense = list(row[0] for row in enemy_offense)  # pylint: disable=W0238
 
-    def __keep_penalty_area(self, robot: Robot, enemy: Robot) -> RobotCommand:
+    def __keep_penalty_area(self, robot: Robot, enemy: Robot) -> RobotCommand:  # pylint: disable=W0238
         """keep_penalty_area"""
         radian_enemy_goal = (
             MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))
@@ -157,12 +158,61 @@ class Defense(StrategyBase):
             if abs(radian_enemy_goal) < MU.PI / 4:
                 target_pose.y += self.__max_robot_radius * (self.__diff_defense_enemy_quantity - self.__count * 2)
             else:
-                target_pose.x -= (
+                target_pose.x += (
                     self.__max_robot_radius * (self.__diff_defense_enemy_quantity - self.__count * 2)
                 ) * sign(radian_enemy_goal)
             self.__count += 1
 
         return self.controls.pid(target_pose, robot)
+
+    def __keep_penalty_area_from_attacker(self) -> None:
+        """keep_penalty_areafrom_attacker"""
+
+        if enemy := self.observer.get_enemy_by_id(self.__subrole.enemy_attacker_id):
+            for i, bot_id in enumerate(self.role.defense_id_list):
+                if bot := self.observer.get_our_by_id(bot_id):
+                    radian_enemy_goal = (
+                        MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))
+                        * self.__attack_direction
+                    )
+                    radian_enemy_robot = MU.radian(enemy, bot)
+
+                    if abs(radian_enemy_goal) >= MU.PI / 2:
+                        radian_enemy_goal = (sign(radian_enemy_goal) * MU.PI) / 2
+
+                    if abs(radian_enemy_goal) < MU.PI / 4:
+                        target_pose = Pose(
+                            (
+                                self.__goal.x
+                                + (self.observer.geometry.goal_width + self.__max_robot_radius)
+                                * self.__attack_direction
+                            ),
+                            ((self.observer.geometry.goal_width + self.__max_robot_radius) * tan(radian_enemy_goal)),
+                            radian_enemy_robot,
+                        )
+
+                    else:
+                        target_pose = Pose(
+                            (
+                                self.__goal.x
+                                + (self.__goal.y + self.observer.geometry.goal_width + self.__max_robot_radius)
+                                / tan(radian_enemy_goal)
+                                * sign(radian_enemy_goal)
+                                * self.__attack_direction
+                            ),
+                            (self.__goal.y + (self.observer.geometry.goal_width + self.__max_robot_radius))
+                            * sign(radian_enemy_goal),
+                            radian_enemy_robot,
+                        )
+                    if abs(radian_enemy_goal) < MU.PI / 4:
+                        target_pose.y += self.__max_robot_radius * (self.__defense_quantity - i * 2)
+                    else:
+                        target_pose.x += (self.__max_robot_radius * (self.__defense_quantity - i * 2)) * sign(
+                            radian_enemy_goal
+                        )
+
+                    cmd = self.controls.pid(target_pose, bot)
+                    self.send_cmds += [cmd]
 
     def default_position(self) -> None:
         """keep_penalty_area"""
