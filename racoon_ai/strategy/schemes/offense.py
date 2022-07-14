@@ -7,7 +7,7 @@
 """
 
 from logging import getLogger
-from math import cos, sin
+from math import cos, radians, sin
 from typing import Optional
 
 from numpy import sign
@@ -87,10 +87,13 @@ class Offense(StrategyBase):
                 cmd.kickpow = 10
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.avoid_enemy(cmd, bot, self.observer.ball)
+            cmd.dribble_pow = 0.0
             # close to ball
-            if bot.distance_ball_robot <= 600:
-                cmd = self.controls.speed_limiter(cmd, 0.12)
-            cmd = self.controls.speed_limiter(cmd, 0.2)
+            if bot.distance_ball_robot <= 600 and bot.radian_ball_robot < radians(20):
+                cmd = self.controls.speed_limiter(cmd, 0.14)
+                cmd.dribble_pow = 1.0
+            cmd = self.controls.speed_limiter(cmd, 0.22)
+            # print(cmd.dribble_pow)
             self.send_cmds += [cmd]
 
     def pass_to_receiver(self) -> None:

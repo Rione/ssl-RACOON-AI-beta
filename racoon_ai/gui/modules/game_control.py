@@ -4,12 +4,17 @@
 
     This module is for the Game class.
 """
+from typing import TypeAlias
+
 from PySide6.QtGui import QFont  # pylint: disable=E0611
 from PySide6.QtWidgets import QComboBox, QLabel, QPushButton, QSpinBox  # pylint: disable=E0611
+
+from racoon_ai.proto.pb_gen.to_racoonai_pb2 import Referee_Info
 
 from .animated_toggle import AnimatedToggle
 from .main import Main
 
+REF_COMMAND: TypeAlias = Referee_Info.Command
 
 class Game:  # pylint: disable=R0903
     """Game
@@ -95,6 +100,8 @@ class Game:  # pylint: disable=R0903
         self.__score_yellow.setStyleSheet("QLabel { color : white; }")
         self.__score_yellow.move(1180, 351)
 
+        self.__combo = QComboBox(self.__main)
+
     def __set_toggle(self) -> None:
         toggle_referee = AnimatedToggle(
             self.__main,
@@ -105,30 +112,65 @@ class Game:  # pylint: disable=R0903
         toggle_referee.move(1222, 68)
 
     def __set_combo(self) -> None:
-        self.__combo = QComboBox(self.__main)
+        
         self.__combo.addItems(
             [
                 "NORMAL_START",
                 "STOP",
                 "HALT",
                 "FORCE_START",
-                "PRE_KICKOFF_OUR",
-                "PRE_KICKOFF_THEIR",
-                "PRE_PENALTY_OUR",
-                "PRE_PENALTY_THEIR",
-                "DIRECT_OUR",
-                "DIRECT_THEIR",
-                "INDIRECT_OUR",
-                "INDIRECT_THEIR",
-                "TIMEOUT_OUR",
-                "TIMEOUT_THEIR",
-                "GOAL_OUR",
-                "GOAL_THEIR",
-                "PLACEMENT_OUR",
-                "PRE_KICKOFF_THEIR",
+                "PRE_KICKOFF_BLUE",
+                "PRE_KICKOFF_YELLOW",
+                "PRE_PENALTY_BLUE",
+                "PRE_PENALTY_YELLOW",
+                "DIRECT_BLUE",
+                "DIRECT_YELLOW",
+                "INDIRECT_BLUE",
+                "INDIRECT_YELLOW",
+                "TIMEOUT_BLUE",
+                "TIMEOUT_YELLOW",
+                "GOAL_BLUE",
+                "GOAL_YELLOW",
+                "PLACEMENT_BLUE",
+                "PRE_KICKOFF_YELLOW",
             ]
         )
         self.__combo.setGeometry(1225, 140, 150, 50)
+    
+    def update_command(self):
+        """update combo"""
+        if self.__combo.currentText() == "HALT":
+            return REF_COMMAND.HALT
+        elif self.__combo.currentText() == "STOP":
+            return REF_COMMAND.STOP
+        elif self.__combo.currentText() == "NORMAL_START":
+            return REF_COMMAND.NORMAL_START
+        elif self.__combo.currentText() == "FORCE_START":
+            return REF_COMMAND.FORCE_START
+        elif self.__combo.currentText() == "PRE_KICKOFF_BLUE":
+            return REF_COMMAND.PREPARE_KICKOFF_BLUE
+        elif self.__combo.currentText() == "PRE_KICKOFF_YELLOW":
+            return REF_COMMAND.PREPARE_KICKOFF_YELLOW
+        elif self.__combo.currentText() == "PRE_PENALTY_BLUE":
+            return REF_COMMAND.PREPARE_PENALTY_BLUE
+        elif self.__combo.currentText() == "PRE_PENALTY_YELLOW":
+            return REF_COMMAND.PREPARE_PENALTY_YELLOW
+        elif self.__combo.currentText() == "DIRECT_BLUE":
+            return REF_COMMAND.DIRECT_FREE_BLUE
+        elif self.__combo.currentText() == "DIRECT_YELLOW":
+            return REF_COMMAND.DIRECT_FREE_YELLOW
+        elif self.__combo.currentText() == "INDIRECT_BLUE":
+            return REF_COMMAND.INDIRECT_FREE_BLUE
+        elif self.__combo.currentText() == "INDIRECT_YELLOW":
+            return REF_COMMAND.INDIRECT_FREE_YELLOW
+        elif self.__combo.currentText() == "PLACEMENT_BLUE":
+            return REF_COMMAND.BALL_PLACEMENT_BLUE
+        elif self.__combo.currentText() == "PLACEMENT_YELLOW":
+            return REF_COMMAND.BALL_PLACEMENT_YELLOW
+
+        return 0
+            
+        # print(self.__combo.currentText())
 
     def __set_box(self) -> None:
         replace_x = QSpinBox(self.__main)

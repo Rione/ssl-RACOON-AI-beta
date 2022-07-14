@@ -71,6 +71,9 @@ class Game:  # pylint: disable=R0903
         self.__use_test_rule: bool = use_test_rule
         self.__logger.info("Use test rule: %s", self.__use_test_rule)
 
+
+        self.__is_show_gui: bool = show_gui
+
         self.__gui: Gui = Gui(show_gui, self.__observer, self.__role)
 
         self.__strategy: Strategy = Strategy(self.__observer, self.__role, controls)
@@ -104,11 +107,12 @@ class Game:  # pylint: disable=R0903
         self,
     ) -> tuple[Callable[..., list[RobotCommand]], RULE_ARG_TYPE]:
         """handle_ref_command"""
-        if self.__use_test_rule:
-            return (test_cbf, self.__strategy)
 
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
         cmd: "REF_COMMAND.V" = self.__observer.referee.command
+        if self.__is_show_gui:
+            cmd = self.__gui.get_command()
+        
         if cmd is REF_COMMAND.HALT:
             self.__is_inplay = False
             return (on_halt_cbf, self.__observer)
