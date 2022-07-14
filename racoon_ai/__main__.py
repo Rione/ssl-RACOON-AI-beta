@@ -80,10 +80,18 @@ class RacoonMain:
         get_team_flag: Callable[[bool], str] = lambda is_yellow: "yellow" if is_yellow else "blue"
         team_flag: str = get_team_flag(self.__conf.getboolean("commons", "isTeamYellow"))
 
-        get_goal_flag: Callable[[bool], str] = lambda is_negative_side: "P" if is_negative_side else "N"
-        goal_flag: str = get_goal_flag(self.__conf.getboolean("commons", "isOurCourtNegative"))
+        is_our_court_negative: bool = self.__conf.getboolean("commons", "isOurCourtNegative")
 
-        cmds: str = f"bin/RACOON-MW.exe -g {goal_flag!s} -p {vision_port:s} {sim_flag:s} -t {team_flag:s} &"
+        get_goal_flag: Callable[[bool], str] = lambda is_negative_side: "P" if is_negative_side else "N"
+        goal_flag: str = get_goal_flag(is_our_court_negative)
+
+        is_half_coat_test: bool = self.__conf.getboolean("commons", "isHalfCourtTest")
+        get_coat_flag: Callable[[bool], str] = lambda is_negative_side: "N" if is_negative_side else "P"
+        half_coat_flag: str = f"{get_coat_flag(is_our_court_negative):s}" if is_half_coat_test else "F"
+
+        cmds: str = (
+            f"bin/RACOON-MW.exe -g {goal_flag!s} -p {vision_port:s} {sim_flag:s} -t {team_flag:s} -c {half_coat_flag} &"
+        )
         self.__logger.info("Executing: %s", cmds)
         return Popen(cmds.split(), stdin=None)
 
