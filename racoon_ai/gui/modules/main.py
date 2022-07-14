@@ -122,7 +122,7 @@ class Main(QMainWindow):
         self._draw_ball()
         self._draw_robots("blue")
         self._draw_robots("yellow")
-        # self._draw_role()
+        self._draw_role()
 
         self.__fps_num.setNum(60)
 
@@ -186,14 +186,15 @@ class Main(QMainWindow):
         self.__midfielder_num.setGeometry(20, 20, 645, 70)
         self.__midfielder_num.move(1100, 319)
         # self.__midfielder_num.setNum(1)
-        for i in range(3):
+        for i, bot_id in enumerate(self.__role.offense_id_list):
             self.__offense_num[i].setGeometry(20, 20, 645, 70)
             self.__offense_num[i].move(735 + (61 * i), 319)
-            self.__offense_num[i].setNum(self.__role.get_offense_id(i))
+            self.__offense_num[i].setNum(bot_id)
 
+        for i, bot_id in enumerate(self.__role.defense_id_list):
             self.__defense_num[i].setGeometry(20, 20, 645, 70)
             self.__defense_num[i].move(918 + (61 * i), 319)
-            self.__defense_num[i].setNum(self.__role.get_defense_id(i))
+            self.__defense_num[i].setNum(bot_id)
         self.__ui.drawPixmap(590, 297, 550, 115, self.__pixmap_role)
 
     def _draw_background(self) -> None:

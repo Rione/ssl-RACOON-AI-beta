@@ -12,6 +12,7 @@ from typing import Optional
 
 from racoon_ai.common.math_utils import MathUtils as MU
 from racoon_ai.models.coordinate import Point, Pose
+from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
@@ -73,8 +74,23 @@ class OutOfPlay(StrategyBase):
         cmds: list[RobotCommand] = reset_all_imu(target_bot_set)
         self.send_cmds += cmds
 
+    def reset_flag(self) -> None:
+        """reset_flag"""
+        self.__move_to_ball = False
+        self.__is_arrived = False
+        self.__is_fin = False
+        self.__wait_counter = 0
+
     def placement_our(self) -> None:
         """placement_our"""
+
+        if self.observer.is_team_yellow is False:
+            if self.observer.referee.pre_one_command != REF_COMMAND.BALL_PLACEMENT_BLUE:  # BALL_PLACEMENT_BLUE
+                self.reset_flag()
+        else:
+            if self.observer.referee.pre_one_command != REF_COMMAND.BALL_PLACEMENT_YELLOW:  # BALL_PLACEMENT_YELLOW
+                self.reset_flag()
+
         self.__logger.debug("Placement...")
 
         self.send_cmds = []  # リスト初期化
@@ -94,12 +110,12 @@ class OutOfPlay(StrategyBase):
                 if self.__move_to_ball:
                     target_pose = Pose(self.observer.ball.x, self.observer.ball.y, 0)
 
-                cmd = self.controls.pid(target_pose, bot, 0.5)
+                cmd = self.controls.pid(target_pose, bot, 0.2)
                 cmd.dribble_pow = float(1)
 
                 if bot.is_ball_catched:
                     target_pose = Pose(point.x, point.y, 0)
-                    cmd = self.controls.pid(target_pose, bot, 0.3)
+                    cmd = self.controls.pid(target_pose, bot, 0.15)
                     cmd.dribble_pow = float(1)
 
                     if MU.distance(target_pose, bot) < 10:
@@ -207,25 +223,24 @@ class OutOfPlay(StrategyBase):
                 cmd = self.controls.speed_limiter(cmd)
                 self.send_cmds += [cmd]
 
-    def penalty_kick(self, is_our: bool = False) -> None:
-        """penalty_kick"""
+    def penalty_position(self, *, is_our: bool) -> None:
+        """prep_penalty_kick"""
 
         self.send_cmds = []
-        ignore_robot_id: int = self.role.keeper_id
-        revers: float = 1
-        if is_our:
-            revers = -1
-            ignore_robot_id = self.__subrole.our_attacker_id
+        ignore_robot_id: int = self.__subrole.our_attacker_id if is_our else self.role.keeper_id
+        revers: float = -self.__attack_direction
 
         for bot in self.observer.our_robots_available:
-            if bot.robot_id != ignore_robot_id:
-                target_pose = Pose(
-                    self.observer.geometry.field_length / 2 * self.__attack_direction * revers,
-                    bot.y,
-                    0,
-                )
-                cmd: RobotCommand = self.controls.pid(target_pose, bot)
-                cmd = self.controls.avoid_ball(cmd, bot, target_pose)
-                cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
-                cmd = self.controls.speed_limiter(cmd)
-                self.send_cmds += [cmd]
+            if bot.robot_id == ignore_robot_id:
+                continue
+
+            target_pose = Pose(
+                self.observer.geometry.field_length / 2 * self.__attack_direction * revers,
+                bot.y,
+                0,
+            )
+            cmd: RobotCommand = self.controls.pid(target_pose, bot)
+            cmd = self.controls.avoid_ball(cmd, bot, target_pose)
+            cmd = self.controls.avoid_enemy(cmd, bot, target_pose)
+            cmd = self.controls.speed_limiter(cmd)
+            self.send_cmds += [cmd]

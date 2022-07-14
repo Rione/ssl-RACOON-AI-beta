@@ -83,14 +83,6 @@ class Role:
         """defense_id_list"""
         return self.__defense_quantity
 
-    def get_offense_id(self, offense_id: int) -> int:
-        """get_offense_id"""
-        return self.__offense[offense_id]
-
-    def get_defense_id(self, defense_id: int) -> int:
-        """get_defense_id"""
-        return self.__defense[defense_id]
-
     def main(self) -> None:
         """main"""
         self.__decide_quantity()

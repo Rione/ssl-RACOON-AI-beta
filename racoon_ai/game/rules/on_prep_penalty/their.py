@@ -26,7 +26,7 @@ def on_prep_penalty_their_cbf(logger: Logger, strategies: Strategy) -> list[Robo
     """
     strategies.keeper.to_goal_position()
 
-    strategies.out_of_play.penalty_kick()
+    strategies.out_of_play.penalty_position(is_our=False)
 
     send_cmds: list[RobotCommand] = []
     send_cmds += strategies.keeper.send_cmds
