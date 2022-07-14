@@ -114,8 +114,10 @@ class Game:  # pylint: disable=R0903
 
         if self.__use_test_rule and self.__is_show_gui:
             cmd = self.__gui.get_command()
-            self.__observer.referee._Referee__placement_designated_point = self.__gui.get_placement()
-        
+            self.__observer.referee._Referee__placement_designated_point = (  # type: ignore  # pylint: disable=W0212
+                self.__gui.get_placement()
+            )
+
         self.__logger.debug("Current referee command: %s", self.__observer.referee.command_str)
 
         if cmd is REF_COMMAND.HALT:
@@ -236,6 +238,7 @@ class Game:  # pylint: disable=R0903
             return (on_placement_their_cbf, self.__strategy)
 
         self.__is_inplay = False
+        self.__strategy.out_of_play.reset_flag()
         return (on_stop_cbf, self.__strategy)
 
     def __is_ball_moved(self, distance: float = 15e2) -> bool:
