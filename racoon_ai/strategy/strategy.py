@@ -27,6 +27,8 @@ class Strategy:
         self.__logger: Logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
 
+        # self.__stop_count: int = int(-1)
+
         self.__controls: Controls = controls
 
         self.__subrole: SubRole = SubRole(observer, role)
@@ -36,8 +38,10 @@ class Strategy:
         self.__keeper: Keeper = Keeper(observer, role, controls)
 
         self.__offense: Offense = Offense(observer, role, self.__subrole, self.__controls)
+        # self.__offense: Offense = Offense(observer, role, self.__subrole, self.__controls, self.__stop_count)
 
         self.__out_of_play: OutOfPlay = OutOfPlay(observer, role, self.__subrole, self.__controls)
+        # self.__out_of_play: OutOfPlay = OutOfPlay(observer, role, self.__subrole, self.__controls, self.__stop_count)
 
     @property
     def defense(self) -> Defense:
@@ -58,6 +62,11 @@ class Strategy:
     def out_of_play(self) -> OutOfPlay:
         """out_of_play"""
         return self.__out_of_play
+
+    # def stop_countup(self) -> None:
+    #     """stop_count"""
+    #     print(self.__stop_count)
+    #     self.__stop_count += 1
 
     def update_subrole(self) -> None:
         """update_subrole"""

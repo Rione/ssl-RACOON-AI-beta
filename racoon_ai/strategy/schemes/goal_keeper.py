@@ -66,7 +66,7 @@ class Keeper(StrategyBase):
             radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
         target_pose = Pose(
             (self.__goal.x + self.__radius * cos(radian_ball_goal) * self.__attack_direction),
-            (self.__goal.y + self.__radius * sin(radian_ball_goal) * self.__attack_direction),
+            (self.__goal.y + self.__radius * sin(radian_ball_goal) * self.__attack_direction) * 1.4,
             radian_ball_robot,
         )
 

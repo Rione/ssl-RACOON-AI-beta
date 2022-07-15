@@ -46,6 +46,7 @@ class Offense(StrategyBase):
         # self.__goal: Point = self.observer.geometry.goal
         # self.__their_goal: Point = self.observer.geometry.their_goal
         self.__attack_direction: float = self.observer.attack_direction
+        # self.__stop_count: int = stop_count
 
     def main(self, is_indirect: bool = False) -> None:
         """main"""
@@ -153,6 +154,7 @@ class Offense(StrategyBase):
         # commandの情報を格納するリスト
         self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
+            # if 10 < self.__stop_count:
             cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot, 500)
             cmd = self.controls.avoid_penalty_area(cmd, bot)
             cmd = self.controls.speed_limiter(cmd, 0.3)
@@ -168,6 +170,7 @@ class Offense(StrategyBase):
                 return
 
             cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot)
+            cmd = self.controls.speed_limiter(cmd, 0.3)
             self.send_cmds += [cmd]
 
     def default_position(self) -> None:

@@ -52,6 +52,8 @@ class OutOfPlay(StrategyBase):
         self.__attack_direction: float = self.observer.attack_direction
         self.__center_circle_radius: float = self.observer.geometry.center_circle_radius
 
+        # self.__stop_count: int = stop_count  # Roop counter
+
     def reset_imu(self, without_attacker: bool = False) -> None:
         """reset_imu"""
         self.__logger.debug("Reset IMU by camera theta ...")
@@ -98,7 +100,7 @@ class OutOfPlay(StrategyBase):
 
                 cmd = self.controls.pid(target_pose, bot, 0.2)
                 # ロボットがtarget_poseに近づいたら
-                if MU.distance(target_pose, bot) < 50:
+                if MU.distance(target_pose, bot) < 60:
                     self.__move_to_ball = True
 
                 if self.__move_to_ball:
@@ -112,7 +114,7 @@ class OutOfPlay(StrategyBase):
                         self.observer.ball.y + distance_robot_point * sin(radian_ball_point),
                     )
                     cmd = self.controls.ball_around(target_pose, bot)
-                    cmd = self.controls.speed_limiter(cmd, 0.2)
+                    cmd = self.controls.speed_limiter(cmd, 0.1)
 
                 cmd.dribble_pow = float(1)
 
@@ -122,7 +124,7 @@ class OutOfPlay(StrategyBase):
                     cmd = self.controls.pid(target_pose, bot, 0.1)
                     cmd.dribble_pow = float(1)
 
-                    if MU.distance(target_pose, bot) < 50:
+                    if MU.distance(target_pose, bot) < 60:
                         target_pose = Pose(point.x, point.y, MU.radian(self.observer.ball, point))
                         cmd = self.controls.pid(target_pose, bot, 0.1)
                         self.__is_arrived = True

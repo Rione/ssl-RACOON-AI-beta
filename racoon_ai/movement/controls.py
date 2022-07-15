@@ -273,7 +273,7 @@ class Controls:
             MU.radian(target, bot),
         )
 
-        adjustment = (0.25 / MU.div_safe(abs(discrimination))) ** 2
+        adjustment = (0.15 / MU.div_safe(abs(discrimination))) ** 2
         vel_fwd += cos(bot.radian_ball_robot) * adjustment
         vel_sway += sin(bot.radian_ball_robot) * adjustment
 

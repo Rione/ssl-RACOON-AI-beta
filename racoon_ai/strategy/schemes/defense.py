@@ -212,7 +212,7 @@ class Defense(StrategyBase):
                     )
 
                 cmd = self.controls.pid(target_pose, bot)
-                # cmd = self.controls.avoid_penalty_area(cmd, bot, 100)
+                cmd = self.controls.avoid_penalty_area(cmd, bot, 30)
                 self.send_cmds += [cmd]
 
     def default_position(self) -> None:

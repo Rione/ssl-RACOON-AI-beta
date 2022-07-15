@@ -86,8 +86,8 @@ class Game:  # pylint: disable=R0903
         self.__logger.info("Starting main roop...")
         while True:
             self.__observer.main()
-            self.__role.main()
-            self.__strategy.subrole.main()
+            self.__role.update()
+            self.__strategy.update_subrole()
             self.__gui.update()
 
             args: tuple[
