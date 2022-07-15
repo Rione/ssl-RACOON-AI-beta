@@ -40,7 +40,7 @@ class Controls:
         self.__pre_bot_theta: NDArray[float64] = zeros((11,), dtype=float64)
         self.__theta_accumulation: NDArray[float64] = zeros((11,), dtype=float64)
         self.__standard_distance_enemy: float = 500**2
-        self.__standard_distance_penalty: float = 350**2
+        # self.__standard_distance_penalty: float = 350**2
         # self.__max_robot_radius: float = 90
         self.__attack_direction: float = self.__observer.attack_direction
 
@@ -191,9 +191,10 @@ class Controls:
             cmd.vel_sway += vel[1]
         return cmd
 
-    def avoid_penalty_area(self, cmd: RobotCommand, bot: Robot) -> RobotCommand:
+    def avoid_penalty_area(self, cmd: RobotCommand, bot: Robot, distance_penalty: float = 350) -> RobotCommand:
         """avoid_penalty_erie"""
         adjustment: float = 0
+        distance_penalty = distance_penalty**2
 
         rot_theta: NDArray[float64] = array(
             [
@@ -212,7 +213,7 @@ class Controls:
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-        adjustment = self.__standard_distance_penalty / (distance_robot_penalty**2)
+        adjustment = distance_penalty / (distance_robot_penalty**2)
         bvel_our: NDArray[float64] = array(
             [
                 adjustment * cos(theta) * self.__attack_direction,
@@ -233,7 +234,7 @@ class Controls:
             distance_robot_penalty = robot_dis - (self.__observer.geometry.goal_width / cos(theta))
         else:
             distance_robot_penalty = robot_dis - abs(self.__observer.geometry.goal_width / sin(theta))
-        adjustment = self.__standard_distance_penalty / (distance_robot_penalty**2)
+        adjustment = distance_penalty / (distance_robot_penalty**2)
         bvel_their: NDArray[float64] = array(
             [
                 adjustment * -1 * cos(theta) * self.__attack_direction,
