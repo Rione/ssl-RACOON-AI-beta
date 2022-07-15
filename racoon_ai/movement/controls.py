@@ -194,7 +194,7 @@ class Controls:
     def avoid_penalty_area(self, cmd: RobotCommand, bot: Robot, distance_penalty: float = 350) -> RobotCommand:
         """avoid_penalty_erie"""
         adjustment: float = 0
-        distance_penalty = distance_penalty ** 2
+        distance_penalty = distance_penalty**2
 
         rot_theta: NDArray[float64] = array(
             [
