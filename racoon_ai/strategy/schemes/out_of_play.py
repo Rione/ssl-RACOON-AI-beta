@@ -10,9 +10,8 @@ from logging import getLogger
 from math import cos, sin
 from typing import Optional
 
-from racoon_ai.common.math_utils import MathUtils as MU
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Point, Pose
-from racoon_ai.models.referee import REF_COMMAND
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls, reset_all_imu
 from racoon_ai.observer import Observer
@@ -83,14 +82,6 @@ class OutOfPlay(StrategyBase):
 
     def placement_our(self) -> None:
         """placement_our"""
-
-        if self.observer.is_team_yellow is False:
-            if self.observer.referee.pre_one_command != REF_COMMAND.BALL_PLACEMENT_BLUE:  # BALL_PLACEMENT_BLUE
-                self.reset_flag()
-        else:
-            if self.observer.referee.pre_one_command != REF_COMMAND.BALL_PLACEMENT_YELLOW:  # BALL_PLACEMENT_YELLOW
-                self.reset_flag()
-
         self.__logger.debug("Placement...")
 
         self.send_cmds = []  # リスト初期化
@@ -99,46 +90,62 @@ class OutOfPlay(StrategyBase):
         # find nearest to ball robot
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             if point := self.observer.referee.placement_designated_point:
-
                 # 2点間の中心座標を算出
-                target_pose = Pose((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2, 0)
+                radian_ball_robot: float = MU.radian(self.observer.ball, bot)
+                target_pose: Pose = Pose(
+                    (point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2, radian_ball_robot
+                )
 
+                cmd = self.controls.pid(target_pose, bot, 0.2)
                 # ロボットがtarget_poseに近づいたら
-                if MU.distance(target_pose, bot) < 10:
+                if MU.distance(target_pose, bot) < 50:
                     self.__move_to_ball = True
 
                 if self.__move_to_ball:
-                    target_pose = Pose(self.observer.ball.x, self.observer.ball.y, 0)
+                    self.__logger.info("Move to ball...")
+                    # target_pose = Pose(self.observer.ball.x, self.observer.ball.y, bot.radian_ball_robot + bot.theta)
+                    # cmd = self.controls.pid(target_pose, bot, 0.1)
+                    radian_ball_point: float = MU.radian(self.observer.ball, point)
+                    distance_robot_point: float = MU.distance(self.observer.ball, point)
+                    target_pose = Pose(
+                        self.observer.ball.x + distance_robot_point * cos(radian_ball_point),
+                        self.observer.ball.y + distance_robot_point * sin(radian_ball_point),
+                    )
+                    cmd = self.controls.ball_around(target_pose, bot)
+                    cmd = self.controls.speed_limiter(cmd, 0.2)
 
-                cmd = self.controls.pid(target_pose, bot, 0.2)
                 cmd.dribble_pow = float(1)
 
                 if bot.is_ball_catched:
-                    target_pose = Pose(point.x, point.y, 0)
-                    cmd = self.controls.pid(target_pose, bot, 0.15)
+                    self.__logger.info("Catch ball...")
+                    target_pose = Pose(point.x, point.y, MU.radian(self.observer.ball, point))
+                    cmd = self.controls.pid(target_pose, bot, 0.1)
                     cmd.dribble_pow = float(1)
 
-                    if MU.distance(target_pose, bot) < 10:
+                    if MU.distance(target_pose, bot) < 50:
+                        target_pose = Pose(point.x, point.y, MU.radian(self.observer.ball, point))
+                        cmd = self.controls.pid(target_pose, bot, 0.1)
                         self.__is_arrived = True
                         self.__logger.info("Arrived")
 
                 if self.__is_arrived:
-                    target_pose = Pose(point.x - 125 * cos(bot.theta), point.y - 125 * sin(bot.theta), 0)
-                    cmd = self.controls.pid(target_pose, bot)
-                    cmd.dribble_pow = True
-
-                    if MU.distance(target_pose, bot) < 10:
-                        self.__wait_counter += 1
-                        cmd.dribble_pow = False
-                        if self.__wait_counter > 100:
-                            self.__is_fin = True
+                    target_pose = Pose(bot.x, bot.y, MU.radian(self.observer.ball, point))
+                    self.__wait_counter += 1
+                    cmd.dribble_pow = False
+                    cmd = RobotCommand(255)
+                    if self.__wait_counter > 100:
+                        self.__is_fin = True
 
                 if self.__is_fin:
-                    target_pose = Pose(point.x - 300 * cos(bot.theta), point.y - 300 * sin(bot.theta), 0)
-                    cmd = self.controls.pid(target_pose, bot)
+                    target_pose = Pose(
+                        point.x - 300 * cos(bot.theta),
+                        point.y - 300 * sin(bot.theta),
+                        MU.radian(self.observer.ball, point),
+                    )
+                    cmd = self.controls.pid(target_pose, bot, 0.2)
                     cmd.dribble_pow = False
 
-                cmd.vel_angular = bot.radian_ball_robot
+                cmd.vel_angular = bot.radian_ball_robot + bot.theta
                 self.send_cmds += [cmd]
 
     def placement_their(self) -> None:
@@ -147,21 +154,22 @@ class OutOfPlay(StrategyBase):
 
         self.send_cmds = []  # リスト初期化
         bot: Optional[Robot]
-        point: Optional[Point] = self.observer.referee.placement_designated_point
+        point: Optional[Point]
 
         # find nearest to ball robot
-
-        if point:
+        if point := self.observer.referee.placement_designated_point:
             for bot in self.observer.our_robots_available:
-                if bot.robot_id != self.role.keeper_id:
-                    base_point = Point((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2)
-                    avoid_distance = MU.distance(self.observer.ball, base_point) + 1000
-                    cmd: RobotCommand = self.controls.make_command(bot)
-                    cmd = self.controls.avoid_point(cmd, bot, base_point, avoid_distance)
-                    cmd = self.controls.avoid_ball(cmd, bot, base_point)
-                    cmd = self.controls.avoid_enemy(cmd, bot, base_point)
-                    cmd = self.controls.speed_limiter(cmd)
-                    self.send_cmds += [cmd]
+                if bot.robot_id == self.role.keeper_id:
+                    continue
+
+                base_point = Point((point.x + self.observer.ball.x) / 2, (point.y + self.observer.ball.y) / 2)
+                avoid_distance = MU.distance(self.observer.ball, base_point) + 1000
+                cmd: RobotCommand = self.controls.make_command(bot)
+                cmd = self.controls.avoid_point(cmd, bot, base_point, avoid_distance)
+                cmd = self.controls.avoid_ball(cmd, bot, base_point)
+                cmd = self.controls.avoid_enemy(cmd, bot, base_point)
+                cmd = self.controls.speed_limiter(cmd)
+                self.send_cmds += [cmd]
 
     def time_out(self) -> list[RobotCommand]:
         """placement_our"""
@@ -228,7 +236,7 @@ class OutOfPlay(StrategyBase):
 
         self.send_cmds = []
         ignore_robot_id: int = self.__subrole.our_attacker_id if is_our else self.role.keeper_id
-        revers: float = -self.__attack_direction
+        revers: int = -1 if is_our else 1
 
         for bot in self.observer.our_robots_available:
             if bot.robot_id == ignore_robot_id:

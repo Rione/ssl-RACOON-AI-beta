@@ -20,8 +20,6 @@ from racoon_ai.observer import Observer
 from ..role import Role, SubRole
 from .base import StrategyBase
 
-# from typing import Optional
-
 
 class Defense(StrategyBase):
     """Defense(StrategyBase)
@@ -42,7 +40,7 @@ class Defense(StrategyBase):
         self.__logger = getLogger(__name__)
         self.__logger.debug("Initializing...")
         self.__subrole: SubRole = subrole
-        self.__enemy_offense: list[int] = []
+        self.__enemy_offense: list[int] = []  # pylint: disable=W0238
         self.__defense_quantity: int = 0
         self.__max_robot_radius: float = 90
         self.__diff_defense_enemy_quantity: int = 0
@@ -119,9 +117,9 @@ class Defense(StrategyBase):
             enemy_offense.sort(reverse=False, key=lambda x: x[1])
             del enemy_offense[defense_quantity:]
             enemy_offense.sort(reverse=True, key=lambda x: x[2])
-        self.__enemy_offense = list(row[0] for row in enemy_offense)
+        self.__enemy_offense = list(row[0] for row in enemy_offense)  # pylint: disable=W0238
 
-    def __keep_penalty_area(self, robot: Robot, enemy: Robot) -> RobotCommand:
+    def __keep_penalty_area(self, robot: Robot, enemy: Robot) -> RobotCommand:  # pylint: disable=W0238
         """keep_penalty_area"""
         radian_enemy_goal = (
             MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))

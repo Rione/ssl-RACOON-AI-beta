@@ -70,7 +70,7 @@ class Keeper(StrategyBase):
             radian_ball_robot,
         )
 
-        return self.controls.pid(target_pose, robot)
+        return self.controls.pid(target_pose, robot, 0.6)
 
     def to_goal_position(self) -> None:
         """to_goal_position"""

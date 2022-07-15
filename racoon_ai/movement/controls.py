@@ -44,7 +44,7 @@ class Controls:
         # self.__max_robot_radius: float = 90
         self.__attack_direction: float = self.__observer.attack_direction
 
-    def pid(self, target: Pose, bot: Robot, limiter: float = 0.28) -> RobotCommand:  # pylint: disable=R0914
+    def pid(self, target: Pose, bot: Robot, limiter: float = 0.3) -> RobotCommand:  # pylint: disable=R0914
         """pid
 
         Apply PID control to the robot to reach the target pose.
@@ -136,7 +136,7 @@ class Controls:
         return vel_angular
 
     @staticmethod
-    def speed_limiter(cmd: RobotCommand, limiter: float = 0.20) -> RobotCommand:
+    def speed_limiter(cmd: RobotCommand, limiter: float = 0.3) -> RobotCommand:
         """speed_limiter"""
         if limiter <= 0:
             return cmd
@@ -263,7 +263,7 @@ class Controls:
         )
         radian_around -= (sin(discrimination) * MU.PI) / 2
         radian_around -= bot.theta
-        adjustment = 280**2 / MU.div_safe(bot.distance_ball_robot**2)
+        adjustment = (220 / MU.div_safe(bot.distance_ball_robot)) / (0.5 / MU.div_safe(abs(discrimination)))
 
         vel_fwd += cos(radian_around) * adjustment
         vel_sway += sin(radian_around) * adjustment
@@ -273,7 +273,7 @@ class Controls:
             MU.radian(target, bot),
         )
 
-        adjustment = (0.3 / MU.div_safe(abs(discrimination))) ** 2
+        adjustment = (0.25 / MU.div_safe(abs(discrimination))) ** 2
         vel_fwd += cos(bot.radian_ball_robot) * adjustment
         vel_sway += sin(bot.radian_ball_robot) * adjustment
 
@@ -343,10 +343,9 @@ class Controls:
             self.__observer.ball.y - leave_distance * sin(radian_point_ball),
             radian_point_ball,
         )
-        cmd = self.pid(target_pose, bot)
+        cmd = self.pid(target_pose, bot, 0.7)
         cmd = self.avoid_ball(cmd, bot, target_pose, leave_distance * 1.2)
         cmd = self.avoid_enemy(cmd, bot, target_pose)
-        cmd = self.speed_limiter(cmd)
         return cmd
 
     @staticmethod

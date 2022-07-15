@@ -150,7 +150,10 @@ class Referee:
                 proto.ball_placement_x,
                 proto.ball_placement_y,
             )
-            if (proto.command is (REF_COMMAND.BALL_PLACEMENT_BLUE or REF_COMMAND.BALL_PLACEMENT_YELLOW))
+            if (
+                (proto.command is REF_COMMAND.BALL_PLACEMENT_BLUE)
+                or (proto.command is REF_COMMAND.BALL_PLACEMENT_YELLOW)
+            )
             else None
         )
 
