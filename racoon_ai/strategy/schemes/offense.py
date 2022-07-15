@@ -12,7 +12,7 @@ from typing import Optional
 
 from numpy import sign
 
-from racoon_ai.common.math_utils import MathUtils as MU
+from racoon_ai.common import MathUtils as MU
 from racoon_ai.models.coordinate import Point, Pose
 from racoon_ai.models.robot import Robot, RobotCommand
 from racoon_ai.movement import Controls

@@ -83,7 +83,7 @@ class Role:
         """defense_id_list"""
         return self.__defense_quantity
 
-    def main(self) -> None:
+    def update(self) -> None:
         """main"""
         self.__decide_quantity()
         self.__decide_defense()

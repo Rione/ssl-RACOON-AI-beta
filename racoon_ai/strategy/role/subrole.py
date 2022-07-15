@@ -55,13 +55,13 @@ class SubRole:
         Returns:
             None
         """
-        self.decide_our_attacker()
-        self.decide_enemy_attacker()
-        self.decide_receiver()
+        self.__decide_our_attacker()
+        self.__decide_enemy_attacker()
+        self.__decide_receiver()
         self.__logger.debug(self.__our_attacker)
         self.__logger.debug(self.__receiver)
 
-    def decide_our_attacker(self) -> None:
+    def __decide_our_attacker(self) -> None:
         """decide_our_attacker
         Returns:
            None
@@ -81,7 +81,7 @@ class SubRole:
             attacker.sort(reverse=False, key=lambda x: x[1])
             self.__our_attacker = int(attacker[0][0])
 
-    def decide_enemy_attacker(self) -> None:
+    def __decide_enemy_attacker(self) -> None:
         """decide_their_attacker
         Returns:
            None
@@ -99,7 +99,7 @@ class SubRole:
             attacker.sort(reverse=False, key=lambda x: x[1])
             self.__enemy_attacker = int(attacker[0][0])
 
-    def decide_receiver(self) -> None:
+    def __decide_receiver(self) -> None:
         """decide_receiver
         Return:
           None

@@ -45,7 +45,7 @@ class OutOfPlay(StrategyBase):
         self.__is_arrived: bool = False
         self.__is_fin: bool = False
         self.__wait_counter: int = 0
-        self.__maintenance_point: float = 1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
+        self.__maintenance_point: float = -1  # Time out position (1: Plus in Y axis, -1: Minus in Y axis)
 
         self.__goal: Point = self.observer.geometry.goal
         self.__their_goal: Point = self.observer.geometry.their_goal
@@ -147,6 +147,9 @@ class OutOfPlay(StrategyBase):
 
                 cmd.vel_angular = bot.radian_ball_robot + bot.theta
                 self.send_cmds += [cmd]
+                return
+
+            self.__logger.error("No designated point registered ...")
 
     def placement_their(self) -> None:
         """placement_their"""

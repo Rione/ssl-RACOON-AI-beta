@@ -40,11 +40,6 @@ class Strategy:
         self.__out_of_play: OutOfPlay = OutOfPlay(observer, role, self.__subrole, self.__controls)
 
     @property
-    def subrole(self) -> SubRole:
-        """subrole"""
-        return self.__subrole
-
-    @property
     def defense(self) -> Defense:
         """defense"""
         return self.__defense
@@ -63,3 +58,7 @@ class Strategy:
     def out_of_play(self) -> OutOfPlay:
         """out_of_play"""
         return self.__out_of_play
+
+    def update_subrole(self) -> None:
+        """update_subrole"""
+        self.__subrole.main()
