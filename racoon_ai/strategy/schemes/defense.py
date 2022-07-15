@@ -80,7 +80,7 @@ class Defense(StrategyBase):
         #             cmd = self.__keep_penalty_area(bot, ene)
         #             self.send_cmds += [cmd]
 
-        self.__keep_penalty_area_from_attacker()
+        self.__keep_penalty_area_from_ball()
 
     def __enemy_offense_decide(self) -> None:
         """enemy_offense_decide"""
@@ -165,55 +165,55 @@ class Defense(StrategyBase):
 
         return self.controls.pid(target_pose, robot)
 
-    def __keep_penalty_area_from_attacker(self) -> None:
-        """keep_penalty_areafrom_attacker"""
+    def __keep_penalty_area_from_ball(self) -> None:
+        """keep_penalty_areafrom_ball"""
 
-        if enemy := self.observer.get_enemy_by_id(self.__subrole.enemy_attacker_id):
-            for i, bot_id in enumerate(self.role.defense_id_list):
-                if bot := self.observer.get_our_by_id(bot_id):
-                    radian_enemy_goal = (
-                        MU.radian_reduce(MU.radian(enemy, self.__goal), MU.radian(self.__their_goal, self.__goal))
-                        * self.__attack_direction
+        for i, bot_id in enumerate(self.role.defense_id_list):
+            if bot := self.observer.get_our_by_id(bot_id):
+                radian_ball_goal = (
+                    MU.radian_reduce(
+                        MU.radian(self.observer.ball, self.__goal), MU.radian(self.__their_goal, self.__goal)
                     )
-                    radian_enemy_robot = MU.radian(enemy, bot)
+                    * self.__attack_direction
+                )
+                radian_enemy_robot = MU.radian(self.observer.ball, bot)
 
-                    if abs(radian_enemy_goal) >= MU.PI / 2:
-                        radian_enemy_goal = (sign(radian_enemy_goal) * MU.PI) / 2
+                if abs(radian_ball_goal) >= MU.PI / 2:
+                    radian_ball_goal = (sign(radian_ball_goal) * MU.PI) / 2
 
-                    if abs(radian_enemy_goal) < MU.PI / 4:
-                        target_pose = Pose(
-                            (
-                                self.__goal.x
-                                + (self.observer.geometry.goal_width + self.__max_robot_radius)
-                                * self.__attack_direction
-                            ),
-                            ((self.observer.geometry.goal_width + self.__max_robot_radius) * tan(radian_enemy_goal)),
-                            radian_enemy_robot,
-                        )
+                if abs(radian_ball_goal) < MU.PI / 4:
+                    target_pose = Pose(
+                        (
+                            self.__goal.x
+                            + (self.observer.geometry.goal_width + self.__max_robot_radius) * self.__attack_direction
+                        ),
+                        ((self.observer.geometry.goal_width + self.__max_robot_radius) * tan(radian_ball_goal)),
+                        radian_enemy_robot,
+                    )
 
-                    else:
-                        target_pose = Pose(
-                            (
-                                self.__goal.x
-                                + (self.__goal.y + self.observer.geometry.goal_width + self.__max_robot_radius)
-                                / tan(radian_enemy_goal)
-                                * sign(radian_enemy_goal)
-                                * self.__attack_direction
-                            ),
-                            (self.__goal.y + (self.observer.geometry.goal_width + self.__max_robot_radius))
-                            * sign(radian_enemy_goal),
-                            radian_enemy_robot,
-                        )
-                    if abs(radian_enemy_goal) < MU.PI / 4:
-                        target_pose.y += self.__max_robot_radius * (self.__defense_quantity - i * 2)
-                    else:
-                        target_pose.x += (self.__max_robot_radius * (self.__defense_quantity - i * 2)) * sign(
-                            radian_enemy_goal
-                        )
+                else:
+                    target_pose = Pose(
+                        (
+                            self.__goal.x
+                            + (self.__goal.y + self.observer.geometry.goal_width + self.__max_robot_radius)
+                            / tan(radian_ball_goal)
+                            * sign(radian_ball_goal)
+                            * self.__attack_direction
+                        ),
+                        (self.__goal.y + (self.observer.geometry.goal_width + self.__max_robot_radius))
+                        * sign(radian_ball_goal),
+                        radian_enemy_robot,
+                    )
+                if abs(radian_ball_goal) < MU.PI / 4:
+                    target_pose.y += self.__max_robot_radius * (self.__defense_quantity - i * 2)
+                else:
+                    target_pose.x += (self.__max_robot_radius * (self.__defense_quantity - i * 2)) * sign(
+                        radian_ball_goal
+                    )
 
-                    cmd = self.controls.pid(target_pose, bot)
-                    # cmd = self.controls.avoid_penalty_area(cmd, bot, 100)
-                    self.send_cmds += [cmd]
+                cmd = self.controls.pid(target_pose, bot)
+                # cmd = self.controls.avoid_penalty_area(cmd, bot, 100)
+                self.send_cmds += [cmd]
 
     def default_position(self) -> None:
         """keep_penalty_area"""
