@@ -11,6 +11,8 @@ from logging import Logger
 from racoon_ai.models.robot import RobotCommand
 from racoon_ai.strategy import Strategy
 
+from .on_placement import on_placement_their_cbf
+
 
 def on_stop_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     """on_halt_cbf
@@ -30,12 +32,13 @@ def on_stop_cbf(logger: Logger, strategy: Strategy) -> list[RobotCommand]:
     strategy.out_of_play.reset_imu(without_attacker=True)
 
     # strategy.offense.stop_offense()
-    strategy.offense.stop_attacker()
+    # strategy.offense.stop_attacker()
 
     send_cmds: list[RobotCommand] = []
     # send_cmds += strategy.defense.send_cmds
     # send_cmds += strategy.keeper.send_cmds
-    send_cmds += strategy.offense.send_cmds
+    # send_cmds += strategy.offense.send_cmds
     send_cmds += strategy.out_of_play.send_cmds
+    send_cmds += on_placement_their_cbf(logger, strategy)
     logger.debug(send_cmds)
     return send_cmds

@@ -155,9 +155,9 @@ class Offense(StrategyBase):
         self.send_cmds = []
         if bot := self.observer.get_our_by_id(self.__subrole.our_attacker_id):
             # if 10 < self.__stop_count:
-            cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot, 500)
+            cmd = self.controls.to_front_ball(self.observer.geometry.their_goal, bot, 700)
             cmd = self.controls.avoid_penalty_area(cmd, bot)
-            cmd = self.controls.speed_limiter(cmd, 0.3)
+            cmd = self.controls.speed_limiter(cmd, 0)
             self.send_cmds.append(cmd)
 
     def penalty_kick(self, *, is_prepare: bool) -> None:
